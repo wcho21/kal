@@ -1,3 +1,3 @@
-# kal
+# 🔪 KAL
 
-Korean-assisted language. 🔪
+Korean algorithmic language.
