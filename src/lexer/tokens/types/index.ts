@@ -1,6 +1,9 @@
 export type TokenType = Symbol;
 
 // NOTE:
+// define token type as Symbol, since the value is not important and
+// it's ok if can be compared by value (that is, not a reference type)
+//
 // give descriptive name to variables (possibly quite long though)
 // rather than cryptic one
 
