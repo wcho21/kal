@@ -1,55 +1,137 @@
-import Lexer, { types, type TokenType } from "./";
+import Lexer from "./";
+import * as Token from "./token";
+import type * as TokenType from "./token";
 
 describe("getToken()", () => {
-  describe("single tokens", () => {
-    const inputAndExpectedTokenTypes: [string, TokenType][] = [
-      ["=", types.assign],
-      ["==", types.equal],
-      ["+", types.plus],
-      ["-", types.minus],
-      ["*", types.asterisk],
-      ["/", types.slash],
-      ["!", types.bang],
-      ["!=", types.notEqual],
-      [">", types.greaterThan],
-      [">=", types.greaterThanOrEqualTo],
-      ["<", types.lessThan],
-      ["<=", types.lessThanOrEqualTo],
-      ["(", types.leftParen],
-      [")", types.rightParen],
-      ["{", types.leftBrace],
-      ["}", types.rightBrace],
-      [",", types.comma],
-      [";", types.semicolon],
-      ["함수", types.func],
-      ["변수", types.variable],
-      ["만약", types.condIf],
-      ["아니면", types.condElse],
-      ["반환", types.funcReturn],
-      ["참", types.boolTrue],
-      ["거짓", types.boolFalse],
-      ["some_identifier", types.identifier],
-      ["어떤_식별자", types.identifier],
-      ["1234567890", types.integer],
-    ];
+  describe("single token", () => {
+    describe("operators", () => {
+      const cases: { input: string, expected: TokenType.Operator }[] = [
+        { input: "+", expected: Token.operator("+") },
+        { input: "-", expected: Token.operator("-") },
+        { input: "*", expected: Token.operator("*") },
+        { input: "/", expected: Token.operator("/") },
+        { input: "=", expected: Token.operator("=") },
+      ];
 
-    it.each(inputAndExpectedTokenTypes)("get token %s", (input, expectedTokenType) => {
-      const lexer = new Lexer(input);
+      it.each(cases)("get operator token '$input'", ({ input, expected }) => {
+        const lexer = new Lexer(input);
 
-      const expectedToken = { type: expectedTokenType, value: input };
-      expect(lexer.getToken()).toEqual(expectedToken);
+        const token = lexer.getToken();
+
+        expect(token).toEqual(expected);
+      });
+    });
+
+    describe("identifiers", () => {
+      const cases: { input: string, expected: TokenType.Identifier }[] = [
+        { input: "foo", expected: Token.identifier("foo") },
+        { input: "이름", expected: Token.identifier("이름") },
+        { input: "foo이름", expected: Token.identifier("foo이름") },
+        { input: "foo123", expected: Token.identifier("foo123") },
+        { input: "이름foo", expected: Token.identifier("이름foo") },
+        { input: "_foo이름", expected: Token.identifier("_foo이름") },
+      ];
+
+      it.each(cases)("get identifier token '$input'", ({ input, expected }) => {
+        const lexer = new Lexer(input);
+
+        const token = lexer.getToken();
+
+        expect(token).toEqual(expected);
+      });
+    });
+
+    describe("literals", () => {
+      const cases: { input: string, expected: TokenType.NumberLiteral }[] = [
+        { input: "0", expected: Token.numberLiteral("0") },
+        { input: "123", expected: Token.numberLiteral("123") },
+      ];
+
+      it.each(cases)("get literal token '$input'", ({ input, expected }) => {
+        const lexer = new Lexer(input);
+
+        const token = lexer.getToken();
+
+        expect(token).toEqual(expected);
+      });
+    });
+
+    describe("illegal", () => {
+      const cases: { input: string, expected: TokenType.Illegal }[] = [
+        { input: "$", expected: Token.illegal("$") },
+      ];
+
+      it.each(cases)("get illegal token '$input'", ({ input, expected }) => {
+        const lexer = new Lexer(input);
+
+        const token = lexer.getToken();
+
+        expect(token).toEqual(expected);
+      });
+    });
+
+    describe("end", () => {
+      const cases: { input: string, expected: TokenType.End }[] = [
+        { input: "", expected: Token.end },
+      ];
+
+      it.each(cases)("get end token '$input'", ({ input, expected }) => {
+        const lexer = new Lexer(input);
+
+        const token = lexer.getToken();
+
+        expect(token).toEqual(expected);
+      });
     });
   });
 
   describe("multiple tokens", () => {
-    it("get tokens", () => {
-      const input = "= == <= >=";
+    const cases: { input: string, expectedTokens: TokenType.TokenType[] }[] = [
+      {
+        input: "12 + 34 * 5 / 67 - 89",
+        expectedTokens: [
+          Token.numberLiteral("12"),
+          Token.operator("+"),
+          Token.numberLiteral("34"),
+          Token.operator("*"),
+          Token.numberLiteral("5"),
+          Token.operator("/"),
+          Token.numberLiteral("67"),
+          Token.operator("-"),
+          Token.numberLiteral("89"),
+          Token.end,
+        ]
+      },
+      {
+        input: "_이름 = foo123",
+        expectedTokens: [
+          Token.identifier("_이름"),
+          Token.operator("="),
+          Token.identifier("foo123"),
+          Token.end,
+        ]
+      },
+    ];
+
+    it.each(cases)("get tokens from input '$input'", ({ input, expectedTokens }) => {
       const lexer = new Lexer(input);
 
-      expect(lexer.getToken()).toEqual({ type: types.assign, value: "=" });
-      expect(lexer.getToken()).toEqual({ type: types.equal, value: "==" });
-      expect(lexer.getToken()).toEqual({ type: types.lessThanOrEqualTo, value: "<=" });
-      expect(lexer.getToken()).toEqual({ type: types.greaterThanOrEqualTo, value: ">=" });
+      for (const expected of expectedTokens) {
+        const token = lexer.getToken();
+        expect(token).toEqual(expected);
+      }
+    });
+  });
+
+  describe("no token", () => {
+    it("get only end token", () => {
+      const input = "  \r\r\n\n\t\t";
+      const expected = Token.end;
+
+      const lexer = new Lexer(input);
+
+      const token = lexer.getToken();
+      expect(token).toEqual(expected);
     });
   });
 });
