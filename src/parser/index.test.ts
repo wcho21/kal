@@ -36,4 +36,18 @@ describe("parseProgram()", () => {
       right: { type: "number node", value: 9 },
     });
   });
+
+  it("parse a single identifier expression", () => {
+    const input = "x";
+    const lexer = new Lexer(input);
+    const parser = new Parser(lexer);
+
+    const node = parser.parseProgram();
+    expect(node.statements.length).toBe(1);
+
+    expect(node.statements[0]).toEqual({
+      type: "expression statement",
+      expression: { type: "identifier", value: "x" },
+    });
+  });
 });

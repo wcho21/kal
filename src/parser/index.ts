@@ -35,21 +35,21 @@ export default class Parser {
     let token: TokenType;
 
     token = this.buffer.read();
-    this.buffer.next();
+    this.buffer.next(); // eat token before throwing
     if (token.type !== "identifier") {
       throw new Error(`not identifier, but received ${token.type}`);
     }
     const identifier = SyntaxTree.identifier(token.value);
 
     token = this.buffer.read();
-    this.buffer.next();
     if (token.type !== "operator" || token.value !== "=") {
-      throw new Error(`not operator =, but received ${token.type}`);
+      return SyntaxTree.expressionStatement(identifier);
     }
+    this.buffer.next(); // eat token after branching
 
     // TODO: support more node type (currenly number literal supported)
     token = this.buffer.read();
-    this.buffer.next();
+    this.buffer.next(); // eat token before throwing
     if (token.type !== "number literal") {
       throw new Error(`not number literal, but received ${token.type}`);
     }
