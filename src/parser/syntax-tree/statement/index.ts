@@ -2,6 +2,7 @@ import type * as Expression from "../expression";
 
 export type Statement = Assignment;
 
+/** An assignment statement where the assignment operator ('=') is used */
 export interface Assignment {
   type: "assignment";
   left: Expression.Identifier;
