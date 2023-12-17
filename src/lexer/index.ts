@@ -38,7 +38,7 @@ export default class Lexer {
     }
   }
 
-  getToken() {
+  getToken(): Token.TokenType {
     this.skipWhitespaces();
 
     const char = this.buffer.peek();
