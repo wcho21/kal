@@ -1,6 +1,6 @@
 import type * as Expression from "../expression";
 
-export type Statement = Assignment;
+export type Statement = Assignment | ExpressionStatement;
 
 /** An assignment statement where the assignment operator ('=') is used */
 export interface Assignment {
