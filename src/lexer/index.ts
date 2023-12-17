@@ -72,3 +72,5 @@ export default class Lexer {
     }
   }
 }
+
+export type { TokenType } from "./token";
