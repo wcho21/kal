@@ -8,7 +8,7 @@ export interface ExpressionStatement {
   expression: Expression.Expression;
 }
 
-export const expressionStatement = (expression: ExpressionStatement["expression"]): ExpressionStatement => ({
+export const makeExpressionStatement = (expression: ExpressionStatement["expression"]): ExpressionStatement => ({
   type: "expression statement",
   expression,
 });

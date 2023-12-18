@@ -7,7 +7,7 @@ export interface Program {
   statements: Statement.Statement[];
 }
 
-export const program = (statements: Program["statements"] = []): Program => ({
+export const makeProgram = (statements: Program["statements"] = []): Program => ({
   type: "program",
   statements,
 });

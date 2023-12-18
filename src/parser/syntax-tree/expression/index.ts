@@ -16,18 +16,18 @@ export interface Assignment {
   right: Expression;
 }
 
-export const identifier = (value: Identifier["value"]): Identifier => ({
+export const makeIdentifier = (value: Identifier["value"]): Identifier => ({
   type: "identifier",
   value,
 });
 
-export const numberNode = (value: NumberNode["value"]): NumberNode => ({
+export const makeNumberNode = (value: NumberNode["value"]): NumberNode => ({
   type: "number node",
   value,
 });
 
 
-export const assignment = (left: Assignment["left"], right: Assignment["right"]): Assignment => ({
+export const makeAssignment = (left: Assignment["left"], right: Assignment["right"]): Assignment => ({
   type: "assignment",
   left,
   right,

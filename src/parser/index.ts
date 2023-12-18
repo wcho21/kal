@@ -1,9 +1,9 @@
 import {
-  program as makeProgram,
-  identifier as makeIdentifier,
-  assignment as makeAssignment,
-  numberNode,
-  expressionStatement,
+  makeProgram,
+  makeIdentifier,
+  makeAssignment,
+  makeNumberNode,
+  makeExpressionStatement,
 } from "./syntax-tree";
 import type {
   Program,
@@ -53,7 +53,7 @@ export default class Parser {
       throw new Error(`expected non-NaN number, but received '${literal}'`);
     }
 
-    return numberNode(parsedNumber);
+    return makeNumberNode(parsedNumber);
   }
 
   private parseExpressionStatement(): ExpressionStatement {
@@ -63,7 +63,7 @@ export default class Parser {
     this.buffer.next(); // eat token before throwing
     if (token.type === "number literal") {
       const numberNode = this.parseNumberLiteral(token.value);
-      return expressionStatement(numberNode);
+      return makeExpressionStatement(numberNode);
     }
     if (token.type !== "identifier") {
       throw new Error(`not identifier, but received ${token.type}`);
@@ -72,7 +72,7 @@ export default class Parser {
 
     token = this.buffer.read();
     if (token.type !== "operator" || token.value !== "=") {
-      return expressionStatement(identifier);
+      return makeExpressionStatement(identifier);
     }
     this.buffer.next(); // eat token after branching
 
@@ -85,7 +85,7 @@ export default class Parser {
     const expression = this.parseNumberLiteral(token.value);
     const assignment = makeAssignment(identifier, expression);
 
-    return expressionStatement(assignment);
+    return makeExpressionStatement(assignment);
   }
 
   private parseStatement(): Statement {
