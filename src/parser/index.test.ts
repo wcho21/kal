@@ -12,9 +12,12 @@ describe("parseProgram()", () => {
       expect(node.statements.length).toBe(1);
 
       expect(node.statements[0]).toEqual({
-        type: "assignment",
-        left: { type: "identifier", value: "x" },
-        right: { type: "number node", value: 42 },
+        type: "expression statement",
+        expression: {
+          type: "assignment",
+          left: { type: "identifier", value: "x" },
+          right: { type: "number node", value: 42 },
+        },
       });
     });
 
@@ -27,14 +30,20 @@ describe("parseProgram()", () => {
       expect(node.statements.length).toBe(2);
 
       expect(node.statements[0]).toEqual({
-        type: "assignment",
-        left: { type: "identifier", value: "x" },
-        right: { type: "number node", value: 42 },
+        type: "expression statement",
+        expression: {
+          type: "assignment",
+          left: { type: "identifier", value: "x" },
+          right: { type: "number node", value: 42 },
+        },
       });
       expect(node.statements[1]).toEqual({
-        type: "assignment",
-        left: { type: "identifier", value: "한" },
-        right: { type: "number node", value: 9 },
+        type: "expression statement",
+        expression: {
+          type: "assignment",
+          left: { type: "identifier", value: "한" },
+          right: { type: "number node", value: 9 },
+        },
       });
     });
   });

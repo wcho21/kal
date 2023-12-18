@@ -71,8 +71,9 @@ export default class Parser {
       throw new Error(`not number literal, but received ${token.type}`);
     }
     const expression = this.parseNumberLiteral(token.value);
+    const assignment = SyntaxTree.assignment(identifier, expression);
 
-    return SyntaxTree.assignment(identifier, expression);
+    return SyntaxTree.expressionStatement(assignment);
   }
 
   parseProgram(): SyntaxTree.Program {
