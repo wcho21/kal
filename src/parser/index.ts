@@ -24,13 +24,38 @@ export default class Parser {
     this.buffer = new TokenReader(lexer);
   }
 
-  private parseNumberLiteral(literal: string): NumberNode {
-    const parsedNumber = Number(literal);
-    if (Number.isNaN(parsedNumber)) {
-      throw new Error(`expected non-NaN number, but received '${literal}'`);
+  parseProgram(): Program {
+    const program = makeProgram();
+
+    while (!this.buffer.isEnd()) {
+      const statement = this.parseStatement();
+      if (statement !== null) {
+        program.statements.push(statement);
+      }
     }
 
-    return makeNumberNode(parsedNumber);
+    return program;
+  }
+
+  private parseStatement(): Statement {
+    return this.parseExpressionStatement();
+  }
+
+  private parseExpressionStatement(): ExpressionStatement {
+    const expression = this.parseExpression();
+
+    return makeExpressionStatement(expression);
+  }
+
+  private parseExpression(): Expression  {
+    const left = this.parsePrefixExpression();
+
+    const infixExpression = this.parseInfixExpression(left);
+    if (infixExpression === null) {
+      return left;
+    }
+
+    return infixExpression;
   }
 
   private parsePrefixExpression(): Expression {
@@ -79,38 +104,13 @@ export default class Parser {
     return makeAssignment(left, expression);
   }
 
-  private parseExpression(): Expression  {
-    const left = this.parsePrefixExpression();
-
-    const infixExpression = this.parseInfixExpression(left);
-    if (infixExpression === null) {
-      return left;
+  private parseNumberLiteral(literal: string): NumberNode {
+    const parsedNumber = Number(literal);
+    if (Number.isNaN(parsedNumber)) {
+      throw new Error(`expected non-NaN number, but received '${literal}'`);
     }
 
-    return infixExpression;
-  }
-
-  private parseExpressionStatement(): ExpressionStatement {
-    const expression = this.parseExpression();
-
-    return makeExpressionStatement(expression);
-  }
-
-  private parseStatement(): Statement {
-    return this.parseExpressionStatement();
-  }
-
-  parseProgram(): Program {
-    const program = makeProgram();
-
-    while (!this.buffer.isEnd()) {
-      const statement = this.parseStatement();
-      if (statement !== null) {
-        program.statements.push(statement);
-      }
-    }
-
-    return program;
+    return makeNumberNode(parsedNumber);
   }
 }
 
