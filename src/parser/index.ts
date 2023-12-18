@@ -15,35 +15,13 @@ import type {
   PrefixExpression,
 } from "./syntax-tree";
 import Lexer from "../lexer";
-import type { TokenType } from "../lexer";
-
-class TokenBuffer {
-  private readonly lexer: Lexer;
-  private token: TokenType;
-
-  constructor(lexer: Lexer) {
-    this.lexer = lexer;
-    this.token = lexer.getToken();
-  }
-
-  isEnd(): boolean {
-    return this.token.type === "end";
-  }
-
-  read(): TokenType {
-    return this.token;
-  }
-
-  next(): void {
-    this.token = this.lexer.getToken();
-  }
-}
+import TokenReader from "./token-reader";
 
 export default class Parser {
-  private buffer: TokenBuffer;
+  private buffer: TokenReader;
 
   constructor(lexer: Lexer) {
-    this.buffer = new TokenBuffer(lexer);
+    this.buffer = new TokenReader(lexer);
   }
 
   private parseNumberLiteral(literal: string): NumberNode {
