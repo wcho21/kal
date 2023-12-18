@@ -1,10 +1,22 @@
-import * as SyntaxTree from "./syntax-tree";
-import type * as SyntaxTreeType from "./syntax-tree";
+import {
+  program as makeProgram,
+  identifier as makeIdentifier,
+  assignment as makeAssignment,
+  numberNode,
+  expressionStatement,
+} from "./syntax-tree";
+import type {
+  Program,
+  Statement,
+  NumberNode,
+  ExpressionStatement,
+  Expression,
+} from "./syntax-tree";
 import Lexer from "../lexer";
 import type { TokenType } from "../lexer";
 
-type PrefixParser = () => SyntaxTreeType.Expression;
-type InfixParser = (left: SyntaxTreeType.Expression) => SyntaxTreeType.Expression;
+type PrefixParser = () => Expression;
+type InfixParser = (left: Expression) => Expression;
 
 class TokenBuffer {
   private readonly lexer: Lexer;
@@ -35,32 +47,32 @@ export default class Parser {
     this.buffer = new TokenBuffer(lexer);
   }
 
-  private parseNumberLiteral(literal: string): SyntaxTree.NumberNode {
+  private parseNumberLiteral(literal: string): NumberNode {
     const parsedNumber = Number(literal);
     if (Number.isNaN(parsedNumber)) {
       throw new Error(`expected non-NaN number, but received '${literal}'`);
     }
 
-    return SyntaxTree.numberNode(parsedNumber);
+    return numberNode(parsedNumber);
   }
 
-  private parseExpressionStatement(): SyntaxTree.ExpressionStatement {
+  private parseExpressionStatement(): ExpressionStatement {
     let token: TokenType;
 
     token = this.buffer.read();
     this.buffer.next(); // eat token before throwing
     if (token.type === "number literal") {
       const numberNode = this.parseNumberLiteral(token.value);
-      return SyntaxTree.expressionStatement(numberNode);
+      return expressionStatement(numberNode);
     }
     if (token.type !== "identifier") {
       throw new Error(`not identifier, but received ${token.type}`);
     }
-    const identifier = SyntaxTree.identifier(token.value);
+    const identifier = makeIdentifier(token.value);
 
     token = this.buffer.read();
     if (token.type !== "operator" || token.value !== "=") {
-      return SyntaxTree.expressionStatement(identifier);
+      return expressionStatement(identifier);
     }
     this.buffer.next(); // eat token after branching
 
@@ -71,17 +83,17 @@ export default class Parser {
       throw new Error(`not number literal, but received ${token.type}`);
     }
     const expression = this.parseNumberLiteral(token.value);
-    const assignment = SyntaxTree.assignment(identifier, expression);
+    const assignment = makeAssignment(identifier, expression);
 
-    return SyntaxTree.expressionStatement(assignment);
+    return expressionStatement(assignment);
   }
 
-  private parseStatement(): SyntaxTree.Statement {
+  private parseStatement(): Statement {
     return this.parseExpressionStatement();
   }
 
-  parseProgram(): SyntaxTree.Program {
-    const program = SyntaxTree.program();
+  parseProgram(): Program {
+    const program = makeProgram();
 
     while (!this.buffer.isEnd()) {
       const statement = this.parseStatement();
