@@ -44,7 +44,7 @@ export default class Parser {
     return SyntaxTree.numberNode(parsedNumber);
   }
 
-  private parseStatement(): SyntaxTree.Statement {
+  private parseExpressionStatement(): SyntaxTree.ExpressionStatement {
     let token: TokenType;
 
     token = this.buffer.read();
@@ -74,6 +74,10 @@ export default class Parser {
     const assignment = SyntaxTree.assignment(identifier, expression);
 
     return SyntaxTree.expressionStatement(assignment);
+  }
+
+  private parseStatement(): SyntaxTree.Statement {
+    return this.parseExpressionStatement();
   }
 
   parseProgram(): SyntaxTree.Program {
