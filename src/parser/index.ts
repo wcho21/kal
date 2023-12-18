@@ -56,25 +56,30 @@ export default class Parser {
     return makeNumberNode(parsedNumber);
   }
 
-  private parseExpression(): Expression  {
-    let token: TokenType;
+  private parsePrefixExpression(): Expression {
+    const token = this.buffer.read();
+    this.buffer.next(); // eat token
 
-    token = this.buffer.read();
-    this.buffer.next(); // eat token before throwing
     if (token.type === "number literal") {
       const numberNode = this.parseNumberLiteral(token.value);
       return numberNode;
     }
-    if (token.type !== "identifier") {
-      throw new Error(`not identifier, but received ${token.type}`);
-    }
-    const identifier = makeIdentifier(token.value);
-
-    token = this.buffer.read();
-    if (token.type !== "operator" || token.value !== "=") {
+    if (token.type === "identifier") {
+      const identifier = makeIdentifier(token.value);
       return identifier;
     }
-    this.buffer.next(); // eat token after branching
+
+    throw new Error(`bad token type ${token.type} for prefix expression`);
+  }
+
+  private parseExpression(): Expression  {
+    const left = this.parsePrefixExpression();
+
+    let token = this.buffer.read();
+    if (token.type !== "operator" || token.value !== "=") {
+      return left;
+    }
+    this.buffer.next(); // eat operator token after branching
 
     // TODO: support more node type (currenly number literal supported)
     token = this.buffer.read();
@@ -82,9 +87,12 @@ export default class Parser {
     if (token.type !== "number literal") {
       throw new Error(`not number literal, but received ${token.type}`);
     }
+    if (left.type !== "identifier") {
+      throw new Error(`expected identifier on left value, but received ${token.type}`);
+    }
 
     const expression = this.parseNumberLiteral(token.value);
-    return makeAssignment(identifier, expression);
+    return makeAssignment(left, expression);
   }
 
   private parseExpressionStatement(): ExpressionStatement {
