@@ -70,11 +70,7 @@ export default class Parser {
     if (token.type !== "number literal") {
       throw new Error(`not number literal, but received ${token.type}`);
     }
-    const numberParsed = Number(token.value);
-    if (Number.isNaN(numberParsed)) {
-      throw new Error(`received NaN`);
-    }
-    const expression = SyntaxTree.numberNode(numberParsed);
+    const expression = this.parseNumberLiteral(token.value);
 
     return SyntaxTree.assignment(identifier, expression);
   }
