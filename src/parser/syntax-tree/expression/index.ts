@@ -1,4 +1,4 @@
-export type Expression = Identifier | NumberNode | PrefixExpression | Assignment;
+export type Expression = Identifier | NumberNode | PrefixExpression | InfixExpression | Assignment;
 
 export interface Identifier {
   type: "identifier";
@@ -14,6 +14,13 @@ export interface PrefixExpression {
   type: "prefix expression";
   prefix: "+" | "-";
   expression: Expression;
+}
+
+export interface InfixExpression {
+  type: "infix expression";
+  infix: "+" | "-" | "*" | "/" | "=";
+  left: Expression;
+  right: Expression;
 }
 
 export interface Assignment {
@@ -36,6 +43,13 @@ export const makePrefixExpression = (prefix: PrefixExpression["prefix"], express
   type: "prefix expression",
   prefix,
   expression,
+});
+
+export const makeInfixExpression = (infix: InfixExpression["infix"], left: InfixExpression["left"], right: InfixExpression["right"]): InfixExpression => ({
+  type: "infix expression",
+  infix,
+  left,
+  right,
 });
 
 export const makeAssignment = (left: Assignment["left"], right: Assignment["right"]): Assignment => ({

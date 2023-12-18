@@ -5,6 +5,7 @@ import {
   makeNumberNode,
   makeExpressionStatement,
   makePrefixExpression,
+  makeInfixExpression,
 } from "./syntax-tree";
 import type {
   Program,
@@ -12,10 +13,34 @@ import type {
   NumberNode,
   ExpressionStatement,
   Expression,
+  Identifier,
   PrefixExpression,
 } from "./syntax-tree";
 import Lexer from "../lexer";
 import TokenReader from "./token-reader";
+
+type BindingPower = number;
+const bindingPower = {
+  lowest: 0,
+  assignment: 40,
+  summative: 50,
+  productive: 60,
+  prefix: 70,
+};
+const getBindingPower = (infix: string): BindingPower => {
+  switch (infix) {
+    case "=":
+      return bindingPower.assignment;
+    case "+":
+    case "-":
+      return bindingPower.summative;
+    case "*":
+    case "/":
+      return bindingPower.productive;
+    default:
+      return bindingPower.lowest;
+  }
+};
 
 export default class Parser {
   private buffer: TokenReader;
@@ -42,20 +67,29 @@ export default class Parser {
   }
 
   private parseExpressionStatement(): ExpressionStatement {
-    const expression = this.parseExpression();
+    const expression = this.parseExpression(bindingPower.lowest);
 
     return makeExpressionStatement(expression);
   }
 
-  private parseExpression(): Expression  {
-    const left = this.parsePrefixExpression();
+  private parseExpression(threshold: BindingPower): Expression  {
+    let expression = this.parsePrefixExpression();
 
-    const infixExpression = this.parseInfixExpression(left);
-    if (infixExpression === null) {
-      return left;
+    while (true) {
+      const nextBindingPower = getBindingPower(this.buffer.read().value);
+      if (nextBindingPower <= threshold) {
+        break;
+      }
+
+      const infixExpression = this.parseInfixExpression(expression);
+      if (infixExpression === null) {
+        break;
+      }
+
+      expression = infixExpression;
     }
 
-    return infixExpression;
+    return expression;
   }
 
   private parsePrefixExpression(): Expression {
@@ -74,7 +108,7 @@ export default class Parser {
       token.type === "operator" &&
       (token.value === "+" || token.value === "-")
     ) {
-      const subExpression = this.parseExpression();
+      const subExpression = this.parseExpression(bindingPower.prefix);
       const prefix = token.value;
       const expression = makePrefixExpression(prefix, subExpression);
       return expression;
@@ -85,23 +119,37 @@ export default class Parser {
 
   private parseInfixExpression(left: Expression): Expression | null {
     let token = this.buffer.read();
-    if (token.type !== "operator" || token.value !== "=") {
+    if (token.type !== "operator") {
       return null;
     }
-    this.buffer.next(); // eat operator token after branching
 
-    // TODO: support more node type (currenly number literal supported)
-    token = this.buffer.read();
-    this.buffer.next(); // eat token before throwing
-    if (token.type !== "number literal") {
-      throw new Error(`not number literal, but received ${token.type}`);
-    }
-    if (left.type !== "identifier") {
-      throw new Error(`expected identifier on left value, but received ${token.type}`);
-    }
+    const infix = token.value;
+    this.buffer.next(); // eat infix token
 
-    const expression = this.parseNumberLiteral(token.value);
-    return makeAssignment(left, expression);
+    if (infix === "=" && left.type === "identifier") {
+      return this.parseAssignment(left);
+    }
+    if (infix === "+" || infix === "-" || infix === "*" || infix === "/") {
+      return this.parseArithmeticInfixExpression(left, infix);
+    }
+    return null;
+  }
+
+  private parseAssignment(left: Identifier): Expression {
+    const infix = "=";
+    const infixBindingPower = getBindingPower(infix);
+
+    const right = this.parseExpression(infixBindingPower);
+
+    return makeAssignment(left, right);
+  }
+
+  private parseArithmeticInfixExpression(left: Expression, infix: "+" | "-" | "*" | "/"): Expression {
+    const infixBindingPower = getBindingPower(infix);
+
+    const right = this.parseExpression(infixBindingPower);
+
+    return makeInfixExpression(infix, left, right);
   }
 
   private parseNumberLiteral(literal: string): NumberNode {
