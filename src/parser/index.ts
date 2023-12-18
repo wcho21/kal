@@ -135,3 +135,5 @@ export default class Parser {
     return program;
   }
 }
+
+export type * from "./syntax-tree";
