@@ -56,14 +56,14 @@ export default class Parser {
     return makeNumberNode(parsedNumber);
   }
 
-  private parseExpressionStatement(): ExpressionStatement {
+  private parseExpression(): Expression  {
     let token: TokenType;
 
     token = this.buffer.read();
     this.buffer.next(); // eat token before throwing
     if (token.type === "number literal") {
       const numberNode = this.parseNumberLiteral(token.value);
-      return makeExpressionStatement(numberNode);
+      return numberNode;
     }
     if (token.type !== "identifier") {
       throw new Error(`not identifier, but received ${token.type}`);
@@ -72,7 +72,7 @@ export default class Parser {
 
     token = this.buffer.read();
     if (token.type !== "operator" || token.value !== "=") {
-      return makeExpressionStatement(identifier);
+      return identifier;
     }
     this.buffer.next(); // eat token after branching
 
@@ -82,10 +82,15 @@ export default class Parser {
     if (token.type !== "number literal") {
       throw new Error(`not number literal, but received ${token.type}`);
     }
-    const expression = this.parseNumberLiteral(token.value);
-    const assignment = makeAssignment(identifier, expression);
 
-    return makeExpressionStatement(assignment);
+    const expression = this.parseNumberLiteral(token.value);
+    return makeAssignment(identifier, expression);
+  }
+
+  private parseExpressionStatement(): ExpressionStatement {
+    const expression = this.parseExpression();
+
+    return makeExpressionStatement(expression);
   }
 
   private parseStatement(): Statement {
