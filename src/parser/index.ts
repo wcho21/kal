@@ -15,9 +15,6 @@ import type {
 import Lexer from "../lexer";
 import type { TokenType } from "../lexer";
 
-type PrefixParser = () => Expression;
-type InfixParser = (left: Expression) => Expression;
-
 class TokenBuffer {
   private readonly lexer: Lexer;
   private token: TokenType;
@@ -72,12 +69,10 @@ export default class Parser {
     throw new Error(`bad token type ${token.type} for prefix expression`);
   }
 
-  private parseExpression(): Expression  {
-    const left = this.parsePrefixExpression();
-
+  private parseInfixExpression(left: Expression): Expression | null {
     let token = this.buffer.read();
     if (token.type !== "operator" || token.value !== "=") {
-      return left;
+      return null;
     }
     this.buffer.next(); // eat operator token after branching
 
@@ -93,6 +88,17 @@ export default class Parser {
 
     const expression = this.parseNumberLiteral(token.value);
     return makeAssignment(left, expression);
+  }
+
+  private parseExpression(): Expression  {
+    const left = this.parsePrefixExpression();
+
+    const infixExpression = this.parseInfixExpression(left);
+    if (infixExpression === null) {
+      return left;
+    }
+
+    return infixExpression;
   }
 
   private parseExpressionStatement(): ExpressionStatement {
