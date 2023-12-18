@@ -22,6 +22,7 @@ export interface Illegal {
 
 export interface End {
   type: "end";
+  value: "$end";
 }
 
 export const operator = (value: Operator["value"]): Operator => ({
@@ -46,4 +47,5 @@ export const illegal = (value: Illegal["value"]): Illegal => ({
 
 export const end: End = {
   type: "end",
+  value: "$end", // unreadable character '$' used to avoid `identifer` value
 };

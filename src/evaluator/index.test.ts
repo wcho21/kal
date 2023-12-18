@@ -8,6 +8,17 @@ describe("evaluate()", () => {
     { input: "-5", expected: -5 },
     { input: "--5", expected: 5 },
     { input: "+5", expected: 5 },
+    { input: "100+25", expected: 125 },
+    { input: "100-25", expected: 75 },
+    { input: "100*25", expected: 2500 },
+    { input: "100/25", expected: 4 },
+    { input: "100+25+4", expected: 129 },
+    { input: "100+25-4", expected: 121 },
+    { input: "100+25*4", expected: 200 },
+
+    /* test case for left associativity */
+    { input: "100-25-4", expected: 71 },
+    { input: "100/25/4", expected: 1 },
   ];
 
   it.each(cases)("evaluate $input", ({ input, expected }) => {
