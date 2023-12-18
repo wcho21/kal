@@ -4,6 +4,7 @@ import {
   makeAssignment,
   makeNumberNode,
   makeExpressionStatement,
+  makePrefixExpression,
 } from "./syntax-tree";
 import type {
   Program,
@@ -11,6 +12,7 @@ import type {
   NumberNode,
   ExpressionStatement,
   Expression,
+  PrefixExpression,
 } from "./syntax-tree";
 import Lexer from "../lexer";
 import type { TokenType } from "../lexer";
@@ -64,6 +66,15 @@ export default class Parser {
     if (token.type === "identifier") {
       const identifier = makeIdentifier(token.value);
       return identifier;
+    }
+    if (
+      token.type === "operator" &&
+      (token.value === "+" || token.value === "-")
+    ) {
+      const subExpression = this.parseExpression();
+      const prefix = token.value;
+      const expression = makePrefixExpression(prefix, subExpression);
+      return expression;
     }
 
     throw new Error(`bad token type ${token.type} for prefix expression`);

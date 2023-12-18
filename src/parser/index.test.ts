@@ -76,5 +76,63 @@ describe("parseProgram()", () => {
         expression: { type: "number node", value: 5 },
       });
     });
+
+    it("parse negative number literal expression", () => {
+      const input = "-42";
+      const lexer = new Lexer(input);
+      const parser = new Parser(lexer);
+
+      const node = parser.parseProgram();
+      expect(node.statements.length).toBe(1);
+
+      expect(node.statements[0]).toEqual({
+        type: "expression statement",
+        expression: {
+          type: "prefix expression",
+          prefix: "-",
+          expression: { type: "number node", value: 42 },
+        },
+      });
+    });
+
+    it("parse negative number literal expression", () => {
+      const input = "+42";
+      const lexer = new Lexer(input);
+      const parser = new Parser(lexer);
+
+      const node = parser.parseProgram();
+      expect(node.statements.length).toBe(1);
+
+      expect(node.statements[0]).toEqual({
+        type: "expression statement",
+        expression: {
+          type: "prefix expression",
+          prefix: "+",
+          expression: { type: "number node", value: 42 },
+        },
+      });
+    });
+
+    it("parse doubly negative number literal expression", () => {
+      const input = "--42";
+      const lexer = new Lexer(input);
+      const parser = new Parser(lexer);
+
+      const node = parser.parseProgram();
+      expect(node.statements.length).toBe(1);
+
+      expect(node.statements[0]).toEqual({
+        type: "expression statement",
+        expression: {
+          type: "prefix expression",
+          prefix: "-",
+          expression: {
+            type: "prefix expression",
+            prefix: "-",
+            expression: { type: "number node", value: 42 },
+          },
+        },
+      });
+    });
   });
 });

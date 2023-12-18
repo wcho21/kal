@@ -1,4 +1,4 @@
-export type Expression = Identifier | NumberNode | Assignment;
+export type Expression = Identifier | NumberNode | PrefixExpression | Assignment;
 
 export interface Identifier {
   type: "identifier";
@@ -8,6 +8,12 @@ export interface Identifier {
 export interface NumberNode {
   type: "number node";
   value: number;
+}
+
+export interface PrefixExpression {
+  type: "prefix expression";
+  prefix: "+" | "-";
+  expression: Expression;
 }
 
 export interface Assignment {
@@ -26,6 +32,11 @@ export const makeNumberNode = (value: NumberNode["value"]): NumberNode => ({
   value,
 });
 
+export const makePrefixExpression = (prefix: PrefixExpression["prefix"], expression: PrefixExpression["expression"]): PrefixExpression => ({
+  type: "prefix expression",
+  prefix,
+  expression,
+});
 
 export const makeAssignment = (left: Assignment["left"], right: Assignment["right"]): Assignment => ({
   type: "assignment",
