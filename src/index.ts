@@ -2,7 +2,7 @@ import Lexer from "./lexer";
 import Parser from "./parser";
 import Evaluator from "./evaluator";
 
-const execute = (input: string): string => {
+export const execute = (input: string): string => {
   const lexer = new Lexer(input);
   const parser = new Parser(lexer);
   const parsed = parser.parseProgram();
@@ -12,4 +12,3 @@ const execute = (input: string): string => {
 
   return String(evaluated);
 };
-export default execute;
