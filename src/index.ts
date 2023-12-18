@@ -1,38 +1,15 @@
 import Lexer from "./lexer";
 import Parser from "./parser";
-import CodeGenerator from "./code-generator";
-import VirtualMachine from "./virtual-machine";
+import Evaluator from "./evaluator";
 
-export class Compiler {
-  private lexer: Lexer;
-  private parser: Parser;
-  private codeGenerator: CodeGenerator;
+const execute = (input: string): string => {
+  const lexer = new Lexer(input);
+  const parser = new Parser(lexer);
+  const parsed = parser.parseProgram();
 
-  constructor() {
-    this.lexer = new Lexer() ;
-    this.parser = new Parser();
-    this.codeGenerator = new CodeGenerator();
-  }
+  const evaluator = new Evaluator();
+  const evaluated = evaluator.evaluate(parsed);
 
-  compile() {
-    const tokens = this.lexer.getTokens();
-    const syntaxTree = this.parser.parse(tokens);
-    const codes = this.codeGenerator.generate(syntaxTree);
-
-    return codes;
-  }
-}
-
-export class Executor {
-  private virtualMachine: VirtualMachine;
-
-  constructor() {
-    this.virtualMachine = new VirtualMachine();
-  }
-
-  execute(code: any) {
-    const output = this.virtualMachine.execute(code);
-
-    return output;
-  }
-}
+  return String(evaluated);
+};
+export default execute;
