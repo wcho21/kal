@@ -23,6 +23,23 @@ export default class Evaluator {
     throw new Error(`bad prefix ${prefix}`);
   }
 
+  private evaluateInfixExpression(infix: string, left: number, right: number): any {
+    if (infix === "+") {
+      return left + right;
+    }
+    if (infix === "-") {
+      return left - right;
+    }
+    if (infix === "*") {
+      return left * right;
+    }
+    if (infix === "/") {
+      return left / right;
+    }
+
+    throw new Error(`bad infix ${infix}`);
+  }
+
   evaluate(node: Node): any {
     if (node.type === "program") {
       return this.evaluateProgram(node);
@@ -32,6 +49,19 @@ export default class Evaluator {
     }
     if (node.type === "number node") {
       return node.value;
+    }
+    if (node.type === "infix expression") {
+      const left = this.evaluate(node.left);
+      const right = this.evaluate(node.right);
+
+      if (typeof left !== "number") {
+        throw new Error(`expected left expression type number, but received ${typeof left}`);
+      }
+      if (typeof right !== "number") {
+        throw new Error(`expected left expression type number, but received ${typeof left}`);
+      }
+
+      return this.evaluateInfixExpression(node.infix, left, right);
     }
     if (node.type === "prefix expression") {
       const subExpression = this.evaluate(node.expression);
