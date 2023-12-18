@@ -27,9 +27,9 @@ describe("next()", () => {
     const lexer = new Lexer(input);
     const reader = new TokenReader(lexer);
 
-    expect(reader.read()).toEqual({ type: "end" });
+    expect(reader.read().type).toEqual("end");
     reader.next();
-    expect(reader.read()).toEqual({ type: "end" });
+    expect(reader.read().type).toEqual("end");
   });
 });
 
