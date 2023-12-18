@@ -1,6 +1,10 @@
 import * as SyntaxTree from "./syntax-tree";
+import type * as SyntaxTreeType from "./syntax-tree";
 import Lexer from "../lexer";
 import type { TokenType } from "../lexer";
+
+type PrefixParser = () => SyntaxTreeType.Expression;
+type InfixParser = (left: SyntaxTreeType.Expression) => SyntaxTreeType.Expression;
 
 class TokenBuffer {
   private readonly lexer: Lexer;
@@ -31,11 +35,24 @@ export default class Parser {
     this.buffer = new TokenBuffer(lexer);
   }
 
+  private parseNumberLiteral(literal: string): SyntaxTree.NumberNode {
+    const parsedNumber = Number(literal);
+    if (Number.isNaN(parsedNumber)) {
+      throw new Error(`expected non-NaN number, but received '${literal}'`);
+    }
+
+    return SyntaxTree.numberNode(parsedNumber);
+  }
+
   private parseStatement(): SyntaxTree.Statement {
     let token: TokenType;
 
     token = this.buffer.read();
     this.buffer.next(); // eat token before throwing
+    if (token.type === "number literal") {
+      const numberNode = this.parseNumberLiteral(token.value);
+      return SyntaxTree.expressionStatement(numberNode);
+    }
     if (token.type !== "identifier") {
       throw new Error(`not identifier, but received ${token.type}`);
     }
