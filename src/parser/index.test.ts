@@ -1,138 +1,159 @@
 import Lexer from "../lexer";
 import Parser from "./";
+import type { Program } from "./syntax-tree";
 
 describe("parseProgram()", () => {
+  const testParsing = ({ input, expected }: { input: string, expected: Program }) => {
+    const lexer = new Lexer(input);
+    const parser = new Parser(lexer);
+
+    const node = parser.parseProgram();
+
+    expect(node).toEqual(expected);
+  };
+
   describe("assignment", () => {
-    it("should parse an assignment statement", () => {
-      const input = "x = 42"
-      const lexer = new Lexer(input);
-      const parser = new Parser(lexer);
-
-      const node = parser.parseProgram();
-      expect(node.statements.length).toBe(1);
-
-      expect(node.statements[0]).toEqual({
-        type: "expression statement",
-        expression: {
-          type: "assignment",
-          left: { type: "identifier", value: "x" },
-          right: { type: "number node", value: 42 },
+    const cases: { name: string, input: string, expected: Program }[] = [
+      {
+        name: "a single assignment statement",
+        input: "x = 42",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: {
+                type: "assignment",
+                left: { type: "identifier", value: "x" },
+                right: { type: "number node", value: 42 },
+              },
+            },
+          ],
         },
-      });
-    });
-
-    it("should parse more than one assignment statements", () => {
-      const input = "x = 42 한 = 9"
-      const lexer = new Lexer(input);
-      const parser = new Parser(lexer);
-
-      const node = parser.parseProgram();
-      expect(node.statements.length).toBe(2);
-
-      expect(node.statements[0]).toEqual({
-        type: "expression statement",
-        expression: {
-          type: "assignment",
-          left: { type: "identifier", value: "x" },
-          right: { type: "number node", value: 42 },
+      },
+      {
+        name: "multiple assignment statements",
+        input: "x = 42 한 = 9 _123 = 123",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: {
+                type: "assignment",
+                left: { type: "identifier", value: "x" },
+                right: { type: "number node", value: 42 },
+              },
+            },
+            {
+              type: "expression statement",
+              expression: {
+                type: "assignment",
+                left: { type: "identifier", value: "한" },
+                right: { type: "number node", value: 9 },
+              },
+            },
+            {
+              type: "expression statement",
+              expression: {
+                type: "assignment",
+                left: { type: "identifier", value: "_123" },
+                right: { type: "number node", value: 123 },
+              },
+            },
+          ],
         },
-      });
-      expect(node.statements[1]).toEqual({
-        type: "expression statement",
-        expression: {
-          type: "assignment",
-          left: { type: "identifier", value: "한" },
-          right: { type: "number node", value: 9 },
-        },
-      });
-    });
+      },
+    ];
+
+    it.each(cases)("parse $name", testParsing);
   });
 
-  describe("single expression", () => {
-    it("parse a single identifier expression", () => {
-      const input = "x";
-      const lexer = new Lexer(input);
-      const parser = new Parser(lexer);
-
-      const node = parser.parseProgram();
-      expect(node.statements.length).toBe(1);
-
-      expect(node.statements[0]).toEqual({
-        type: "expression statement",
-        expression: { type: "identifier", value: "x" },
-      });
-    });
-
-    it("parse a number literal expression", () => {
-      const input = "5";
-      const lexer = new Lexer(input);
-      const parser = new Parser(lexer);
-
-      const node = parser.parseProgram();
-      expect(node.statements.length).toBe(1);
-
-      expect(node.statements[0]).toEqual({
-        type: "expression statement",
-        expression: { type: "number node", value: 5 },
-      });
-    });
-
-    it("parse negative number literal expression", () => {
-      const input = "-42";
-      const lexer = new Lexer(input);
-      const parser = new Parser(lexer);
-
-      const node = parser.parseProgram();
-      expect(node.statements.length).toBe(1);
-
-      expect(node.statements[0]).toEqual({
-        type: "expression statement",
-        expression: {
-          type: "prefix expression",
-          prefix: "-",
-          expression: { type: "number node", value: 42 },
+  describe("simple expression", () => {
+    const cases: { name: string, input: string, expected: Program }[] = [
+      {
+        name: "an identifier",
+        input: "x",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: { type: "identifier", value: "x" },
+            },
+          ],
         },
-      });
-    });
-
-    it("parse negative number literal expression", () => {
-      const input = "+42";
-      const lexer = new Lexer(input);
-      const parser = new Parser(lexer);
-
-      const node = parser.parseProgram();
-      expect(node.statements.length).toBe(1);
-
-      expect(node.statements[0]).toEqual({
-        type: "expression statement",
-        expression: {
-          type: "prefix expression",
-          prefix: "+",
-          expression: { type: "number node", value: 42 },
+      },
+      {
+        name: "a number",
+        input: "123",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: { type: "number node", value: 123 },
+            },
+          ],
         },
-      });
-    });
-
-    it("parse doubly negative number literal expression", () => {
-      const input = "--42";
-      const lexer = new Lexer(input);
-      const parser = new Parser(lexer);
-
-      const node = parser.parseProgram();
-      expect(node.statements.length).toBe(1);
-
-      expect(node.statements[0]).toEqual({
-        type: "expression statement",
-        expression: {
-          type: "prefix expression",
-          prefix: "-",
-          expression: {
-            type: "prefix expression",
-            prefix: "-",
-            expression: { type: "number node", value: 42 },
-          },
+      },
+      {
+        name: "a negative number",
+        input: "-42",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: {
+                type: "prefix expression",
+                prefix: "-",
+                expression: { type: "number node", value: 42 },
+              },
+            },
+          ],
         },
-      });
-    });
+      },
+      {
+        name: "a doubly negative number",
+        input: "--42",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: {
+                type: "prefix expression",
+                prefix: "-",
+                expression: {
+                  type: "prefix expression",
+                  prefix: "-",
+                  expression: { type: "number node", value: 42 },
+                },
+              },
+            },
+          ],
+        },
+      },
+      {
+        name: "a positive number",
+        input: "+42",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: {
+                type: "prefix expression",
+                prefix: "+",
+                expression: { type: "number node", value: 42 },
+              },
+            },
+          ],
+        },
+      },
+    ];
+
+    it.each(cases)("parse $name", testParsing);
   });
 });
