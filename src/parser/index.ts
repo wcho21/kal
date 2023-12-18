@@ -15,44 +15,47 @@ import type {
   PrefixExpression,
 } from "./syntax-tree";
 import Lexer from "../lexer";
-import type { TokenType } from "../lexer";
-
-class TokenBuffer {
-  private readonly lexer: Lexer;
-  private token: TokenType;
-
-  constructor(lexer: Lexer) {
-    this.lexer = lexer;
-    this.token = lexer.getToken();
-  }
-
-  isEnd(): boolean {
-    return this.token.type === "end";
-  }
-
-  read(): TokenType {
-    return this.token;
-  }
-
-  next(): void {
-    this.token = this.lexer.getToken();
-  }
-}
+import TokenReader from "./token-reader";
 
 export default class Parser {
-  private buffer: TokenBuffer;
+  private buffer: TokenReader;
 
   constructor(lexer: Lexer) {
-    this.buffer = new TokenBuffer(lexer);
+    this.buffer = new TokenReader(lexer);
   }
 
-  private parseNumberLiteral(literal: string): NumberNode {
-    const parsedNumber = Number(literal);
-    if (Number.isNaN(parsedNumber)) {
-      throw new Error(`expected non-NaN number, but received '${literal}'`);
+  parseProgram(): Program {
+    const program = makeProgram();
+
+    while (!this.buffer.isEnd()) {
+      const statement = this.parseStatement();
+      if (statement !== null) {
+        program.statements.push(statement);
+      }
     }
 
-    return makeNumberNode(parsedNumber);
+    return program;
+  }
+
+  private parseStatement(): Statement {
+    return this.parseExpressionStatement();
+  }
+
+  private parseExpressionStatement(): ExpressionStatement {
+    const expression = this.parseExpression();
+
+    return makeExpressionStatement(expression);
+  }
+
+  private parseExpression(): Expression  {
+    const left = this.parsePrefixExpression();
+
+    const infixExpression = this.parseInfixExpression(left);
+    if (infixExpression === null) {
+      return left;
+    }
+
+    return infixExpression;
   }
 
   private parsePrefixExpression(): Expression {
@@ -101,38 +104,13 @@ export default class Parser {
     return makeAssignment(left, expression);
   }
 
-  private parseExpression(): Expression  {
-    const left = this.parsePrefixExpression();
-
-    const infixExpression = this.parseInfixExpression(left);
-    if (infixExpression === null) {
-      return left;
+  private parseNumberLiteral(literal: string): NumberNode {
+    const parsedNumber = Number(literal);
+    if (Number.isNaN(parsedNumber)) {
+      throw new Error(`expected non-NaN number, but received '${literal}'`);
     }
 
-    return infixExpression;
-  }
-
-  private parseExpressionStatement(): ExpressionStatement {
-    const expression = this.parseExpression();
-
-    return makeExpressionStatement(expression);
-  }
-
-  private parseStatement(): Statement {
-    return this.parseExpressionStatement();
-  }
-
-  parseProgram(): Program {
-    const program = makeProgram();
-
-    while (!this.buffer.isEnd()) {
-      const statement = this.parseStatement();
-      if (statement !== null) {
-        program.statements.push(statement);
-      }
-    }
-
-    return program;
+    return makeNumberNode(parsedNumber);
   }
 }
 
