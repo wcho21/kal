@@ -94,9 +94,16 @@ export default class Lexer {
         }
 
         if (Util.isLetter(char)) {
-          const identifier = this.readIdentifier();
+          // match keyword first before matching identifier
+          // since identifier is a string of letters not matched with keywords
 
-          return Token.identifier(identifier);
+          const read = this.readIdentifier();
+
+          if (read === "참" || read === "거짓") {
+            return Token.booleanLiteral(read);
+          }
+
+          return Token.identifier(read);
         }
 
         this.buffer.pop(); // discard current character

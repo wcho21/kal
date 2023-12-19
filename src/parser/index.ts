@@ -3,6 +3,7 @@ import {
   makeIdentifier,
   makeAssignment,
   makeNumberNode,
+  makeBooleanNode,
   makeExpressionStatement,
   makePrefixExpression,
   makeInfixExpression,
@@ -11,6 +12,7 @@ import type {
   Program,
   Statement,
   NumberNode,
+  BooleanNode,
   ExpressionStatement,
   Expression,
   Identifier,
@@ -99,6 +101,10 @@ export default class Parser {
       const numberNode = this.parseNumberLiteral(token.value);
       return numberNode;
     }
+    if (token.type === "boolean literal") {
+      const booleanNode = this.parseBooleanLiteral(token.value);
+      return booleanNode;
+    }
     if (token.type === "identifier") {
       const identifier = makeIdentifier(token.value);
       return identifier;
@@ -169,6 +175,12 @@ export default class Parser {
     }
 
     return makeNumberNode(parsedNumber);
+  }
+
+  private parseBooleanLiteral(literal: "참" | "거짓"): BooleanNode {
+    const parsedValue = literal === "참";
+
+    return makeBooleanNode(parsedValue);
   }
 }
 

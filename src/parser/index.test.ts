@@ -506,6 +506,32 @@ describe("parseProgram()", () => {
           ],
         },
       },
+      {
+        name: "true boolean literal",
+        input: "참",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: { type: "boolean node", value: true },
+            },
+          ],
+        },
+      },
+      {
+        name: "false boolean literal",
+        input: "거짓",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: { type: "boolean node", value: false },
+            },
+          ],
+        },
+      },
     ];
 
     it.each(cases)("parse $name", testParsing);

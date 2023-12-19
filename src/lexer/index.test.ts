@@ -3,6 +3,7 @@ import {
   operator,
   identifier,
   numberLiteral,
+  booleanLiteral,
   groupDelimiter,
   illegal,
   end,
@@ -12,6 +13,7 @@ import type {
   Operator,
   Identifier,
   NumberLiteral,
+  BooleanLiteral,
   GroupDelimiter,
   Illegal,
   End,
@@ -52,7 +54,7 @@ describe("getToken()", () => {
       it.each(cases)("get identifier token '$input'", testLexing);
     });
 
-    describe("literals", () => {
+    describe("number literals", () => {
       const cases: { input: string, expected: NumberLiteral }[] = [
         { input: "0", expected: numberLiteral("0") },
         { input: "123", expected: numberLiteral("123") },
@@ -61,7 +63,16 @@ describe("getToken()", () => {
         { input: "2.00", expected: numberLiteral("2.00") },
       ];
 
-      it.each(cases)("get literal token '$input'", testLexing);
+      it.each(cases)("get number literal token '$input'", testLexing);
+    });
+
+    describe("boolean literals", () => {
+      const cases: { input: string, expected: BooleanLiteral }[] = [
+        { input: "참", expected: booleanLiteral("참") },
+        { input: "거짓", expected: booleanLiteral("거짓") },
+      ];
+
+      it.each(cases)("get boolean literal token '$input'", testLexing);
     });
 
     describe("group delimiters", () => {

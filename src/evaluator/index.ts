@@ -51,6 +51,9 @@ export default class Evaluator {
     if (node.type === "number node") {
       return node.value;
     }
+    if (node.type === "boolean node") {
+      return node.value;
+    }
     if (node.type === "infix expression") {
       const left = this.evaluate(node.left, env);
       const right = this.evaluate(node.right, env);

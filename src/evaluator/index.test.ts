@@ -17,6 +17,8 @@ describe("evaluate()", () => {
       { input: "100+25+4", expected: 129 },
       { input: "100+25-4", expected: 121 },
       { input: "100+25*4", expected: 200 },
+      { input: "참", expected: true },
+      { input: "거짓", expected: false },
 
       /* test case for left associativity */
       { input: "100-25-4", expected: 71 },

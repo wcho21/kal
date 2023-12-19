@@ -16,6 +16,10 @@ it("execute 2.5/0.5", () => {
   expect(execute("2.5/0.5")).toBe("5");
 });
 
+it("execute 참", () => {
+  expect(execute("참")).toBe("true"); // TODO(?): display as "참"
+});
+
 it("execute assignment", () => {
   expect(execute("변수1 = 4  변수2 = 9  (변수2 - 변수1) * 변수1")).toBe("20");
 });

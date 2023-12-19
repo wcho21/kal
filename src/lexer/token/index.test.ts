@@ -2,12 +2,14 @@ import {
   operator,
   identifier,
   numberLiteral,
+  booleanLiteral,
   groupDelimiter,
 } from "./";
 import type {
   Operator,
   Identifier,
   NumberLiteral,
+  BooleanLiteral,
   GroupDelimiter,
 } from "./";
 
@@ -49,6 +51,19 @@ describe("number literal", () => {
 
   it.each(cases)("make number literal token for '$input'", ({ input, expected }) => {
     const token = numberLiteral(input);
+
+    expect(token).toEqual(expected);
+  });
+});
+
+describe("boolean literal", () => {
+  const cases: { input: BooleanLiteral["value"], expected: BooleanLiteral }[] = [
+    { input: "참", expected: booleanLiteral("참") },
+    { input: "거짓", expected: booleanLiteral("거짓") },
+  ];
+
+  it.each(cases)("make boolean literal token for '$input'", ({ input, expected }) => {
+    const token = booleanLiteral(input);
 
     expect(token).toEqual(expected);
   });
