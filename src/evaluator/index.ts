@@ -24,21 +24,51 @@ export default class Evaluator {
     throw new Error(`bad prefix ${prefix}`);
   }
 
-  private evaluateInfixExpression(infix: string, left: number, right: number): any {
-    if (infix === "+") {
-      return left + right;
-    }
-    if (infix === "-") {
-      return left - right;
-    }
-    if (infix === "*") {
-      return left * right;
-    }
-    if (infix === "/") {
-      return left / right;
+  private evaluateInfixExpression(infix: string, left: unknown, right: unknown): any {
+    // type matching order is important: more inclusive case first
+
+    if (
+      (typeof left === "boolean" && typeof right === "boolean") ||
+      (typeof left === "number" && typeof right === "number")
+    ) {
+      if (infix === "==") {
+        return left === right;
+      }
+      if (infix === "!=") {
+        return left !== right;
+      }
+      if (infix === ">") {
+        return left > right;
+      }
+      if (infix === "<") {
+        return left < right;
+      }
+      if (infix === ">=") {
+        return left >= right;
+      }
+      if (infix === "<=") {
+        return left <= right;
+      }
     }
 
-    throw new Error(`bad infix ${infix}`);
+    if (typeof left === "number" && typeof right === "number") {
+      if (infix === "+") {
+        return left + right;
+      }
+      if (infix === "-") {
+        return left - right;
+      }
+      if (infix === "*") {
+        return left * right;
+      }
+      if (infix === "/") {
+        return left / right;
+      }
+
+      throw new Error(`bad infix ${infix} for number operands`);
+    }
+
+    throw new Error(`bad infix ${infix}, with left '${left}' and right '${right}'`);
   }
 
   evaluate(node: Node, env: Environment): any {
@@ -60,13 +90,6 @@ export default class Evaluator {
     if (node.type === "infix expression") {
       const left = this.evaluate(node.left, env);
       const right = this.evaluate(node.right, env);
-
-      if (typeof left !== "number") {
-        throw new Error(`expected left expression type number, but received ${typeof left}`);
-      }
-      if (typeof right !== "number") {
-        throw new Error(`expected left expression type number, but received ${typeof left}`);
-      }
 
       return this.evaluateInfixExpression(node.infix, left, right);
     }
