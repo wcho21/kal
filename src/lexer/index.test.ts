@@ -19,6 +19,14 @@ import type {
 
 describe("getToken()", () => {
   describe("single token", () => {
+    const testLexing = ({ input, expected }: { input: string, expected: TokenType }) => {
+      const lexer = new Lexer(input);
+
+      const token = lexer.getToken();
+
+      expect(token).toEqual(expected);
+    };
+
     describe("operators", () => {
       const cases: { input: string, expected: Operator }[] = [
         { input: "+", expected: operator("+") },
@@ -28,13 +36,7 @@ describe("getToken()", () => {
         { input: "=", expected: operator("=") },
       ];
 
-      it.each(cases)("get operator token '$input'", ({ input, expected }) => {
-        const lexer = new Lexer(input);
-
-        const token = lexer.getToken();
-
-        expect(token).toEqual(expected);
-      });
+      it.each(cases)("get operator token '$input'", testLexing);
     });
 
     describe("identifiers", () => {
@@ -47,13 +49,7 @@ describe("getToken()", () => {
         { input: "_foo이름", expected: identifier("_foo이름") },
       ];
 
-      it.each(cases)("get identifier token '$input'", ({ input, expected }) => {
-        const lexer = new Lexer(input);
-
-        const token = lexer.getToken();
-
-        expect(token).toEqual(expected);
-      });
+      it.each(cases)("get identifier token '$input'", testLexing);
     });
 
     describe("literals", () => {
@@ -62,28 +58,16 @@ describe("getToken()", () => {
         { input: "123", expected: numberLiteral("123") },
       ];
 
-      it.each(cases)("get literal token '$input'", ({ input, expected }) => {
-        const lexer = new Lexer(input);
-
-        const token = lexer.getToken();
-
-        expect(token).toEqual(expected);
-      });
+      it.each(cases)("get literal token '$input'", testLexing);
     });
 
     describe("group delimiters", () => {
-      const cases: { input: "(" | ")", expected: GroupDelimiter }[] = [
+      const cases: { input: string, expected: GroupDelimiter }[] = [
         { input: "(", expected: groupDelimiter("(") },
         { input: ")", expected: groupDelimiter(")") },
       ];
 
-      it.each(cases)("get group delimiter token '$input'", ({ input, expected }) => {
-        const lexer = new Lexer(input);
-
-        const token = lexer.getToken();
-
-        expect(token).toEqual(expected);
-      });
+      it.each(cases)("get group delimiter token '$input'", testLexing);
     });
 
     describe("illegal", () => {
@@ -91,13 +75,7 @@ describe("getToken()", () => {
         { input: "$", expected: illegal("$") },
       ];
 
-      it.each(cases)("get illegal token '$input'", ({ input, expected }) => {
-        const lexer = new Lexer(input);
-
-        const token = lexer.getToken();
-
-        expect(token).toEqual(expected);
-      });
+      it.each(cases)("get illegal token '$input'", testLexing);
     });
 
     describe("end", () => {
@@ -105,13 +83,7 @@ describe("getToken()", () => {
         { input: "", expected: end },
       ];
 
-      it.each(cases)("get end token '$input'", ({ input, expected }) => {
-        const lexer = new Lexer(input);
-
-        const token = lexer.getToken();
-
-        expect(token).toEqual(expected);
-      });
+      it.each(cases)("get end token '$input'", testLexing);
     });
   });
 
