@@ -72,7 +72,30 @@ export default class Evaluator {
 
       return this.evaluatePrefixExpression(node.prefix, subExpression);
     }
-    throw new Error(`not supported node type '${node.type}'`);
+    if (node.type === "assignment") {
+      const varValue = this.evaluate(node.right, env);
+
+      if (node.left.type !== "identifier") {
+        throw new Error(`expected identifier on left value, but received ${typeof node.left.type}`);
+      }
+      const varName = node.left.value;
+
+      env.set(varName, varValue);
+
+      return varValue;
+    }
+    if (node.type === "identifier") {
+      const varName = node.value;
+      const value = env.get(varName);
+
+      if (value === null) {
+        throw new Error(`identifier '${varName}' not found`);
+      }
+
+      return value;
+    }
+
+    // throw new Error(`not supported node type '${node.type}'`);
   }
 }
 
