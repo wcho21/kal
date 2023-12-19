@@ -1,10 +1,10 @@
-import type * as Statement from "../statement";
+import type { Statement } from "../statement";
 
 export type Group = Program;
 
 export interface Program {
   type: "program";
-  statements: Statement.Statement[];
+  statements: Statement[];
 }
 
 export const makeProgram = (statements: Program["statements"] = []): Program => ({

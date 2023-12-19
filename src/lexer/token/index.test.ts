@@ -1,57 +1,67 @@
-import * as Token from "./";
-import type * as TokenType from "./";
+import {
+  operator,
+  identifier,
+  numberLiteral,
+  groupDelimiter,
+} from "./";
+import type {
+  Operator,
+  Identifier,
+  NumberLiteral,
+  GroupDelimiter,
+} from "./";
 
 describe("operator", () => {
-  const cases: { input: TokenType.Operator["value"], expected: TokenType.Operator }[] = [
-    { input: "+", expected: Token.operator("+") },
-    { input: "-", expected: Token.operator("-") },
-    { input: "*", expected: Token.operator("*") },
-    { input: "/", expected: Token.operator("/") },
-    { input: "=", expected: Token.operator("=") },
+  const cases: { input: Operator["value"], expected: Operator }[] = [
+    { input: "+", expected: operator("+") },
+    { input: "-", expected: operator("-") },
+    { input: "*", expected: operator("*") },
+    { input: "/", expected: operator("/") },
+    { input: "=", expected: operator("=") },
   ];
 
   it.each(cases)("make operator token for '$input'", ({ input, expected }) => {
-    const token = Token.operator(input);
+    const token = operator(input);
 
     expect(token).toEqual(expected);
   });
 });
 
 describe("identifier", () => {
-  const cases: { input: TokenType.Identifier["value"], expected: TokenType.Identifier }[] = [
-    { input: "foo", expected: Token.identifier("foo") },
-    { input: "이름", expected: Token.identifier("이름") },
-    { input: "_foo이름123", expected: Token.identifier("_foo이름123") },
+  const cases: { input: Identifier["value"], expected: Identifier }[] = [
+    { input: "foo", expected: identifier("foo") },
+    { input: "이름", expected: identifier("이름") },
+    { input: "_foo이름123", expected: identifier("_foo이름123") },
   ];
 
   it.each(cases)("make identifier token for '$input'", ({ input, expected }) => {
-    const token = Token.identifier(input);
+    const token = identifier(input);
 
     expect(token).toEqual(expected);
   });
 });
 
 describe("number literal", () => {
-  const cases: { input: TokenType.NumberLiteral["value"], expected: TokenType.NumberLiteral }[] = [
-    { input: "0", expected: Token.numberLiteral("0") },
-    { input: "123", expected: Token.numberLiteral("123") },
+  const cases: { input: NumberLiteral["value"], expected: NumberLiteral }[] = [
+    { input: "0", expected: numberLiteral("0") },
+    { input: "123", expected: numberLiteral("123") },
   ];
 
   it.each(cases)("make number literal token for '$input'", ({ input, expected }) => {
-    const token = Token.numberLiteral(input);
+    const token = numberLiteral(input);
 
     expect(token).toEqual(expected);
   });
 });
 
 describe("group delimiter", () => {
-  const cases: { input: TokenType.GroupDelimiter["value"], expected: TokenType.GroupDelimiter }[] = [
-    { input: "(", expected: Token.groupDelimiter("(") },
-    { input: ")", expected: Token.groupDelimiter(")") },
+  const cases: { input: GroupDelimiter["value"], expected: GroupDelimiter }[] = [
+    { input: "(", expected: groupDelimiter("(") },
+    { input: ")", expected: groupDelimiter(")") },
   ];
 
   it.each(cases)("make group delimiter token for '$input'", ({ input, expected }) => {
-    const token = Token.groupDelimiter(input);
+    const token = groupDelimiter(input);
 
     expect(token).toEqual(expected);
   });

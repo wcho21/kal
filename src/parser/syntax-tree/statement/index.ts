@@ -1,11 +1,11 @@
-import type * as Expression from "../expression";
+import type { Expression } from "../expression";
 
 export type Statement = ExpressionStatement;
 
 /** A wrapper type to treat a single expression as a statement. */
 export interface ExpressionStatement {
   type: "expression statement";
-  expression: Expression.Expression;
+  expression: Expression;
 }
 
 export const makeExpressionStatement = (expression: ExpressionStatement["expression"]): ExpressionStatement => ({
