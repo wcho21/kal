@@ -152,13 +152,6 @@ describe("parseProgram()", () => {
           ],
         },
       },
-    ];
-
-    it.each(cases)("parse $name", testParsing);
-  });
-
-  describe("simple expression", () => {
-    const cases: { name: string, input: string, expected: Program }[] = [
       {
         name: "an addition of two numbers",
         input: "42+99",
