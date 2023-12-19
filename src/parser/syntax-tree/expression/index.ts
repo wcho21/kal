@@ -1,4 +1,9 @@
-export type Expression = Identifier | NumberNode | PrefixExpression | InfixExpression | Assignment;
+export type Expression =
+  Identifier |
+  NumberNode |
+  PrefixExpression |
+  InfixExpression |
+  Assignment;
 
 export interface Identifier {
   type: "identifier";
