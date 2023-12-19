@@ -152,13 +152,6 @@ describe("parseProgram()", () => {
           ],
         },
       },
-    ];
-
-    it.each(cases)("parse $name", testParsing);
-  });
-
-  describe("simple expression", () => {
-    const cases: { name: string, input: string, expected: Program }[] = [
       {
         name: "an addition of two numbers",
         input: "42+99",
@@ -391,6 +384,105 @@ describe("parseProgram()", () => {
                   right: { type: "number node", value: 99 },
                 },
                 right: { type: "number node", value: 12 },
+              },
+            },
+          ],
+        },
+      },
+      {
+        name: "an addition with grouped expression",
+        input: "12+(34+56)",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: {
+                type: "infix expression",
+                infix: "+",
+                left: { type: "number node", value: 12 },
+                right: {
+                  type: "infix expression",
+                  infix: "+",
+                  left: { type: "number node", value: 34 },
+                  right: { type: "number node", value: 56 },
+                },
+              },
+            },
+          ],
+        },
+      },
+      {
+        name: "an addition with grouped more than once",
+        input: "12+(34+(56+(78+9)))",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: {
+                type: "infix expression",
+                infix: "+",
+                left: { type: "number node", value: 12 },
+                right: {
+                  type: "infix expression",
+                  infix: "+",
+                  left: { type: "number node", value: 34 },
+                  right: {
+                    type: "infix expression",
+                    infix: "+",
+                    left: { type: "number node", value: 56 },
+                    right: {
+                      type: "infix expression",
+                      infix: "+",
+                      left: { type: "number node", value: 78 },
+                      right: { type: "number node", value: 9 },
+                    },
+                  },
+                },
+              },
+            },
+          ],
+        },
+      },
+      {
+        name: "arithmetic expression with grouped more than once",
+        input: "(12*(34/56))+(7-((8+9)*10))",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: {
+                type: "infix expression",
+                infix: "+",
+                left: {
+                  type: "infix expression",
+                  infix: "*",
+                  left: { type: "number node", value: 12 },
+                  right: {
+                    type: "infix expression",
+                    infix: "/",
+                    left: { type: "number node", value: 34 },
+                    right: { type: "number node", value: 56 },
+                  },
+                },
+                right: {
+                  type: "infix expression",
+                  infix: "-",
+                  left: { type: "number node", value: 7 },
+                  right: {
+                    type: "infix expression",
+                    infix: "*",
+                    left: {
+                      type: "infix expression",
+                      infix: "+",
+                      left: { type: "number node", value: 8 },
+                      right: { type: "number node", value: 9 },
+                    },
+                    right: { type: "number node", value: 10 },
+                  },
+                },
               },
             },
           ],

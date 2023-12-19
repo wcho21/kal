@@ -43,3 +43,16 @@ describe("number literal", () => {
     expect(token).toEqual(expected);
   });
 });
+
+describe("group delimiter", () => {
+  const cases: { input: TokenType.GroupDelimiter["value"], expected: TokenType.GroupDelimiter }[] = [
+    { input: "(", expected: Token.groupDelimiter("(") },
+    { input: ")", expected: Token.groupDelimiter(")") },
+  ];
+
+  it.each(cases)("make group delimiter token for '$input'", ({ input, expected }) => {
+    const token = Token.groupDelimiter(input);
+
+    expect(token).toEqual(expected);
+  });
+});

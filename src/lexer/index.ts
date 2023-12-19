@@ -52,6 +52,11 @@ export default class Lexer {
         this.buffer.pop(); // discard current character
 
         return Token.operator(char);
+      case "(":
+      case ")":
+        this.buffer.pop(); // discard current character
+
+        return Token.groupDelimiter(char);
       case "\0":
         return Token.end;
       default:
