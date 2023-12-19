@@ -56,6 +56,21 @@ describe("getToken()", () => {
       });
     });
 
+    describe("group delimiters", () => {
+      const cases: { input: "(" | ")", expected: TokenType.GroupDelimiter }[] = [
+        { input: "(", expected: Token.groupDelimiter("(") },
+        { input: ")", expected: Token.groupDelimiter(")") },
+      ];
+
+      it.each(cases)("get group delimiter token '$input'", ({ input, expected }) => {
+        const lexer = new Lexer(input);
+
+        const token = lexer.getToken();
+
+        expect(token).toEqual(expected);
+      });
+    });
+
     describe("illegal", () => {
       const cases: { input: string, expected: TokenType.Illegal }[] = [
         { input: "$", expected: Token.illegal("$") },
