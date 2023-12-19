@@ -19,6 +19,12 @@ describe("evaluate()", () => {
     /* test case for left associativity */
     { input: "100-25-4", expected: 71 },
     { input: "100/25/4", expected: 1 },
+
+    /* test case for grouped expression */
+    { input: "100-(25-4)", expected: 79 },
+    { input: "12-(34-56)", expected: 34 },
+    { input: "12*(12/6)", expected: 24 },
+    { input: "12+((30+4)-3*(12/(56-50)))", expected: 40 },
   ];
 
   it.each(cases)("evaluate $input", ({ input, expected }) => {

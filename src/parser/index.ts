@@ -113,6 +113,17 @@ export default class Parser {
       const expression = makePrefixExpression(prefix, subExpression);
       return expression;
     }
+    if (token.type === "group delimiter" && token.value === "(") {
+      const groupedExpression = this.parseExpression(bindingPower.lowest);
+
+      const nextToken = this.buffer.read();
+      this.buffer.next(); // eat token
+      if (nextToken.type !== "group delimiter" || nextToken.value !== ")") {
+        throw new Error(`expected ) but received ${nextToken.type}`);
+      }
+
+      return groupedExpression;
+    }
 
     throw new Error(`bad token type ${token.type} for prefix expression`);
   }
