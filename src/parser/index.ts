@@ -3,6 +3,8 @@ import {
   makeIdentifier,
   makeAssignment,
   makeNumberNode,
+  makeBooleanNode,
+  makeStringNode,
   makeExpressionStatement,
   makePrefixExpression,
   makeInfixExpression,
@@ -11,6 +13,8 @@ import type {
   Program,
   Statement,
   NumberNode,
+  BooleanNode,
+  StringNode,
   ExpressionStatement,
   Expression,
   Identifier,
@@ -99,6 +103,14 @@ export default class Parser {
       const numberNode = this.parseNumberLiteral(token.value);
       return numberNode;
     }
+    if (token.type === "boolean literal") {
+      const booleanNode = this.parseBooleanLiteral(token.value);
+      return booleanNode;
+    }
+    if (token.type === "string literal") {
+      const stringNode = this.parseStringLiteral(token.value);
+      return stringNode;
+    }
     if (token.type === "identifier") {
       const identifier = makeIdentifier(token.value);
       return identifier;
@@ -124,7 +136,7 @@ export default class Parser {
       return groupedExpression;
     }
 
-    throw new Error(`bad token type ${token.type} for prefix expression`);
+    throw new Error(`bad token type ${token.type} (${token.value}) for prefix expression`);
   }
 
   private parseInfixExpression(left: Expression): Expression | null {
@@ -169,6 +181,16 @@ export default class Parser {
     }
 
     return makeNumberNode(parsedNumber);
+  }
+
+  private parseBooleanLiteral(literal: "참" | "거짓"): BooleanNode {
+    const parsedValue = literal === "참";
+
+    return makeBooleanNode(parsedValue);
+  }
+
+  private parseStringLiteral(literal: string): StringNode {
+    return makeStringNode(literal);
   }
 }
 

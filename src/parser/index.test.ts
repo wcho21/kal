@@ -488,6 +488,63 @@ describe("parseProgram()", () => {
           ],
         },
       },
+      {
+        name: "arithmetic expression with floating point numbers",
+        input: "0.75 + 1.25",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: {
+                type: "infix expression",
+                infix: "+",
+                left: { type: "number node", value: 0.75 },
+                right: { type: "number node", value: 1.25 },
+              },
+            },
+          ],
+        },
+      },
+      {
+        name: "true boolean literal",
+        input: "참",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: { type: "boolean node", value: true },
+            },
+          ],
+        },
+      },
+      {
+        name: "false boolean literal",
+        input: "거짓",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: { type: "boolean node", value: false },
+            },
+          ],
+        },
+      },
+      {
+        name: "string literal",
+        input: "'foo bar'",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: { type: "string node", value: "foo bar" },
+            },
+          ],
+        },
+      },
     ];
 
     it.each(cases)("parse $name", testParsing);

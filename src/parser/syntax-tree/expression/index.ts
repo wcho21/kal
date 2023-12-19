@@ -1,6 +1,8 @@
 export type Expression =
   Identifier |
   NumberNode |
+  BooleanNode |
+  StringNode |
   PrefixExpression |
   InfixExpression |
   Assignment;
@@ -13,6 +15,16 @@ export interface Identifier {
 export interface NumberNode {
   type: "number node";
   value: number;
+}
+
+export interface BooleanNode {
+  type: "boolean node";
+  value: boolean;
+}
+
+export interface StringNode {
+  type: "string node";
+  value: string;
 }
 
 export interface PrefixExpression {
@@ -41,6 +53,16 @@ export const makeIdentifier = (value: Identifier["value"]): Identifier => ({
 
 export const makeNumberNode = (value: NumberNode["value"]): NumberNode => ({
   type: "number node",
+  value,
+});
+
+export const makeBooleanNode = (value: BooleanNode["value"]): BooleanNode => ({
+  type: "boolean node",
+  value,
+});
+
+export const makeStringNode = (value: StringNode["value"]): StringNode => ({
+  type: "string node",
   value,
 });
 

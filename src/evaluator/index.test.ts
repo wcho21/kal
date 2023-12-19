@@ -17,6 +17,9 @@ describe("evaluate()", () => {
       { input: "100+25+4", expected: 129 },
       { input: "100+25-4", expected: 121 },
       { input: "100+25*4", expected: 200 },
+      { input: "참", expected: true },
+      { input: "거짓", expected: false },
+      { input: "'foo bar'", expected: "foo bar" },
 
       /* test case for left associativity */
       { input: "100-25-4", expected: 71 },
@@ -27,6 +30,10 @@ describe("evaluate()", () => {
       { input: "12-(34-56)", expected: 34 },
       { input: "12*(12/6)", expected: 24 },
       { input: "12+((30+4)-3*(12/(56-50)))", expected: 40 },
+
+      /* test case for floating point numbers */
+      { input: "0.75 + 1.25", expected: 2 },
+      { input: "2.5 / 0.5", expected: 5 },
     ];
 
     it.each(cases)("evaluate $input", ({ input, expected }) => {

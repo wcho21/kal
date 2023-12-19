@@ -2,12 +2,16 @@ import {
   operator,
   identifier,
   numberLiteral,
+  booleanLiteral,
+  stringLiteral,
   groupDelimiter,
 } from "./";
 import type {
   Operator,
   Identifier,
   NumberLiteral,
+  BooleanLiteral,
+  StringLiteral,
   GroupDelimiter,
 } from "./";
 
@@ -49,6 +53,34 @@ describe("number literal", () => {
 
   it.each(cases)("make number literal token for '$input'", ({ input, expected }) => {
     const token = numberLiteral(input);
+
+    expect(token).toEqual(expected);
+  });
+});
+
+describe("boolean literal", () => {
+  const cases: { input: BooleanLiteral["value"], expected: BooleanLiteral }[] = [
+    { input: "참", expected: booleanLiteral("참") },
+    { input: "거짓", expected: booleanLiteral("거짓") },
+  ];
+
+  it.each(cases)("make boolean literal token for '$input'", ({ input, expected }) => {
+    const token = booleanLiteral(input);
+
+    expect(token).toEqual(expected);
+  });
+});
+
+describe("string literal", () => {
+  const cases: { input: StringLiteral["value"], expected: StringLiteral }[] = [
+    { input: "foo bar", expected: stringLiteral("foo bar") },
+    { input: "  ", expected: stringLiteral("  ") },
+    { input: "123", expected: stringLiteral("123") },
+    { input: "참", expected: stringLiteral("참") },
+  ];
+
+  it.each(cases)("make string literal token for '$input'", ({ input, expected }) => {
+    const token = stringLiteral(input);
 
     expect(token).toEqual(expected);
   });

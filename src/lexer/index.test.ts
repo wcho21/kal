@@ -3,6 +3,8 @@ import {
   operator,
   identifier,
   numberLiteral,
+  booleanLiteral,
+  stringLiteral,
   groupDelimiter,
   illegal,
   end,
@@ -12,6 +14,8 @@ import type {
   Operator,
   Identifier,
   NumberLiteral,
+  BooleanLiteral,
+  StringLiteral,
   GroupDelimiter,
   Illegal,
   End,
@@ -52,13 +56,37 @@ describe("getToken()", () => {
       it.each(cases)("get identifier token '$input'", testLexing);
     });
 
-    describe("literals", () => {
+    describe("number literals", () => {
       const cases: { input: string, expected: NumberLiteral }[] = [
         { input: "0", expected: numberLiteral("0") },
         { input: "123", expected: numberLiteral("123") },
+        { input: "12.75", expected: numberLiteral("12.75") },
+        { input: "0.875", expected: numberLiteral("0.875") },
+        { input: "2.00", expected: numberLiteral("2.00") },
       ];
 
-      it.each(cases)("get literal token '$input'", testLexing);
+      it.each(cases)("get number literal token '$input'", testLexing);
+    });
+
+    describe("boolean literals", () => {
+      const cases: { input: string, expected: BooleanLiteral }[] = [
+        { input: "참", expected: booleanLiteral("참") },
+        { input: "거짓", expected: booleanLiteral("거짓") },
+      ];
+
+      it.each(cases)("get boolean literal token '$input'", testLexing);
+    });
+
+    describe("string literals", () => {
+      const cases: { input: string, expected: StringLiteral }[] = [
+        { input: "'foo bar'", expected: stringLiteral("foo bar") },
+        { input: "'123'", expected: stringLiteral("123") },
+        { input: "'!@#$'", expected: stringLiteral("!@#$") },
+        { input: "'   '", expected: stringLiteral("   ") },
+        { input: "'참'", expected: stringLiteral("참") },
+      ];
+
+      it.each(cases)("get string literal token '$input'", testLexing);
     });
 
     describe("group delimiters", () => {
@@ -73,6 +101,7 @@ describe("getToken()", () => {
     describe("illegal", () => {
       const cases: { input: string, expected: Illegal }[] = [
         { input: "$", expected: illegal("$") },
+        { input: "'foo", expected: illegal("'foo") },
       ];
 
       it.each(cases)("get illegal token '$input'", testLexing);
@@ -110,6 +139,14 @@ describe("getToken()", () => {
           identifier("_이름"),
           operator("="),
           identifier("foo123"),
+          end,
+        ]
+      },
+      {
+        input: "'foo' 'bar'",
+        expectedTokens: [
+          stringLiteral("foo"),
+          stringLiteral("bar"),
           end,
         ]
       },
