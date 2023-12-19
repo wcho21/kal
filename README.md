@@ -1,5 +1,7 @@
 # 🗡️ KAL
 
+<img src="./docs/images/kal-logo.png" alt="KAL logo" width="128px" height="128px" />
+
 Korean algorithmic language.
 
 Based on [TypeScript][ts] and [Node.js][node].
