@@ -4,6 +4,7 @@ import {
   makeAssignment,
   makeNumberNode,
   makeBooleanNode,
+  makeStringNode,
   makeExpressionStatement,
   makePrefixExpression,
   makeInfixExpression,
@@ -13,6 +14,7 @@ import type {
   Statement,
   NumberNode,
   BooleanNode,
+  StringNode,
   ExpressionStatement,
   Expression,
   Identifier,
@@ -105,6 +107,10 @@ export default class Parser {
       const booleanNode = this.parseBooleanLiteral(token.value);
       return booleanNode;
     }
+    if (token.type === "string literal") {
+      const stringNode = this.parseStringLiteral(token.value);
+      return stringNode;
+    }
     if (token.type === "identifier") {
       const identifier = makeIdentifier(token.value);
       return identifier;
@@ -130,7 +136,7 @@ export default class Parser {
       return groupedExpression;
     }
 
-    throw new Error(`bad token type ${token.type} for prefix expression`);
+    throw new Error(`bad token type ${token.type} (${token.value}) for prefix expression`);
   }
 
   private parseInfixExpression(left: Expression): Expression | null {
@@ -181,6 +187,10 @@ export default class Parser {
     const parsedValue = literal === "참";
 
     return makeBooleanNode(parsedValue);
+  }
+
+  private parseStringLiteral(literal: string): StringNode {
+    return makeStringNode(literal);
   }
 }
 

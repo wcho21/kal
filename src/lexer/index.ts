@@ -46,6 +46,27 @@ export default class Lexer {
     return read.join("");
   }
 
+  /** return [string-literal, true] if ok; otherwise [string-read-so-far, false] */
+  private readStringLiteral(): [string, boolean] {
+    const read: string[] = [];
+
+    // read string until string closing symbol (')
+    while (true) {
+      const char = this.buffer.pop();
+
+      // return illegal token if end before reading string
+      if (char === "\0") {
+        return [read.join(""), false];
+      }
+
+      if (char === "'") {
+        return [read.join(""), true];
+      }
+
+      read.push(char);
+    }
+  }
+
   private readIdentifier(): string {
     // read letters and digits
     const read = [];
@@ -84,6 +105,13 @@ export default class Lexer {
         this.buffer.pop(); // discard current character
 
         return Token.groupDelimiter(char);
+      case "'":
+        {
+          this.buffer.pop(); // discard current character
+
+          const [str, ok] = this.readStringLiteral();
+          return ok ? Token.stringLiteral(str) : Token.illegal("'" + str);
+        }
       case "\0":
         return Token.end;
       default:

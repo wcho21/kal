@@ -3,6 +3,7 @@ import {
   identifier,
   numberLiteral,
   booleanLiteral,
+  stringLiteral,
   groupDelimiter,
 } from "./";
 import type {
@@ -10,6 +11,7 @@ import type {
   Identifier,
   NumberLiteral,
   BooleanLiteral,
+  StringLiteral,
   GroupDelimiter,
 } from "./";
 
@@ -64,6 +66,21 @@ describe("boolean literal", () => {
 
   it.each(cases)("make boolean literal token for '$input'", ({ input, expected }) => {
     const token = booleanLiteral(input);
+
+    expect(token).toEqual(expected);
+  });
+});
+
+describe("string literal", () => {
+  const cases: { input: StringLiteral["value"], expected: StringLiteral }[] = [
+    { input: "foo bar", expected: stringLiteral("foo bar") },
+    { input: "  ", expected: stringLiteral("  ") },
+    { input: "123", expected: stringLiteral("123") },
+    { input: "참", expected: stringLiteral("참") },
+  ];
+
+  it.each(cases)("make string literal token for '$input'", ({ input, expected }) => {
+    const token = stringLiteral(input);
 
     expect(token).toEqual(expected);
   });

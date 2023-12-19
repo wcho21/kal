@@ -532,6 +532,19 @@ describe("parseProgram()", () => {
           ],
         },
       },
+      {
+        name: "string literal",
+        input: "'foo bar'",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: { type: "string node", value: "foo bar" },
+            },
+          ],
+        },
+      },
     ];
 
     it.each(cases)("parse $name", testParsing);

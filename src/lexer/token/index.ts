@@ -3,6 +3,7 @@ export type TokenType =
   Identifier |
   NumberLiteral |
   BooleanLiteral |
+  StringLiteral |
   GroupDelimiter |
   Illegal |
   End;
@@ -25,6 +26,11 @@ export interface NumberLiteral {
 export interface BooleanLiteral {
   type: "boolean literal";
   value: "참" | "거짓";
+}
+
+export interface StringLiteral {
+  type: "string literal";
+  value: string;
 }
 
 export interface GroupDelimiter {
@@ -59,6 +65,11 @@ export const numberLiteral = (value: NumberLiteral["value"]): NumberLiteral => (
 
 export const booleanLiteral = (value: BooleanLiteral["value"]): BooleanLiteral => ({
   type: "boolean literal",
+  value,
+});
+
+export const stringLiteral = (value: StringLiteral["value"]): StringLiteral => ({
+  type: "string literal",
   value,
 });
 
