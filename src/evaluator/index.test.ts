@@ -1,6 +1,7 @@
 import Lexer from "../lexer";
 import Parser from "../parser";
 import Evaluator from "./";
+import Environment from "./environment";
 
 describe("evaluate()", () => {
   const cases = [
@@ -32,7 +33,8 @@ describe("evaluate()", () => {
     const parser = new Parser(lexer);
     const program = parser.parseProgram();
     const evaluator = new Evaluator();
-    const evaluated = evaluator.evaluate(program);
+    const environment = new Environment();
+    const evaluated = evaluator.evaluate(program, environment);
 
     expect(evaluated).toBe(expected);
   });
