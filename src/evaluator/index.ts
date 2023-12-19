@@ -1,4 +1,4 @@
-import type { Program, Node, PrefixExpression } from "../parser";
+import type { Program, Node } from "../parser";
 
 // TODO: fix any return type to specific ones (by implement value system)
 export default class Evaluator {

@@ -14,7 +14,6 @@ import type {
   ExpressionStatement,
   Expression,
   Identifier,
-  PrefixExpression,
 } from "./syntax-tree";
 import Lexer from "../lexer";
 import TokenReader from "./token-reader";
