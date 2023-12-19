@@ -1,4 +1,4 @@
-export type TokenType = Operator | Identifier | NumberLiteral | Illegal | End;
+export type TokenType = Operator | Identifier | NumberLiteral | GroupDelimiter | Illegal | End;
 
 export interface Operator {
   type: "operator";
@@ -13,6 +13,11 @@ export interface Identifier {
 export interface NumberLiteral {
   type: "number literal";
   value: string;
+}
+
+export interface GroupDelimiter {
+  type: "group delimiter";
+  value: "(" | ")";
 }
 
 export interface Illegal {
@@ -37,6 +42,11 @@ export const identifier = (value: Identifier["value"]): Identifier => ({
 
 export const numberLiteral = (value: NumberLiteral["value"]): NumberLiteral => ({
   type: "number literal",
+  value,
+});
+
+export const groupDelimiter = (value: GroupDelimiter["value"]): GroupDelimiter => ({
+  type: "group delimiter",
   value,
 });
 
