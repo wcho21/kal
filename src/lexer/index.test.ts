@@ -1,16 +1,31 @@
 import Lexer from "./";
-import * as Token from "./token";
-import type * as TokenType from "./token";
+import {
+  operator,
+  identifier,
+  numberLiteral,
+  groupDelimiter,
+  illegal,
+  end,
+} from "./token";
+import type {
+  TokenType,
+  Operator,
+  Identifier,
+  NumberLiteral,
+  GroupDelimiter,
+  Illegal,
+  End,
+} from "./token";
 
 describe("getToken()", () => {
   describe("single token", () => {
     describe("operators", () => {
-      const cases: { input: string, expected: TokenType.Operator }[] = [
-        { input: "+", expected: Token.operator("+") },
-        { input: "-", expected: Token.operator("-") },
-        { input: "*", expected: Token.operator("*") },
-        { input: "/", expected: Token.operator("/") },
-        { input: "=", expected: Token.operator("=") },
+      const cases: { input: string, expected: Operator }[] = [
+        { input: "+", expected: operator("+") },
+        { input: "-", expected: operator("-") },
+        { input: "*", expected: operator("*") },
+        { input: "/", expected: operator("/") },
+        { input: "=", expected: operator("=") },
       ];
 
       it.each(cases)("get operator token '$input'", ({ input, expected }) => {
@@ -23,13 +38,13 @@ describe("getToken()", () => {
     });
 
     describe("identifiers", () => {
-      const cases: { input: string, expected: TokenType.Identifier }[] = [
-        { input: "foo", expected: Token.identifier("foo") },
-        { input: "이름", expected: Token.identifier("이름") },
-        { input: "foo이름", expected: Token.identifier("foo이름") },
-        { input: "foo123", expected: Token.identifier("foo123") },
-        { input: "이름foo", expected: Token.identifier("이름foo") },
-        { input: "_foo이름", expected: Token.identifier("_foo이름") },
+      const cases: { input: string, expected: Identifier }[] = [
+        { input: "foo", expected: identifier("foo") },
+        { input: "이름", expected: identifier("이름") },
+        { input: "foo이름", expected: identifier("foo이름") },
+        { input: "foo123", expected: identifier("foo123") },
+        { input: "이름foo", expected: identifier("이름foo") },
+        { input: "_foo이름", expected: identifier("_foo이름") },
       ];
 
       it.each(cases)("get identifier token '$input'", ({ input, expected }) => {
@@ -42,9 +57,9 @@ describe("getToken()", () => {
     });
 
     describe("literals", () => {
-      const cases: { input: string, expected: TokenType.NumberLiteral }[] = [
-        { input: "0", expected: Token.numberLiteral("0") },
-        { input: "123", expected: Token.numberLiteral("123") },
+      const cases: { input: string, expected: NumberLiteral }[] = [
+        { input: "0", expected: numberLiteral("0") },
+        { input: "123", expected: numberLiteral("123") },
       ];
 
       it.each(cases)("get literal token '$input'", ({ input, expected }) => {
@@ -57,9 +72,9 @@ describe("getToken()", () => {
     });
 
     describe("group delimiters", () => {
-      const cases: { input: "(" | ")", expected: TokenType.GroupDelimiter }[] = [
-        { input: "(", expected: Token.groupDelimiter("(") },
-        { input: ")", expected: Token.groupDelimiter(")") },
+      const cases: { input: "(" | ")", expected: GroupDelimiter }[] = [
+        { input: "(", expected: groupDelimiter("(") },
+        { input: ")", expected: groupDelimiter(")") },
       ];
 
       it.each(cases)("get group delimiter token '$input'", ({ input, expected }) => {
@@ -72,8 +87,8 @@ describe("getToken()", () => {
     });
 
     describe("illegal", () => {
-      const cases: { input: string, expected: TokenType.Illegal }[] = [
-        { input: "$", expected: Token.illegal("$") },
+      const cases: { input: string, expected: Illegal }[] = [
+        { input: "$", expected: illegal("$") },
       ];
 
       it.each(cases)("get illegal token '$input'", ({ input, expected }) => {
@@ -86,8 +101,8 @@ describe("getToken()", () => {
     });
 
     describe("end", () => {
-      const cases: { input: string, expected: TokenType.End }[] = [
-        { input: "", expected: Token.end },
+      const cases: { input: string, expected: End }[] = [
+        { input: "", expected: end },
       ];
 
       it.each(cases)("get end token '$input'", ({ input, expected }) => {
@@ -101,29 +116,29 @@ describe("getToken()", () => {
   });
 
   describe("multiple tokens", () => {
-    const cases: { input: string, expectedTokens: TokenType.TokenType[] }[] = [
+    const cases: { input: string, expectedTokens: TokenType[] }[] = [
       {
         input: "12 + 34 * 5 / 67 - 89",
         expectedTokens: [
-          Token.numberLiteral("12"),
-          Token.operator("+"),
-          Token.numberLiteral("34"),
-          Token.operator("*"),
-          Token.numberLiteral("5"),
-          Token.operator("/"),
-          Token.numberLiteral("67"),
-          Token.operator("-"),
-          Token.numberLiteral("89"),
-          Token.end,
+          numberLiteral("12"),
+          operator("+"),
+          numberLiteral("34"),
+          operator("*"),
+          numberLiteral("5"),
+          operator("/"),
+          numberLiteral("67"),
+          operator("-"),
+          numberLiteral("89"),
+          end,
         ]
       },
       {
         input: "_이름 = foo123",
         expectedTokens: [
-          Token.identifier("_이름"),
-          Token.operator("="),
-          Token.identifier("foo123"),
-          Token.end,
+          identifier("_이름"),
+          operator("="),
+          identifier("foo123"),
+          end,
         ]
       },
     ];
@@ -141,7 +156,7 @@ describe("getToken()", () => {
   describe("no token", () => {
     it("get only end token", () => {
       const input = "  \r\r\n\n\t\t";
-      const expected = Token.end;
+      const expected = end;
 
       const lexer = new Lexer(input);
 

@@ -1,4 +1,10 @@
-export type TokenType = Operator | Identifier | NumberLiteral | GroupDelimiter | Illegal | End;
+export type TokenType =
+  Operator |
+  Identifier |
+  NumberLiteral |
+  GroupDelimiter |
+  Illegal |
+  End;
 
 export interface Operator {
   type: "operator";
