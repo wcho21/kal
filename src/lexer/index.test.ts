@@ -56,6 +56,9 @@ describe("getToken()", () => {
       const cases: { input: string, expected: NumberLiteral }[] = [
         { input: "0", expected: numberLiteral("0") },
         { input: "123", expected: numberLiteral("123") },
+        { input: "12.75", expected: numberLiteral("12.75") },
+        { input: "0.875", expected: numberLiteral("0.875") },
+        { input: "2.00", expected: numberLiteral("2.00") },
       ];
 
       it.each(cases)("get literal token '$input'", testLexing);

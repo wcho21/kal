@@ -10,8 +10,35 @@ export default class Lexer {
   }
 
   private readNumber(): string {
+    const wholeNumberPart = this.readWholeNumberPart();
+    const decimalPart = this.readDecimalPart();
+
+    const number = wholeNumberPart + decimalPart;
+
+    return number;
+  }
+
+  private readWholeNumberPart(): string {
     // read digits
     const read = [];
+    while (Util.isDigit(this.buffer.peek())) {
+      read.push(this.buffer.pop());
+    }
+
+    return read.join("");
+  }
+
+  private readDecimalPart(): string {
+    // early return if not decimal point
+    const maybeDecimalPoint = this.buffer.peek();
+    if (maybeDecimalPoint !== ".") {
+      return "";
+    }
+
+    const read = [maybeDecimalPoint];
+    this.buffer.pop(); // eat the decimal point
+
+    // read digits after decimal point
     while (Util.isDigit(this.buffer.peek())) {
       read.push(this.buffer.pop());
     }

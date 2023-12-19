@@ -488,6 +488,24 @@ describe("parseProgram()", () => {
           ],
         },
       },
+      {
+        name: "arithmetic expression with floating point numbers",
+        input: "0.75 + 1.25",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: {
+                type: "infix expression",
+                infix: "+",
+                left: { type: "number node", value: 0.75 },
+                right: { type: "number node", value: 1.25 },
+              },
+            },
+          ],
+        },
+      },
     ];
 
     it.each(cases)("parse $name", testParsing);
