@@ -35,7 +35,7 @@ export interface PrefixExpression {
 
 export interface InfixExpression {
   type: "infix expression";
-  infix: "+" | "-" | "*" | "/" | "=";
+  infix: "+" | "-" | "*" | "/" | "=" | "==" | "!=" | ">" | "<" | ">=" | "<=";
   left: Expression;
   right: Expression;
 }
