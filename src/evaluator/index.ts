@@ -13,12 +13,20 @@ export default class Evaluator {
     return evaluated;
   }
 
-  private evaluatePrefixExpression(prefix: string, operand: number): any {
+  private evaluatePrefixNumberExpression(prefix: string, operand: number): any {
     if (prefix === "+") {
       return operand;
     }
     if (prefix === "-") {
       return -operand;
+    }
+
+    throw new Error(`bad prefix ${prefix}`);
+  }
+
+  private evaluatePrefixBooleanExpression(prefix: string, operand: boolean): any {
+    if (prefix === "!") {
+      return !operand;
     }
 
     throw new Error(`bad prefix ${prefix}`);
@@ -95,11 +103,17 @@ export default class Evaluator {
     }
     if (node.type === "prefix expression") {
       const subExpression = this.evaluate(node.expression, env);
-      if (typeof subExpression !== "number") {
-        throw new Error(`expected sub expression type number, but received ${typeof subExpression}`);
+      if (
+        (node.prefix === "+" || node.prefix === "-") &&
+        typeof subExpression == "number"
+      ) {
+        return this.evaluatePrefixNumberExpression(node.prefix, subExpression);
+      }
+      if (node.prefix === "!" && typeof subExpression === "boolean") {
+        return this.evaluatePrefixBooleanExpression(node.prefix, subExpression);
       }
 
-      return this.evaluatePrefixExpression(node.prefix, subExpression);
+      throw new Error(`bad prefix expression: prefix: '${node.prefix}' with type: '${typeof subExpression}'`);
     }
     if (node.type === "assignment") {
       const varValue = this.evaluate(node.right, env);

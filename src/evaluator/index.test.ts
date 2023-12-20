@@ -20,6 +20,10 @@ describe("evaluate()", () => {
       { input: "참", expected: true },
       { input: "거짓", expected: false },
       { input: "'foo bar'", expected: "foo bar" },
+      { input: "!참", expected: false },
+      { input: "!거짓", expected: true },
+      { input: "!!참", expected: true },
+      { input: "!!거짓", expected: false },
 
       /* test case for comparison expressions */
       { input: "참 == 참", expected: true },
@@ -42,6 +46,8 @@ describe("evaluate()", () => {
       { input: "2 <= 1", expected: false },
       { input: "1 <= 1", expected: true },
       { input: "1 <= 2", expected: true },
+      { input: "!(1 == 1)", expected: false },
+      { input: "!!(1 == 1)", expected: true },
 
       /* test case for left associativity */
       { input: "100-25-4", expected: 71 },
