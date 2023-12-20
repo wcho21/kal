@@ -93,6 +93,21 @@ describe("evaluate()", () => {
         input: "사과 = 3  바나나 = 4  만약 사과 < 바나나 { 5 }",
         expected: 5
       },
+      {
+        name: "simple if-else statement with true boolean literal predicate",
+        input: "만약 참 { 6 } 아니면 { 7 }",
+        expected: 6
+      },
+      {
+        name: "simple if-else statement with false boolean literal predicate",
+        input: "만약 거짓 { 6 } 아니면 { 7 }",
+        expected: 7
+      },
+      {
+        name: "simple if-else statement with boolean expression predicate",
+        input: "만약 1 == 2 { 34 } 아니면 { 56 }",
+        expected: 56
+      },
     ];
 
     it.each(cases)("evaluate $input", ({ input, expected }) => {

@@ -20,7 +20,7 @@ type BooleanLiteralValue = "참" | "거짓";
 type GroupDelimiterValue = "(" | ")";
 type BlockDelimiterValue = "{" | "}";
 type KeywordValue = BranchKeywordValue;
-type BranchKeywordValue = "만약";
+type BranchKeywordValue = "만약" | "아니면";
 type EndValue = typeof END_VALUE;
 
 export interface Operator {

@@ -95,7 +95,7 @@ export default class Lexer {
             return Token.booleanLiteral(read);
           }
 
-          if (read === "만약") {
+          if (read === "만약" || read === "아니면") {
             return Token.keyword(read);
           }
 
