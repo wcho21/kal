@@ -29,13 +29,13 @@ export interface StringNode {
 
 export interface PrefixExpression {
   type: "prefix expression";
-  prefix: "+" | "-";
+  prefix: "+" | "-" | "!";
   expression: Expression;
 }
 
 export interface InfixExpression {
   type: "infix expression";
-  infix: "+" | "-" | "*" | "/" | "=";
+  infix: "+" | "-" | "*" | "/" | "=" | "==" | "!=" | ">" | "<" | ">=" | "<=";
   left: Expression;
   right: Expression;
 }

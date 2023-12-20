@@ -10,7 +10,7 @@ export type TokenType =
 
 export interface Operator {
   type: "operator";
-  value: "+" | "-" | "*" | "/" | "=";
+  value: "+" | "-" | "*" | "/" | "=" | "!" | "!=" | "==" | ">" | "<" | ">=" | "<=";
 }
 
 export interface Identifier {

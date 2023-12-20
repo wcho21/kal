@@ -92,14 +92,49 @@ export default class Lexer {
     const char = this.buffer.peek();
 
     switch (char) {
+      case "!":
+        this.buffer.pop(); // discard current character
+
+        if (this.buffer.peek() === "=") {
+          this.buffer.pop();
+          return Token.operator("!=");
+        }
+
+        return Token.operator("!");
       case "+":
       case "-":
       case "*":
       case "/":
-      case "=":
         this.buffer.pop(); // discard current character
 
         return Token.operator(char);
+      case "=":
+        this.buffer.pop(); // discard current character
+
+        if (this.buffer.peek() === "=") {
+          this.buffer.pop();
+          return Token.operator("==");
+        }
+
+        return Token.operator("=");
+      case ">":
+        this.buffer.pop();
+
+        if (this.buffer.peek() === "=") {
+          this.buffer.pop();
+          return Token.operator(">=");
+        }
+
+        return Token.operator(">");
+      case "<":
+        this.buffer.pop();
+
+        if (this.buffer.peek() === "=") {
+          this.buffer.pop();
+          return Token.operator("<=");
+        }
+
+        return Token.operator("<");
       case "(":
       case ")":
         this.buffer.pop(); // discard current character

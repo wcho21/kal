@@ -69,6 +69,205 @@ describe("parseProgram()", () => {
     it.each(cases)("parse $name", testParsing);
   });
 
+  describe("logical expression", () => {
+    const cases: { name: string, input: string, expected: Program }[] = [
+      {
+        name: "not operator",
+        input: "!x",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: {
+                type: "prefix expression",
+                prefix: "!",
+                expression: { type: "identifier", value: "x" },
+              },
+            },
+          ],
+        },
+      },
+      {
+        name: "double not operator",
+        input: "!!x",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: {
+                type: "prefix expression",
+                prefix: "!",
+                expression: {
+                  type: "prefix expression",
+                  prefix: "!",
+                  expression: { type: "identifier", value: "x" },
+                },
+              },
+            },
+          ],
+        },
+      },
+      {
+        name: "equal-to comparison",
+        input: "x == y",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: {
+                type: "infix expression",
+                infix: "==",
+                left: { type: "identifier", value: "x" },
+                right: { type: "identifier", value: "y" },
+              },
+            },
+          ],
+        },
+      },
+      {
+        name: "not-equal-to comparison",
+        input: "x != y",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: {
+                type: "infix expression",
+                infix: "!=",
+                left: { type: "identifier", value: "x" },
+                right: { type: "identifier", value: "y" },
+              },
+            },
+          ],
+        },
+      },
+      {
+        name: "greater-than comparison",
+        input: "x > y",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: {
+                type: "infix expression",
+                infix: ">",
+                left: { type: "identifier", value: "x" },
+                right: { type: "identifier", value: "y" },
+              },
+            },
+          ],
+        },
+      },
+      {
+        name: "less-than comparison",
+        input: "x < y",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: {
+                type: "infix expression",
+                infix: "<",
+                left: { type: "identifier", value: "x" },
+                right: { type: "identifier", value: "y" },
+              },
+            },
+          ],
+        },
+      },
+      {
+        name: "greater-than-or-equal-to comparison",
+        input: "x >= y",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: {
+                type: "infix expression",
+                infix: ">=",
+                left: { type: "identifier", value: "x" },
+                right: { type: "identifier", value: "y" },
+              },
+            },
+          ],
+        },
+      },
+      {
+        name: "less-than-or-equal-to comparison",
+        input: "x <= y",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: {
+                type: "infix expression",
+                infix: "<=",
+                left: { type: "identifier", value: "x" },
+                right: { type: "identifier", value: "y" },
+              },
+            },
+          ],
+        },
+      },
+      {
+        name: "left associative comparison",
+        input: "x <= y == z",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: {
+                type: "infix expression",
+                infix: "==",
+                left: {
+                  type: "infix expression",
+                  infix: "<=",
+                  left: { type: "identifier", value: "x" },
+                  right: { type: "identifier", value: "y" },
+                },
+                right: { type: "identifier", value: "z" },
+              },
+            },
+          ],
+        },
+      },
+      {
+        name: "complex grouped comparison",
+        input: "x == (y >= z)",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: {
+                type: "infix expression",
+                infix: "==",
+                left: { type: "identifier", value: "x" },
+                right: {
+                  type: "infix expression",
+                  infix: ">=",
+                  left: { type: "identifier", value: "y" },
+                  right: { type: "identifier", value: "z" },
+                },
+              },
+            },
+          ],
+        },
+      },
+    ];
+
+    it.each(cases)("parse $name", testParsing);
+  });
+
   describe("simple expression", () => {
     const cases: { name: string, input: string, expected: Program }[] = [
       {

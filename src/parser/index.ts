@@ -18,6 +18,7 @@ import type {
   ExpressionStatement,
   Expression,
   Identifier,
+  InfixExpression,
 } from "./syntax-tree";
 import Lexer from "../lexer";
 import TokenReader from "./token-reader";
@@ -25,7 +26,8 @@ import TokenReader from "./token-reader";
 type BindingPower = number;
 const bindingPower = {
   lowest: 0,
-  assignment: 40,
+  assignment: 30,
+  comparison: 40,
   summative: 50,
   productive: 60,
   prefix: 70,
@@ -34,6 +36,13 @@ const getBindingPower = (infix: string): BindingPower => {
   switch (infix) {
     case "=":
       return bindingPower.assignment;
+    case "==":
+    case "!=":
+    case ">":
+    case "<":
+    case ">=":
+    case "<=":
+      return bindingPower.comparison;
     case "+":
     case "-":
       return bindingPower.summative;
@@ -117,7 +126,7 @@ export default class Parser {
     }
     if (
       token.type === "operator" &&
-      (token.value === "+" || token.value === "-")
+      (token.value === "+" || token.value === "-" || token.value === "!")
     ) {
       const subExpression = this.parseExpression(bindingPower.prefix);
       const prefix = token.value;
@@ -151,7 +160,18 @@ export default class Parser {
     if (infix === "=" && left.type === "identifier") {
       return this.parseAssignment(left);
     }
-    if (infix === "+" || infix === "-" || infix === "*" || infix === "/") {
+    if (
+      infix === "+" ||
+      infix === "-" ||
+      infix === "*" ||
+      infix === "/" ||
+      infix === "!=" ||
+      infix === "==" ||
+      infix === ">" ||
+      infix === "<" ||
+      infix === ">=" ||
+      infix === "<="
+    ) {
       return this.parseArithmeticInfixExpression(left, infix);
     }
     return null;
@@ -166,7 +186,7 @@ export default class Parser {
     return makeAssignment(left, right);
   }
 
-  private parseArithmeticInfixExpression(left: Expression, infix: "+" | "-" | "*" | "/"): Expression {
+  private parseArithmeticInfixExpression(left: Expression, infix: InfixExpression["infix"]): Expression {
     const infixBindingPower = getBindingPower(infix);
 
     const right = this.parseExpression(infixBindingPower);

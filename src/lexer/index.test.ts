@@ -38,6 +38,13 @@ describe("getToken()", () => {
         { input: "*", expected: operator("*") },
         { input: "/", expected: operator("/") },
         { input: "=", expected: operator("=") },
+        { input: "!", expected: operator("!") },
+        { input: "==", expected: operator("==") },
+        { input: "!=", expected: operator("!=") },
+        { input: ">", expected: operator(">") },
+        { input: "<", expected: operator("<") },
+        { input: ">=", expected: operator(">=") },
+        { input: "<=", expected: operator("<=") },
       ];
 
       it.each(cases)("get operator token '$input'", testLexing);

@@ -22,6 +22,13 @@ describe("operator", () => {
     { input: "*", expected: operator("*") },
     { input: "/", expected: operator("/") },
     { input: "=", expected: operator("=") },
+    { input: "!", expected: operator("!") },
+    { input: "!=", expected: operator("!=") },
+    { input: "==", expected: operator("==") },
+    { input: ">", expected: operator(">") },
+    { input: "<", expected: operator("<") },
+    { input: ">=", expected: operator(">=") },
+    { input: "<=", expected: operator("<=") },
   ];
 
   it.each(cases)("make operator token for '$input'", ({ input, expected }) => {
