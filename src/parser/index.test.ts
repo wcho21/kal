@@ -69,8 +69,46 @@ describe("parseProgram()", () => {
     it.each(cases)("parse $name", testParsing);
   });
 
-  describe("comparison expression", () => {
+  describe("logical expression", () => {
     const cases: { name: string, input: string, expected: Program }[] = [
+      {
+        name: "not operator",
+        input: "!x",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: {
+                type: "prefix expression",
+                prefix: "!",
+                expression: { type: "identifier", value: "x" },
+              },
+            },
+          ],
+        },
+      },
+      {
+        name: "double not operator",
+        input: "!!x",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: {
+                type: "prefix expression",
+                prefix: "!",
+                expression: {
+                  type: "prefix expression",
+                  prefix: "!",
+                  expression: { type: "identifier", value: "x" },
+                },
+              },
+            },
+          ],
+        },
+      },
       {
         name: "equal-to comparison",
         input: "x == y",

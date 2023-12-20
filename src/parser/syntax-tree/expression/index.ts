@@ -29,7 +29,7 @@ export interface StringNode {
 
 export interface PrefixExpression {
   type: "prefix expression";
-  prefix: "+" | "-";
+  prefix: "+" | "-" | "!";
   expression: Expression;
 }
 
