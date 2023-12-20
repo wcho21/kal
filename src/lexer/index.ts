@@ -88,6 +88,10 @@ export default class Lexer {
             return Token.booleanLiteral(read);
           }
 
+          if (read === "만약") {
+            return Token.keyword(read);
+          }
+
           return Token.identifier(read);
         }
 
