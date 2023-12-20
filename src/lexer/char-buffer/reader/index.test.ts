@@ -22,7 +22,7 @@ describe("read()", () => {
   });
 });
 
-describe("incrementIndex()", () => {
+describe("next()", () => {
   it("increment index and read next character", () => {
     const reader = new Reader("ab", "\0");
 
