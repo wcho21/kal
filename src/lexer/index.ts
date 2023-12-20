@@ -30,6 +30,13 @@ export default class Lexer {
           return Token.groupDelimiter(delimiter);
         }
 
+      case "{":
+      case "}":
+        {
+          const delimiter = this.charBuffer.pop() as typeof char;
+          return Token.blockDelimiter(delimiter);
+        }
+
       case "!":
         {
           this.charBuffer.pop();
@@ -86,6 +93,10 @@ export default class Lexer {
           // order is important: match keywords first, before identifier
           if (read === "참" || read === "거짓") {
             return Token.booleanLiteral(read);
+          }
+
+          if (read === "만약") {
+            return Token.keyword(read);
           }
 
           return Token.identifier(read);

@@ -1,9 +1,19 @@
-import type { Program, Node } from "../parser";
+import type { Program, Block, BranchStatement, Node } from "../parser";
 import Environment from "./environment";
 
 // TODO: fix any return type to specific ones (by implement value system)
 export default class Evaluator {
   private evaluateProgram(node: Program, env: Environment): any {
+    let evaluated;
+
+    for (const statement of node.statements) {
+      evaluated = this.evaluate(statement, env);
+    }
+
+    return evaluated;
+  }
+
+  private evaluateBlock(node: Block, env: Environment): any {
     let evaluated;
 
     for (const statement of node.statements) {
@@ -30,6 +40,18 @@ export default class Evaluator {
     }
 
     throw new Error(`bad prefix ${prefix}`);
+  }
+
+  private evaluateBranchStatement(node: BranchStatement, env: Environment): any {
+    const predicate = this.evaluate(node.predicate, env);
+
+    if (predicate) {
+      const consequence = this.evaluate(node.consequence, env);
+
+      return consequence;
+    } else {
+      return undefined;
+    }
   }
 
   private evaluateInfixExpression(infix: string, left: unknown, right: unknown): any {
@@ -82,6 +104,12 @@ export default class Evaluator {
   evaluate(node: Node, env: Environment): any {
     if (node.type === "program") {
       return this.evaluateProgram(node, env);
+    }
+    if (node.type === "block") {
+      return this.evaluateBlock(node, env);
+    }
+    if (node.type === "branch statement") {
+      return this.evaluateBranchStatement(node, env);
     }
     if (node.type === "expression statement") {
       return this.evaluate(node.expression, env);

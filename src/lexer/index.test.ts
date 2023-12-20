@@ -6,6 +6,8 @@ import {
   booleanLiteral,
   stringLiteral,
   groupDelimiter,
+  blockDelimiter,
+  keyword,
   illegal,
   end,
 } from "./token";
@@ -17,6 +19,8 @@ import type {
   BooleanLiteral,
   StringLiteral,
   GroupDelimiter,
+  BlockDelimiter,
+  Keyword,
   Illegal,
   End,
 } from "./token";
@@ -105,6 +109,23 @@ describe("getToken()", () => {
       it.each(cases)("get group delimiter token '$input'", testLexing);
     });
 
+    describe("block delimiters", () => {
+      const cases: { input: string, expected: BlockDelimiter }[] = [
+        { input: "{", expected: blockDelimiter("{") },
+        { input: "}", expected: blockDelimiter("}") },
+      ];
+
+      it.each(cases)("get group delimiter token '$input'", testLexing);
+    });
+
+    describe("keywords", () => {
+      const cases: { input: string, expected: Keyword }[] = [
+        { input: "만약", expected: keyword("만약") },
+      ];
+
+      it.each(cases)("get group delimiter token '$input'", testLexing);
+    });
+
     describe("illegal", () => {
       const cases: { input: string, expected: Illegal }[] = [
         { input: "$", expected: illegal("$") },
@@ -154,6 +175,17 @@ describe("getToken()", () => {
         expectedTokens: [
           stringLiteral("foo"),
           stringLiteral("bar"),
+          end,
+        ]
+      },
+      {
+        input: "만약 참 { \n 12 \n }",
+        expectedTokens: [
+          keyword("만약"),
+          booleanLiteral("참"),
+          blockDelimiter("{"),
+          numberLiteral("12"),
+          blockDelimiter("}"),
           end,
         ]
       },
