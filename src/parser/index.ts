@@ -126,7 +126,7 @@ export default class Parser {
     }
     if (
       token.type === "operator" &&
-      (token.value === "+" || token.value === "-")
+      (token.value === "+" || token.value === "-" || token.value === "!")
     ) {
       const subExpression = this.parseExpression(bindingPower.prefix);
       const prefix = token.value;
