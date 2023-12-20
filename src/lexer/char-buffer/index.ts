@@ -1,11 +1,12 @@
 import Reader from "./reader";
 
-export default class Buffer {
-  private static readonly END_OF_INPUT = "\0";
+export default class CharBuffer {
+  static readonly END_OF_INPUT = "\0";
+
   private readonly reader: Reader;
 
   constructor(input: string) {
-    this.reader = new Reader(input, Buffer.END_OF_INPUT);
+    this.reader = new Reader(input, CharBuffer.END_OF_INPUT);
   }
 
   pop(): string {

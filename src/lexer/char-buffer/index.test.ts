@@ -1,6 +1,6 @@
 import Buffer from "./";
 
-describe("popChar()", () => {
+describe("pop()", () => {
   it("pop characters", () => {
     const buffer = new Buffer("ab");
 
@@ -22,7 +22,7 @@ describe("popChar()", () => {
   });
 });
 
-describe("peekChar()", () => {
+describe("peek()", () => {
   it("peek character", () => {
     const buffer = new Buffer("a");
 

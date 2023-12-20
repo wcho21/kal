@@ -5,12 +5,27 @@ export type TokenType =
   BooleanLiteral |
   StringLiteral |
   GroupDelimiter |
+  BlockDelimiter |
+  Keyword |
   Illegal |
   End;
 
+export const END_VALUE = "$end"; // unreadable character '$' used to avoid other token values
+
+type OperatorValue = ArithmeticOperatorValue | AssignmentOperatorValue | LogicalOperatorValue;
+type ArithmeticOperatorValue = "+" | "-" | "*" | "/";
+type AssignmentOperatorValue = "=";
+type LogicalOperatorValue = "!" | "!=" | "==" | ">" | "<" | ">=" | "<=";
+type BooleanLiteralValue = "참" | "거짓";
+type GroupDelimiterValue = "(" | ")";
+type BlockDelimiterValue = "{" | "}";
+type KeywordValue = BranchKeywordValue;
+type BranchKeywordValue = "만약";
+type EndValue = typeof END_VALUE;
+
 export interface Operator {
   type: "operator";
-  value: "+" | "-" | "*" | "/" | "=" | "!" | "!=" | "==" | ">" | "<" | ">=" | "<=";
+  value: OperatorValue;
 }
 
 export interface Identifier {
@@ -25,7 +40,7 @@ export interface NumberLiteral {
 
 export interface BooleanLiteral {
   type: "boolean literal";
-  value: "참" | "거짓";
+  value: BooleanLiteralValue;
 }
 
 export interface StringLiteral {
@@ -35,7 +50,17 @@ export interface StringLiteral {
 
 export interface GroupDelimiter {
   type: "group delimiter";
-  value: "(" | ")";
+  value: GroupDelimiterValue;
+}
+
+export interface BlockDelimiter {
+  type: "block delimiter";
+  value: BlockDelimiterValue;
+}
+
+export interface Keyword {
+  type: "keyword";
+  value: KeywordValue;
 }
 
 export interface Illegal {
@@ -45,7 +70,7 @@ export interface Illegal {
 
 export interface End {
   type: "end";
-  value: "$end";
+  value: EndValue
 }
 
 export const operator = (value: Operator["value"]): Operator => ({
@@ -78,12 +103,19 @@ export const groupDelimiter = (value: GroupDelimiter["value"]): GroupDelimiter =
   value,
 });
 
+export const blockDelimiter = (value: BlockDelimiter["value"]): BlockDelimiter => ({
+  type: "block delimiter",
+  value,
+});
+
+export const keyword = (value: Keyword["value"]): Keyword => ({
+  type: "keyword",
+  value,
+});
+
 export const illegal = (value: Illegal["value"]): Illegal => ({
   type: "illegal",
   value,
 });
 
-export const end: End = {
-  type: "end",
-  value: "$end", // unreadable character '$' used to avoid `identifer` value
-};
+export const end: End = { type: "end", value: END_VALUE };
