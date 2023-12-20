@@ -22,6 +22,7 @@ describe("operator", () => {
     { input: "*", expected: operator("*") },
     { input: "/", expected: operator("/") },
     { input: "=", expected: operator("=") },
+    { input: "!", expected: operator("!") },
     { input: "!=", expected: operator("!=") },
     { input: "==", expected: operator("==") },
     { input: ">", expected: operator(">") },
