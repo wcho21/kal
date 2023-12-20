@@ -5,6 +5,7 @@ export type TokenType =
   BooleanLiteral |
   StringLiteral |
   GroupDelimiter |
+  Keyword |
   Illegal |
   End;
 
@@ -16,6 +17,8 @@ type AssignmentOperatorValue = "=";
 type LogicalOperatorValue = "!" | "!=" | "==" | ">" | "<" | ">=" | "<=";
 type BooleanLiteralValue = "참" | "거짓";
 type GroupDelimiterValue = "(" | ")";
+type KeywordValue = BranchKeywordValue;
+type BranchKeywordValue = "만약";
 type EndValue = typeof END_VALUE;
 
 export interface Operator {
@@ -46,6 +49,11 @@ export interface StringLiteral {
 export interface GroupDelimiter {
   type: "group delimiter";
   value: GroupDelimiterValue;
+}
+
+export interface Keyword {
+  type: "keyword";
+  value: KeywordValue;
 }
 
 export interface Illegal {
@@ -85,6 +93,11 @@ export const stringLiteral = (value: StringLiteral["value"]): StringLiteral => (
 
 export const groupDelimiter = (value: GroupDelimiter["value"]): GroupDelimiter => ({
   type: "group delimiter",
+  value,
+});
+
+export const keyword = (value: Keyword["value"]): Keyword => ({
+  type: "keyword",
   value,
 });
 

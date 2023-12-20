@@ -5,6 +5,7 @@ import {
   booleanLiteral,
   stringLiteral,
   groupDelimiter,
+  keyword,
 } from "./";
 import type {
   Operator,
@@ -13,6 +14,7 @@ import type {
   BooleanLiteral,
   StringLiteral,
   GroupDelimiter,
+  Keyword,
 } from "./";
 
 describe("operator", () => {
@@ -101,6 +103,18 @@ describe("group delimiter", () => {
 
   it.each(cases)("make group delimiter token for '$input'", ({ input, expected }) => {
     const token = groupDelimiter(input);
+
+    expect(token).toEqual(expected);
+  });
+});
+
+describe("keywords", () => {
+  const cases: { input: Keyword["value"], expected: Keyword }[] = [
+    { input: "만약", expected: keyword("만약") },
+  ];
+
+  it.each(cases)("make keyword token for '$input'", ({ input, expected }) => {
+    const token = keyword(input);
 
     expect(token).toEqual(expected);
   });
