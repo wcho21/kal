@@ -14,6 +14,27 @@ Try _KAL_ at [KAL Playground][playground].
 
 
 
+## 🗡️ Examples
+
+Variable assignment:
+```
+사과 = 42
+```
+
+Comparison:
+```
+사과 < 99
+```
+
+Conditional statement:
+```
+만약 사과 < 99 {
+    사과 = 99
+}
+```
+
+
+
 ## 🗡️ Manual building and installation
 
 ### How to build
