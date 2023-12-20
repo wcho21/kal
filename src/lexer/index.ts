@@ -9,134 +9,6 @@ export default class Lexer {
     this.charBuffer = new CharBuffer(input);
   }
 
-  private readNumber(): string {
-    const wholeNumberPart = this.readWholeNumberPart();
-    const decimalPart = this.readDecimalPart();
-
-    const number = wholeNumberPart + decimalPart;
-
-    return number;
-  }
-
-  private readWholeNumberPart(): string {
-    const digits = [];
-    while (Util.isDigit(this.charBuffer.peek())) {
-      digits.push(this.charBuffer.pop());
-    }
-
-    const wholeNumberPart = digits.join("");
-    return wholeNumberPart;
-  }
-
-  private readDecimalPart(): string {
-    // early return if not decimal point
-    const maybeDecimalPoint = this.charBuffer.peek();
-    if (maybeDecimalPoint !== ".") {
-      return "";
-    }
-    const decimalPoint = this.charBuffer.pop();
-
-    // read digits after decimal point
-    const digits = [];
-    while (Util.isDigit(this.charBuffer.peek())) {
-      digits.push(this.charBuffer.pop());
-    }
-
-    const decimalPart = decimalPoint + digits.join("");
-    return decimalPart;
-  }
-
-  /** return [string-literal, true] if ok; otherwise [string-read-so-far, false] */
-  private readStringLiteral(): [string, boolean] {
-    const read: string[] = [];
-
-    // read string until string closing symbol (')
-    while (true) {
-      const char = this.charBuffer.pop();
-
-      if (char === "'") {
-        const str = read.join("");
-        const ok = true;
-        return [str, ok];
-      }
-
-      if (char === CharBuffer.END_OF_INPUT) {
-        const str = read.join("");
-        const notOk = false;
-        return [str, notOk];
-      }
-
-      read.push(char);
-    }
-  }
-
-  private readIdentifier(): string {
-    // read letters and digits
-    const read = [];
-    while (
-      Util.isLetter(this.charBuffer.peek()) ||
-      Util.isDigit(this.charBuffer.peek())
-    ) {
-      read.push(this.charBuffer.pop());
-    }
-
-    return read.join("");
-  }
-
-  private skipWhitespaces(): void {
-    while (Util.isWhitespace(this.charBuffer.peek())) {
-      this.charBuffer.pop();
-    }
-  }
-
-  /** assume the bang character popped */
-  private readOperatorStartingWithBang(): "!" | "!=" {
-    switch (this.charBuffer.peek()) {
-      case "=":
-        this.charBuffer.pop();
-        return "!=";
-
-      default:
-        return "!";
-    }
-  }
-
-  /** assume the equal character popped */
-  private readOperatorStartingWithEqual(): "=" | "==" {
-    switch (this.charBuffer.peek()) {
-      case "=":
-        this.charBuffer.pop();
-        return "==";
-
-      default:
-        return "=";
-    }
-  }
-
-  /** assume the greater-than character popped */
-  private readOperatorStartingWithGreaterThan(): ">" | ">=" {
-    switch (this.charBuffer.peek()) {
-      case "=":
-        this.charBuffer.pop();
-        return ">=";
-
-      default:
-        return ">";
-    }
-  }
-
-  /** assume the less-than character popped */
-  private readOperatorStartingWithLessThan(): "<" | "<=" {
-    switch (this.charBuffer.peek()) {
-      case "=":
-        this.charBuffer.pop();
-        return "<=";
-
-      default:
-        return "<";
-    }
-  }
-
   getToken(): Token.TokenType {
     this.skipWhitespaces();
 
@@ -224,6 +96,136 @@ export default class Lexer {
         this.charBuffer.pop();
         return Token.illegal(char);
     }
+  }
+
+  private skipWhitespaces(): void {
+    while (Util.isWhitespace(this.charBuffer.peek())) {
+      this.charBuffer.pop();
+    }
+  }
+
+  /** assume the bang character popped */
+  private readOperatorStartingWithBang(): "!" | "!=" {
+    switch (this.charBuffer.peek()) {
+      case "=":
+        this.charBuffer.pop();
+        return "!=";
+
+      default:
+        return "!";
+    }
+  }
+
+  /** assume the equal character popped */
+  private readOperatorStartingWithEqual(): "=" | "==" {
+    switch (this.charBuffer.peek()) {
+      case "=":
+        this.charBuffer.pop();
+        return "==";
+
+      default:
+        return "=";
+    }
+  }
+
+  /** assume the greater-than character popped */
+  private readOperatorStartingWithGreaterThan(): ">" | ">=" {
+    switch (this.charBuffer.peek()) {
+      case "=":
+        this.charBuffer.pop();
+        return ">=";
+
+      default:
+        return ">";
+    }
+  }
+
+  /** assume the less-than character popped */
+  private readOperatorStartingWithLessThan(): "<" | "<=" {
+    switch (this.charBuffer.peek()) {
+      case "=":
+        this.charBuffer.pop();
+        return "<=";
+
+      default:
+        return "<";
+    }
+  }
+
+  /** return [string-literal, true] if ok; otherwise [string-read-so-far, false] */
+  private readStringLiteral(): [string, boolean] {
+    const read: string[] = [];
+
+    // read string until string closing symbol (')
+    while (true) {
+      const char = this.charBuffer.pop();
+
+      if (char === "'") {
+        const str = read.join("");
+        const ok = true;
+        return [str, ok];
+      }
+
+      if (char === CharBuffer.END_OF_INPUT) {
+        const str = read.join("");
+        const notOk = false;
+        return [str, notOk];
+      }
+
+      read.push(char);
+    }
+  }
+
+  private readNumber(): string {
+    const wholeNumberPart = this.readWholeNumberPart();
+    const decimalPart = this.readDecimalPart();
+
+    const number = wholeNumberPart + decimalPart;
+
+    return number;
+  }
+
+  /** helper function for readNumber() method */
+  private readWholeNumberPart(): string {
+    const digits = [];
+    while (Util.isDigit(this.charBuffer.peek())) {
+      digits.push(this.charBuffer.pop());
+    }
+
+    const wholeNumberPart = digits.join("");
+    return wholeNumberPart;
+  }
+
+  /** helper function for readNumber() method */
+  private readDecimalPart(): string {
+    // early return if not decimal point
+    const maybeDecimalPoint = this.charBuffer.peek();
+    if (maybeDecimalPoint !== ".") {
+      return "";
+    }
+    const decimalPoint = this.charBuffer.pop();
+
+    // read digits after decimal point
+    const digits = [];
+    while (Util.isDigit(this.charBuffer.peek())) {
+      digits.push(this.charBuffer.pop());
+    }
+
+    const decimalPart = decimalPoint + digits.join("");
+    return decimalPart;
+  }
+
+  private readIdentifier(): string {
+    // read letters and digits
+    const read = [];
+    while (
+      Util.isLetter(this.charBuffer.peek()) ||
+      Util.isDigit(this.charBuffer.peek())
+    ) {
+      read.push(this.charBuffer.pop());
+    }
+
+    return read.join("");
   }
 }
 
