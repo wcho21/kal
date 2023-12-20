@@ -47,11 +47,16 @@ export default class Evaluator {
 
     if (predicate) {
       const consequence = this.evaluate(node.consequence, env);
-
       return consequence;
-    } else {
+    }
+
+    // early return if no else block
+    if (typeof node.alternative === "undefined") {
       return undefined;
     }
+
+    const alternative = this.evaluate(node.alternative, env);
+    return alternative;
   }
 
   private evaluateInfixExpression(infix: string, left: unknown, right: unknown): any {
@@ -166,7 +171,7 @@ export default class Evaluator {
       return value;
     }
 
-    // throw new Error(`not supported node type '${node.type}'`);
+    const exhaustiveCheck: never = node;
   }
 }
 
