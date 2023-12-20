@@ -111,6 +111,7 @@ describe("group delimiter", () => {
 describe("keywords", () => {
   const cases: { input: Keyword["value"], expected: Keyword }[] = [
     { input: "만약", expected: keyword("만약") },
+    { input: "아니면", expected: keyword("아니면") },
   ];
 
   it.each(cases)("make keyword token for '$input'", ({ input, expected }) => {
