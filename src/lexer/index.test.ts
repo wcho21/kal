@@ -38,6 +38,7 @@ describe("getToken()", () => {
         { input: "*", expected: operator("*") },
         { input: "/", expected: operator("/") },
         { input: "=", expected: operator("=") },
+        { input: "!", expected: operator("!") },
         { input: "==", expected: operator("==") },
         { input: "!=", expected: operator("!=") },
         { input: ">", expected: operator(">") },

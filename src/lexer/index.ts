@@ -100,7 +100,7 @@ export default class Lexer {
           return Token.operator("!=");
         }
 
-        return Token.illegal("!");
+        return Token.operator("!");
       case "+":
       case "-":
       case "*":
