@@ -1,20 +1,24 @@
 import {
   makeProgram,
+  makeBlock,
   makeIdentifier,
   makeAssignment,
   makeNumberNode,
   makeBooleanNode,
   makeStringNode,
+  makeBranchStatement,
   makeExpressionStatement,
   makePrefixExpression,
   makeInfixExpression,
 } from "./syntax-tree";
 import type {
   Program,
+  Block,
   Statement,
   NumberNode,
   BooleanNode,
   StringNode,
+  BranchStatement,
   ExpressionStatement,
   Expression,
   Identifier,
@@ -74,8 +78,55 @@ export default class Parser {
     return program;
   }
 
+  private parseBlock(): Block {
+    // eat token if block start delimiter; otherwise throw error
+    const maybeBlockStart = this.buffer.read();
+    if (maybeBlockStart.type !== "block delimiter" || maybeBlockStart.value !== "{") {
+      throw new Error(`expected { but received ${maybeBlockStart.type}`);
+    }
+    this.buffer.next();
+
+    // populate statements in block
+    const statements: Statement[] = [];
+    while (true) {
+      const token = this.buffer.read();
+
+      // end block delimiter token and break loop if end of block
+      if (token.type === "block delimiter" && token.value === "}") {
+        this.buffer.next();
+        break;
+      }
+
+      // append statement to block
+      const statement = this.parseStatement();
+      if (statement !== null) {
+        statements.push(statement);
+      }
+    }
+
+    // make and return block
+    const block = makeBlock(statements);
+    return block;
+  }
+
   private parseStatement(): Statement {
+    const token = this.buffer.read();
+
+    if (token.type === "keyword" && token.value === "만약") {
+      this.buffer.next();
+
+      return this.parseBranchStatement();
+    }
+
     return this.parseExpressionStatement();
+  }
+
+  private parseBranchStatement(): BranchStatement {
+    const predicate = this.parseExpression(bindingPower.lowest);
+    const consequence = this.parseBlock();
+
+    const branchStatement = makeBranchStatement(predicate, consequence);
+    return branchStatement;
   }
 
   private parseExpressionStatement(): ExpressionStatement {

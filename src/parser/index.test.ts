@@ -748,4 +748,60 @@ describe("parseProgram()", () => {
 
     it.each(cases)("parse $name", testParsing);
   });
+
+  describe("branch statements", () => {
+    const cases: { name: string, input: string, expected: Program }[] = [
+      {
+        name: "simple if statement with boolean predicate",
+        input: "만약 참 { 1 }",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "branch statement",
+              predicate: { type: "boolean node", value: true },
+              consequence: {
+                type: "block",
+                statements: [
+                  {
+                    type: "expression statement",
+                    expression: { type: "number node", value: 1 },
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      },
+      {
+        name: "simple if statement with expression predicate",
+        input: "만약 사과 == 1 { 2 }",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "branch statement",
+              predicate: {
+                type: "infix expression",
+                infix: "==",
+                left: { type: "identifier", value: "사과" },
+                right:  { type: "number node", value: 1 },
+              },
+              consequence: {
+                type: "block",
+                statements: [
+                  {
+                    type: "expression statement",
+                    expression: { type: "number node", value: 2 },
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      },
+    ];
+
+    it.each(cases)("parse $name", testParsing);
+  });
 });
