@@ -75,17 +75,15 @@ export default class Lexer {
 
       default:
         if (Util.isDigit(char)) {
-          const number = this.readNumber();
+          const number = this.readNumberLiteral();
 
           return Token.numberLiteral(number);
         }
 
         if (Util.isLetter(char)) {
-          // match keyword first before matching identifier
-          // since identifier is a string of letters not matched with keywords
+          const read = this.readLettersAndDigits();
 
-          const read = this.readIdentifier();
-
+          // order is important: match keywords first, before identifier
           if (read === "참" || read === "거짓") {
             return Token.booleanLiteral(read);
           }
@@ -160,24 +158,19 @@ export default class Lexer {
     while (true) {
       const char = this.charBuffer.pop();
 
-      if (char === "'") {
+      if (char === "'" || char === CharBuffer.END_OF_INPUT) {
         const str = read.join("");
-        const ok = true;
-        return [str, ok];
-      }
+        const legalString = char === "'"; // true if closing quote encoutered
 
-      if (char === CharBuffer.END_OF_INPUT) {
-        const str = read.join("");
-        const notOk = false;
-        return [str, notOk];
+        return [str, legalString];
       }
 
       read.push(char);
     }
   }
 
-  private readNumber(): string {
-    const wholeNumberPart = this.readWholeNumberPart();
+  private readNumberLiteral(): string {
+    const wholeNumberPart = this.readDigits();
     const decimalPart = this.readDecimalPart();
 
     const number = wholeNumberPart + decimalPart;
@@ -185,38 +178,32 @@ export default class Lexer {
     return number;
   }
 
-  /** helper function for readNumber() method */
-  private readWholeNumberPart(): string {
-    const digits = [];
+  private readDigits(): string {
+    const read: string[] = [];
     while (Util.isDigit(this.charBuffer.peek())) {
-      digits.push(this.charBuffer.pop());
+      read.push(this.charBuffer.pop());
     }
 
-    const wholeNumberPart = digits.join("");
-    return wholeNumberPart;
+    const digits = read.join("");
+    return digits;
   }
 
-  /** helper function for readNumber() method */
+  /** helper function for readNumberLiteral() method */
   private readDecimalPart(): string {
-    // early return if not decimal point
+    // read decimal point; if not, early return
     const maybeDecimalPoint = this.charBuffer.peek();
     if (maybeDecimalPoint !== ".") {
       return "";
     }
     const decimalPoint = this.charBuffer.pop();
 
-    // read digits after decimal point
-    const digits = [];
-    while (Util.isDigit(this.charBuffer.peek())) {
-      digits.push(this.charBuffer.pop());
-    }
-
-    const decimalPart = decimalPoint + digits.join("");
+    // read and return decimal part
+    const digits = this.readDigits();
+    const decimalPart = decimalPoint + digits;
     return decimalPart;
   }
 
-  private readIdentifier(): string {
-    // read letters and digits
+  private readLettersAndDigits(): string {
     const read = [];
     while (
       Util.isLetter(this.charBuffer.peek()) ||
