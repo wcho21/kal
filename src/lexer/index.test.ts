@@ -121,6 +121,7 @@ describe("getToken()", () => {
     describe("keywords", () => {
       const cases: { input: string, expected: Keyword }[] = [
         { input: "만약", expected: keyword("만약") },
+        { input: "아니면", expected: keyword("아니면") },
       ];
 
       it.each(cases)("get group delimiter token '$input'", testLexing);
@@ -179,12 +180,16 @@ describe("getToken()", () => {
         ]
       },
       {
-        input: "만약 참 { \n 12 \n }",
+        input: "만약 참 { \n 12 \n } 아니면 { \n 34 \n}",
         expectedTokens: [
           keyword("만약"),
           booleanLiteral("참"),
           blockDelimiter("{"),
           numberLiteral("12"),
+          blockDelimiter("}"),
+          keyword("아니면"),
+          blockDelimiter("{"),
+          numberLiteral("34"),
           blockDelimiter("}"),
           end,
         ]
