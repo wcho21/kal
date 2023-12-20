@@ -76,6 +76,37 @@ describe("evaluate()", () => {
     });
   });
 
+  describe("branch statements", () => {
+    const cases = [
+      {
+        name: "simple if statement with boolean literal predicate",
+        input: "만약 참 { 3 }",
+        expected: 3
+      },
+      {
+        name: "simple if statement with boolean expression predicate",
+        input: "만약 1 != 2 { 4 }",
+        expected: 4
+      },
+      {
+        name: "simple if statement with variable comparison predicate",
+        input: "사과 = 3  바나나 = 4  만약 사과 < 바나나 { 5 }",
+        expected: 5
+      },
+    ];
+
+    it.each(cases)("evaluate $input", ({ input, expected }) => {
+      const lexer = new Lexer(input);
+      const parser = new Parser(lexer);
+      const program = parser.parseProgram();
+      const evaluator = new Evaluator();
+      const environment = new Environment();
+      const evaluated = evaluator.evaluate(program, environment);
+
+      expect(evaluated).toBe(expected);
+    });
+  });
+
   describe("variable statements", () => {
     const cases = [
       { name: "integer variable with number literal", input: "foo = 42  foo", expected: 42 },
