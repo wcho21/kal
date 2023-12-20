@@ -125,7 +125,17 @@ export default class Parser {
     const predicate = this.parseExpression(bindingPower.lowest);
     const consequence = this.parseBlock();
 
-    const branchStatement = makeBranchStatement(predicate, consequence);
+    // eat token if else token; otherwise early return without else block
+    const maybeElseToken = this.buffer.read();
+    if (maybeElseToken.type !== "keyword" || maybeElseToken.value !== "아니면") {
+      const branchStatement = makeBranchStatement(predicate, consequence);
+      return branchStatement;
+    }
+    this.buffer.next();
+
+    // return statement with else block
+    const alternative = this.parseBlock();
+    const branchStatement = makeBranchStatement(predicate, consequence, alternative);
     return branchStatement;
   }
 

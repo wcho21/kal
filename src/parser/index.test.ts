@@ -800,6 +800,37 @@ describe("parseProgram()", () => {
           ],
         },
       },
+      {
+        name: "simple if-else statement with boolean predicate",
+        input: "만약 참 { 3 } 아니면 { 4 }",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "branch statement",
+              predicate: { type: "boolean node", value: true },
+              consequence: {
+                type: "block",
+                statements: [
+                  {
+                    type: "expression statement",
+                    expression: { type: "number node", value: 3 },
+                  },
+                ],
+              },
+              alternative: {
+                type: "block",
+                statements: [
+                  {
+                    type: "expression statement",
+                    expression: { type: "number node", value: 4 },
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      },
     ];
 
     it.each(cases)("parse $name", testParsing);
