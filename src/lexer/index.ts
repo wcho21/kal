@@ -1,12 +1,12 @@
-import Buffer from "./buffer";
+import CharBuffer from "./char-buffer";
 import * as Token from "./token";
 import * as Util from "./util";
 
 export default class Lexer {
-  private readonly buffer: Buffer;
+  private readonly buffer: CharBuffer;
 
   constructor(input: string) {
-    this.buffer = new Buffer(input);
+    this.buffer = new CharBuffer(input);
   }
 
   private readNumber(): string {
