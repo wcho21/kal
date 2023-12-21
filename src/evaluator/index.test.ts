@@ -142,4 +142,27 @@ describe("evaluate()", () => {
       expect(evaluated).toBe(expected);
     });
   });
+
+  describe("function expressions", () => {
+    const cases = [
+      {
+        name: "simple function expression",
+        input: "함수 () { 1 }"
+      },
+    ];
+
+    it.each(cases)("evaluate $name", ({ input }) => {
+      const lexer = new Lexer(input);
+      const parser = new Parser(lexer);
+      const program = parser.parseProgram();
+      const evaluator = new Evaluator();
+      const environment = new Environment();
+      const evaluated = evaluator.evaluate(program, environment);
+
+      expect(evaluated).not.toBeUndefined();
+      expect(evaluated).toHaveProperty("parameters");
+      expect(evaluated).toHaveProperty("body");
+      expect(evaluated).toHaveProperty("environment");
+    });
+  });
 });
