@@ -1,3 +1,5 @@
+import { Block } from "../group";
+
 export type Expression =
   Identifier |
   NumberNode |
@@ -5,6 +7,7 @@ export type Expression =
   StringNode |
   PrefixExpression |
   InfixExpression |
+  FunctionExpression |
   Assignment;
 
 export interface Identifier {
@@ -38,6 +41,12 @@ export interface InfixExpression {
   infix: "+" | "-" | "*" | "/" | "=" | "==" | "!=" | ">" | "<" | ">=" | "<=";
   left: Expression;
   right: Expression;
+}
+
+export interface FunctionExpression {
+  type: "function expression";
+  parameter: Identifier[],
+  body: Block;
 }
 
 export interface Assignment {
@@ -77,6 +86,12 @@ export const makeInfixExpression = (infix: InfixExpression["infix"], left: Infix
   infix,
   left,
   right,
+});
+
+export const makeFunctionExpression = (body: FunctionExpression["body"], parameter: FunctionExpression["parameter"] = []): FunctionExpression => ({
+  type: "function expression",
+  parameter,
+  body,
 });
 
 export const makeAssignment = (left: Assignment["left"], right: Assignment["right"]): Assignment => ({
