@@ -122,6 +122,7 @@ describe("getToken()", () => {
       const cases: { input: string, expected: Keyword }[] = [
         { input: "만약", expected: keyword("만약") },
         { input: "아니면", expected: keyword("아니면") },
+        { input: "함수", expected: keyword("함수") },
       ];
 
       it.each(cases)("get group delimiter token '$input'", testLexing);
