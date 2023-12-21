@@ -37,6 +37,12 @@ export default class Lexer {
           return Token.blockDelimiter(delimiter);
         }
 
+      case ",":
+        {
+          const separator = this.charBuffer.pop() as typeof char;
+          return Token.separator(separator);
+        }
+
       case "!":
         {
           this.charBuffer.pop();
