@@ -1,4 +1,4 @@
-import type { Program, Block, BranchStatement, Node } from "../parser";
+import type { Program, Block, BranchStatement, Node, Expression } from "../parser";
 import Environment from "./environment";
 
 // TODO: fix any return type to specific ones (by implement value system)
@@ -153,6 +153,14 @@ export default class Evaluator {
       const body = node.body;
       return { parameters, body, environment: env };
     }
+    if (node.type === "call") {
+      const functionToCall = this.evaluate(node.functionToCall, env);
+
+      const callArguments = this.parseCallArguments(node.callArguments, env);
+
+      const value = this.evaluateFunctionCall(functionToCall, callArguments);
+      return value;
+    }
     if (node.type === "assignment") {
       const varValue = this.evaluate(node.right, env);
 
@@ -176,8 +184,28 @@ export default class Evaluator {
       return value;
     }
 
-    // TODO: uncomment
-    // const exhaustiveCheck: never = node;
+    const exhaustiveCheck: never = node;
+  }
+
+  private parseCallArguments(callArguments: Expression[], env: Environment): any[] {
+    const values = [];
+    for (const arg of callArguments) {
+      const value = this.evaluate(arg, env);
+      values.push(value);
+    }
+    return values;
+  }
+
+  private evaluateFunctionCall(functionToCall: any, callArguments: any[]): any {
+    const functionEnv = new Environment(functionToCall.environment);
+    for (let i = 0; i < functionToCall.parameters.length; ++i) {
+      const name = functionToCall.parameters[i].value;
+      const value = callArguments[i];
+      functionEnv.set(name, value);
+    }
+
+    const value = this.evaluate(functionToCall.body, functionEnv);
+    return value;
   }
 }
 

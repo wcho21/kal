@@ -26,3 +26,24 @@ describe("get()", () => {
     expect(value).toBe(null);
   });
 });
+
+describe("linked environment", () => {
+  it("set super environment and get via sub environment", () => {
+    const superEnv = new Environment();
+    superEnv.set("foo", 42);
+    const subEnv = new Environment(superEnv);
+
+    const value = subEnv.get("foo");
+
+    expect(value).toBe(42);
+  });
+
+  it("get null if not found even in super environment", () => {
+    const superEnv = new Environment();
+    const subEnv = new Environment(superEnv);
+
+    const value = subEnv.get("foo");
+
+    expect(value).toBe(null);
+  });
+});
