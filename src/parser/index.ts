@@ -10,6 +10,7 @@ import {
   makeExpressionStatement,
   makePrefixExpression,
   makeInfixExpression,
+  makeFunctionExpression,
 } from "./syntax-tree";
 import type {
   Program,
@@ -194,6 +195,13 @@ export default class Parser {
       const expression = makePrefixExpression(prefix, subExpression);
       return expression;
     }
+    if (token.type === "keyword" && token.value === "함수") {
+      const parameters = this.parseParameters();
+      const body = this.parseBlock();
+
+      const functionExpression = makeFunctionExpression(body, parameters);
+      return functionExpression;
+    }
     if (token.type === "group delimiter" && token.value === "(") {
       const groupedExpression = this.parseExpression(bindingPower.lowest);
 
@@ -207,6 +215,60 @@ export default class Parser {
     }
 
     throw new Error(`bad token type ${token.type} (${token.value}) for prefix expression`);
+  }
+
+  private parseParameters(): Identifier[] {
+    const parameters: Identifier[] = [];
+
+    const maybeGroupStart = this.buffer.read();
+    if (maybeGroupStart.type !== "group delimiter" || maybeGroupStart.value !== "(") {
+      throw new Error(`expected ( but received ${maybeGroupStart.type}`);
+    }
+    this.buffer.next();
+
+    // early return empty parameters if end of parameter list
+    const maybeIdentifierOrGroupEnd = this.buffer.read();
+    this.buffer.next();
+    if (maybeIdentifierOrGroupEnd.type === "group delimiter" && maybeIdentifierOrGroupEnd.value === ")") {
+      return [];
+    }
+    const maybeIdentifier = maybeIdentifierOrGroupEnd;
+
+    // read first parameter
+    if (maybeIdentifier.type !== "identifier") {
+      throw new Error(`expected identifier but received ${maybeIdentifier}`);
+    }
+    const identifier = maybeIdentifier;
+    parameters.push(identifier);
+
+    // read the rest parameters
+    while (true) {
+      const maybeCommaOrGroupEnd = this.buffer.read();
+      this.buffer.next();
+
+      // break if end of parameter list
+      if (maybeCommaOrGroupEnd.type === "group delimiter" && maybeCommaOrGroupEnd.value === ")") {
+        break;
+      }
+      const maybeComma = maybeCommaOrGroupEnd;
+
+      // read comma
+      if (maybeComma.type !== "separator") {
+        throw new Error(`expected comma but received ${maybeComma}`);
+      }
+
+      // read next identifier
+      const maybeIdentifier = this.buffer.read();
+      this.buffer.next();
+      if (maybeIdentifier.type !== "identifier") {
+        throw new Error(`expected identifier but received ${maybeIdentifier}`);
+      }
+      const identifier = maybeIdentifier;
+
+      parameters.push(identifier);
+    }
+
+    return parameters;
   }
 
   private parseInfixExpression(left: Expression): Expression | null {

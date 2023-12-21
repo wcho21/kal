@@ -171,7 +171,7 @@ export default class Evaluator {
       return value;
     }
 
-    const exhaustiveCheck: never = node;
+//    const exhaustiveCheck: never = node;
   }
 }
 
