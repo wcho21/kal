@@ -819,6 +819,116 @@ describe("parseProgram()", () => {
     it.each(cases)("parse $name", testParsing);
   });
 
+  describe("calls", () => {
+    const cases: { name: string, input: string, expected: Program }[] = [
+      {
+        name: "call function without arguments",
+        input: "과일()",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: {
+                type: "call",
+                functionToCall: { type: "identifier", value: "과일" },
+                callArguments: [],
+              },
+            },
+          ],
+        },
+      },
+      {
+        name: "call function with identifier arguments",
+        input: "과일(사과, 바나나, 포도)",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: {
+                type: "call",
+                functionToCall: { type: "identifier", value: "과일" },
+                callArguments: [
+                  { type: "identifier", value: "사과" },
+                  { type: "identifier", value: "바나나" },
+                  { type: "identifier", value: "포도" },
+                ],
+              },
+            },
+          ],
+        },
+      },
+      {
+        name: "call function with expression arguments",
+        input: "과일(1, 2+3)",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: {
+                type: "call",
+                functionToCall: { type: "identifier", value: "과일" },
+                callArguments: [
+                  { type: "number node", value: 1 },
+                  {
+                    type: "infix expression",
+                    infix: "+",
+                    left: { type: "number node", value: 2 },
+                    right: { type: "number node", value: 3 },
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      },
+      {
+        name: "call function with function literal",
+        input: "함수(사과, 바나나){사과 + 바나나}(1, 2)",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: {
+                type: "call",
+                functionToCall: {
+                  type: "function expression",
+                  parameter: [
+                    { type: "identifier", value: "사과" },
+                    { type: "identifier", value: "바나나" },
+                  ],
+                  body: {
+                    type: "block",
+                    statements: [
+                      {
+                        type: "expression statement",
+                        expression: {
+                          type: "infix expression",
+                          infix: "+",
+                          left: { type: "identifier", value: "사과" },
+                          right: { type: "identifier", value: "바나나" },
+                        },
+                      },
+                    ],
+                  },
+                },
+                callArguments: [
+                  { type: "number node", value: 1 },
+                  { type: "number node", value: 2 },
+                ],
+              },
+            },
+          ],
+        },
+      },
+    ];
+
+    it.each(cases)("parse $name", testParsing);
+  });
+
   describe("branch statements", () => {
     const cases: { name: string, input: string, expected: Program }[] = [
       {
@@ -896,6 +1006,44 @@ describe("parseProgram()", () => {
                     expression: { type: "number node", value: 4 },
                   },
                 ],
+              },
+            },
+          ],
+        },
+      },
+    ];
+
+    it.each(cases)("parse $name", testParsing);
+  });
+
+  describe("complex expression", () => {
+    const cases: { name: string, input: string, expected: Program }[] = [
+      {
+        name: "assignment and arithmetic expression",
+        input: "변수1 = 1  ((변수1 + 변수1) * 변수1)",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: {
+                type: "assignment",
+                left: { type: "identifier", value: "변수1" },
+                right: { type: "number node", value: 1 },
+              },
+            },
+            {
+              type: "expression statement",
+              expression: {
+                type: "infix expression",
+                infix: "*",
+                left: {
+                  type: "infix expression",
+                  infix: "+",
+                  left: { type: "identifier", value: "변수1" },
+                  right: { type: "identifier", value: "변수1" },
+                },
+                right: { type: "identifier", value: "변수1" },
               },
             },
           ],

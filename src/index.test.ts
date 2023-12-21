@@ -44,6 +44,10 @@ it("execute 만약 1 != 1 { 2 } 아니면 { 3 }", () => {
   expect(execute("만약 1 != 1 { 2 } 아니면 { 3 }")).toBe("3");
 });
 
-it("execute assignment", () => {
-  expect(execute("변수1 = 4  변수2 = 9  (변수2 - 변수1) * 변수1")).toBe("20");
+it("execute single assignment", () => {
+  expect(execute("변수1 = 4  변수1")).toBe("4");
+});
+
+it("execute assignment and calculation", () => {
+  expect(execute("변수1 = 4  변수2 = 9  ((변수1 - 변수2) * 변수1)")).toBe("-20");
 });

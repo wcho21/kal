@@ -8,6 +8,7 @@ export type Expression =
   PrefixExpression |
   InfixExpression |
   FunctionExpression |
+  Call |
   Assignment;
 
 export interface Identifier {
@@ -47,6 +48,12 @@ export interface FunctionExpression {
   type: "function expression";
   parameter: Identifier[],
   body: Block;
+}
+
+export interface Call {
+  type: "call";
+  functionToCall: Identifier | FunctionExpression;
+  callArguments: Expression[];
 }
 
 export interface Assignment {
@@ -92,6 +99,12 @@ export const makeFunctionExpression = (body: FunctionExpression["body"], paramet
   type: "function expression",
   parameter,
   body,
+});
+
+export const makeCall = (functionToCall: Call["functionToCall"], callArguments: Call["callArguments"]): Call => ({
+  type: "call",
+  functionToCall,
+  callArguments,
 });
 
 export const makeAssignment = (left: Assignment["left"], right: Assignment["right"]): Assignment => ({

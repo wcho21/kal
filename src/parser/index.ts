@@ -11,6 +11,7 @@ import {
   makePrefixExpression,
   makeInfixExpression,
   makeFunctionExpression,
+  makeCall,
 } from "./syntax-tree";
 import type {
   Program,
@@ -22,6 +23,8 @@ import type {
   BranchStatement,
   ExpressionStatement,
   Expression,
+  FunctionExpression,
+  Call,
   Identifier,
   InfixExpression,
 } from "./syntax-tree";
@@ -36,6 +39,7 @@ const bindingPower = {
   summative: 50,
   productive: 60,
   prefix: 70,
+  call: 80,
 };
 const getBindingPower = (infix: string): BindingPower => {
   switch (infix) {
@@ -54,6 +58,8 @@ const getBindingPower = (infix: string): BindingPower => {
     case "*":
     case "/":
       return bindingPower.productive;
+    case "(": // when '(' is used infix operator, it behaves as call operator
+      return bindingPower.call;
     default:
       return bindingPower.lowest;
   }
@@ -272,16 +278,27 @@ export default class Parser {
   }
 
   private parseInfixExpression(left: Expression): Expression | null {
-    let token = this.buffer.read();
+    // note: do not eat token and just return null if not parsable
+    const token = this.buffer.read();
+
+    if (token.type === "group delimiter" && token.value === "(") {
+      if (left.type !== "function expression" && left.type !== "identifier") {
+        return null;
+      }
+
+      this.buffer.next(); // eat infix token
+      return this.parseCall(left);
+    }
+
     if (token.type !== "operator") {
       return null;
     }
 
     const infix = token.value;
-    this.buffer.next(); // eat infix token
-
     if (infix === "=" && left.type === "identifier") {
-      return this.parseAssignment(left);
+      this.buffer.next(); // eat infix token
+      const a=  this.parseAssignment(left);
+      return a;
     }
     if (
       infix === "+" ||
@@ -295,9 +312,48 @@ export default class Parser {
       infix === ">=" ||
       infix === "<="
     ) {
+      this.buffer.next(); // eat infix token
       return this.parseArithmeticInfixExpression(left, infix);
     }
     return null;
+  }
+
+  private parseCall(functionToCall: Identifier | FunctionExpression): Call {
+    const callArguments = this.parseCallArguments();
+
+    return makeCall(functionToCall, callArguments);
+  }
+
+  private parseCallArguments(): Expression[] {
+    const maybeExpressionOrGroupEnd = this.buffer.read();
+    if (maybeExpressionOrGroupEnd.type === "group delimiter" && maybeExpressionOrGroupEnd.value === ")") {
+      this.buffer.next();
+
+      return [];
+    }
+
+    const firstArgument = this.parseExpression(bindingPower.lowest);
+
+    const callArguments = [firstArgument];
+    while (true) {
+      const maybeComma = this.buffer.read();
+      if (maybeComma.type !== "separator") {
+        break;
+      }
+      this.buffer.next();
+
+      const argument = this.parseExpression(bindingPower.lowest);
+      callArguments.push(argument);
+    }
+
+    // expect ')'
+    const maybeGroupEnd = this.buffer.read();
+    this.buffer.next();
+    if (maybeGroupEnd.type !== "group delimiter" || maybeGroupEnd.value !== ")") {
+      throw new Error(`expect ) but received ${maybeGroupEnd.type}`);
+    }
+
+    return callArguments;
   }
 
   private parseAssignment(left: Identifier): Expression {
