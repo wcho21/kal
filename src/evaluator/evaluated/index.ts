@@ -35,6 +35,15 @@ export interface EvaluatedEmpty extends EvaluatedBase {
   readonly type: "empty";
 }
 
+export type Evaluated =
+  EvaluatedPrimitive |
+  EvaluatedFunction |
+  EvaluatedEmpty;
+export type EvaluatedPrimitive =
+  EvaluatedNumber |
+  EvaluatedString |
+  EvaluatedBoolean;
+
 export type MakeEvaluatedNumber = (value: number) => EvaluatedNumber;
 export const makeEvaluatedNumber: MakeEvaluatedNumber = value => ({
   type: "number",
