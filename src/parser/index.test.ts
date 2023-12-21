@@ -749,6 +749,76 @@ describe("parseProgram()", () => {
     it.each(cases)("parse $name", testParsing);
   });
 
+  describe("functions", () => {
+    const cases: { name: string, input: string, expected: Program }[] = [
+      {
+        name: "function expression with parameters",
+        input: "함수 (사과, 바나나) { 사과 + 바나나 }",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: {
+                type: "function expression",
+                parameter: [
+                  { type: "identifier", value: "사과" },
+                  { type: "identifier", value: "바나나" },
+                ],
+                body: {
+                  type: "block",
+                  statements: [
+                    {
+                      type: "expression statement",
+                      expression: {
+                        type: "infix expression",
+                        infix: "+",
+                        left: { type: "identifier", value: "사과" },
+                        right: { type: "identifier", value: "바나나" },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+        },
+      },
+      {
+        name: "function expression with no parameters",
+        input: "함수 () { 사과 + 바나나 }",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: {
+                type: "function expression",
+                parameter: [],
+                body: {
+                  type: "block",
+                  statements: [
+                    {
+                      type: "expression statement",
+                      expression: {
+                        type: "infix expression",
+                        infix: "+",
+                        left: { type: "identifier", value: "사과" },
+                        right: { type: "identifier", value: "바나나" },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+        },
+      },
+    ];
+
+    it.each(cases)("parse $name", testParsing);
+  });
+
   describe("branch statements", () => {
     const cases: { name: string, input: string, expected: Program }[] = [
       {

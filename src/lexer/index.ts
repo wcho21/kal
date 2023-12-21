@@ -37,6 +37,12 @@ export default class Lexer {
           return Token.blockDelimiter(delimiter);
         }
 
+      case ",":
+        {
+          const separator = this.charBuffer.pop() as typeof char;
+          return Token.separator(separator);
+        }
+
       case "!":
         {
           this.charBuffer.pop();
@@ -95,7 +101,7 @@ export default class Lexer {
             return Token.booleanLiteral(read);
           }
 
-          if (read === "만약" || read === "아니면") {
+          if (read === "만약" || read === "아니면" || read === "함수") {
             return Token.keyword(read);
           }
 

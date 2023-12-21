@@ -148,6 +148,11 @@ export default class Evaluator {
 
       throw new Error(`bad prefix expression: prefix: '${node.prefix}' with type: '${typeof subExpression}'`);
     }
+    if (node.type === "function expression") {
+      const parameters = node.parameter;
+      const body = node.body;
+      return { parameters, body, environment: env };
+    }
     if (node.type === "assignment") {
       const varValue = this.evaluate(node.right, env);
 

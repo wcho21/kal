@@ -8,6 +8,7 @@ import {
   groupDelimiter,
   blockDelimiter,
   keyword,
+  separator,
   illegal,
   end,
 } from "./token";
@@ -21,6 +22,7 @@ import type {
   GroupDelimiter,
   BlockDelimiter,
   Keyword,
+  Separator,
   Illegal,
   End,
 } from "./token";
@@ -122,9 +124,18 @@ describe("getToken()", () => {
       const cases: { input: string, expected: Keyword }[] = [
         { input: "만약", expected: keyword("만약") },
         { input: "아니면", expected: keyword("아니면") },
+        { input: "함수", expected: keyword("함수") },
       ];
 
       it.each(cases)("get group delimiter token '$input'", testLexing);
+    });
+
+    describe("separator", () => {
+      const cases: { input: string, expected: Separator }[] = [
+        { input: ",", expected: separator(",") },
+      ];
+
+      it.each(cases)("get separator token '$input'", testLexing);
     });
 
     describe("illegal", () => {
@@ -193,6 +204,22 @@ describe("getToken()", () => {
           blockDelimiter("}"),
           end,
         ]
+      },
+      {
+        input: "함수(사과, 바나나) { 사과 + 바나나 }",
+        expectedTokens:[
+          keyword("함수"),
+          groupDelimiter("("),
+          identifier("사과"),
+          separator(","),
+          identifier("바나나"),
+          groupDelimiter(")"),
+          blockDelimiter("{"),
+          identifier("사과"),
+          operator("+"),
+          identifier("바나나"),
+          blockDelimiter("}"),
+        ],
       },
     ];
 
