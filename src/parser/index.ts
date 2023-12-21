@@ -278,13 +278,15 @@ export default class Parser {
   }
 
   private parseInfixExpression(left: Expression): Expression | null {
+    // note: do not eat token and just return null if not parsable
     const token = this.buffer.read();
-    this.buffer.next(); // eat infix token
 
     if (token.type === "group delimiter" && token.value === "(") {
       if (left.type !== "function expression" && left.type !== "identifier") {
-        throw new Error(`expected function expression or identifier, but received ${left.type}`);
+        return null;
       }
+
+      this.buffer.next(); // eat infix token
       return this.parseCall(left);
     }
 
@@ -294,7 +296,9 @@ export default class Parser {
 
     const infix = token.value;
     if (infix === "=" && left.type === "identifier") {
-      return this.parseAssignment(left);
+      this.buffer.next(); // eat infix token
+      const a=  this.parseAssignment(left);
+      return a;
     }
     if (
       infix === "+" ||
@@ -308,6 +312,7 @@ export default class Parser {
       infix === ">=" ||
       infix === "<="
     ) {
+      this.buffer.next(); // eat infix token
       return this.parseArithmeticInfixExpression(left, infix);
     }
     return null;

@@ -1015,4 +1015,42 @@ describe("parseProgram()", () => {
 
     it.each(cases)("parse $name", testParsing);
   });
+
+  describe("complex expression", () => {
+    const cases: { name: string, input: string, expected: Program }[] = [
+      {
+        name: "assignment and arithmetic expression",
+        input: "변수1 = 1  ((변수1 + 변수1) * 변수1)",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "expression statement",
+              expression: {
+                type: "assignment",
+                left: { type: "identifier", value: "변수1" },
+                right: { type: "number node", value: 1 },
+              },
+            },
+            {
+              type: "expression statement",
+              expression: {
+                type: "infix expression",
+                infix: "*",
+                left: {
+                  type: "infix expression",
+                  infix: "+",
+                  left: { type: "identifier", value: "변수1" },
+                  right: { type: "identifier", value: "변수1" },
+                },
+                right: { type: "identifier", value: "변수1" },
+              },
+            },
+          ],
+        },
+      },
+    ];
+
+    it.each(cases)("parse $name", testParsing);
+  });
 });
