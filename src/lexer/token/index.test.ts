@@ -5,6 +5,7 @@ import {
   booleanLiteral,
   stringLiteral,
   groupDelimiter,
+  separator,
   keyword,
 } from "./";
 import type {
@@ -14,6 +15,7 @@ import type {
   BooleanLiteral,
   StringLiteral,
   GroupDelimiter,
+  Separator,
   Keyword,
 } from "./";
 
@@ -103,6 +105,18 @@ describe("group delimiter", () => {
 
   it.each(cases)("make group delimiter token for '$input'", ({ input, expected }) => {
     const token = groupDelimiter(input);
+
+    expect(token).toEqual(expected);
+  });
+});
+
+describe("separator", () => {
+  const cases: { input: Separator["value"], expected: Separator }[] = [
+    { input: ",", expected: separator(",") },
+  ];
+
+  it.each(cases)("make separator token for '$input'", ({ input, expected }) => {
+    const token = separator(input);
 
     expect(token).toEqual(expected);
   });
