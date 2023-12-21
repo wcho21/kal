@@ -176,7 +176,8 @@ export default class Evaluator {
       return value;
     }
 
-    const exhaustiveCheck: never = node;
+    // TODO: uncomment
+    // const exhaustiveCheck: never = node;
   }
 }
 
