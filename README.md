@@ -16,6 +16,8 @@ Try _KAL_ at [KAL Playground][playground].
 
 ## 🗡️ Examples
 
+### Statements and expressions
+
 Variable assignment:
 ```
 사과 = 42
@@ -35,6 +37,50 @@ Conditional statement:
 }
 ```
 
+Defining and calling function:
+```
+더하기 = 함수(숫자1, 숫자2) {
+    결과 숫자1 + 숫자2
+}
+
+더하기(42, 10)
+```
+which yields `52`.
+
+Closure:
+```
+더하기 = 함수(숫자1) {
+    결과 함수(숫자2) {
+        결과 숫자1 + 숫자2
+    }
+}
+
+하나더하기 = 더하기(1)
+
+하나더하기(42)
+```
+which yields `43`.
+
+
+
+### Types
+
+_Number type_: any floating-point numbers
+```
+사과 = 42
+포도 = -9.5
+```
+
+_String type_: characters surrounded with single quotes
+```
+사과 = '맛있음'
+```
+
+_Boolean type_: `참`, `거짓`
+```
+사과 = 참
+포도 = 거짓
+```
 
 
 ## 🗡️ Manual building and installation
