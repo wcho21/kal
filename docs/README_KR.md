@@ -1,6 +1,6 @@
 # 🗡️ KAL
 
-<img src="./docs/images/kal-logo.png" alt="KAL logo" width="128px" height="128px" />
+<img src="./images/kal-logo.png" alt="KAL logo" width="128px" height="128px" />
 
 _KAL: Korean Algorithmic Language_.
 
@@ -8,7 +8,7 @@ _KAL: Korean Algorithmic Language_.
 
 _KAL_ 인터프리터를 브라우저에 로드하거나 직접 빌드하는 방법은 아래를 참고하세요.
 
-_KAL_을 [플레이그라운드][playground]에서 체험해보세요.
+_KAL_ 을 [플레이그라운드][playground]에서 체험해보세요.
 
 [playground]: https://kal-playground.rooi.dev/
 
@@ -89,7 +89,7 @@ _불리언 타입_: `참`, `거짓`
 
 빌드 과정은 [Node.js][node]를 기반으로 합니다.
 
-[`pnpm`][pnpm]을 사용해, _KAL_ 인터프리터를 다음 커맨드로 빌드합니다.
+_KAL_ 인터프리터를 다음 커맨드로 [`pnpm`]을 이용해 빌드합니다.
 
 ```
 pnpm install && pnpm build && pnpm bundle`
