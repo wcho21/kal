@@ -22,6 +22,24 @@ _KAL_ 을 [플레이그라운드][playground]에서 체험해보세요.
 
 
 
+## 브라우저에서 사용하기
+
+다음과 같이 인터프리터 스크립트를 HTML 상에서 로드합니다.
+
+```HTML
+<script src="https://cdn.jsdelivr.net/gh/wcho21/kal@latest/dist/index.min.js"></script>
+```
+
+이후, _KAL_ 코드는 다음과 같이 `kal.execute(code-to-execute)`로 실행합니다.
+
+```HTML
+<script>
+  kal.execute("5+5"); // === 10
+</script>
+```
+
+
+
 ## 🗡️ 예시
 
 ### 문법들
@@ -91,6 +109,7 @@ _불리언 타입_: `참`, `거짓`
 ```
 
 
+
 ## 🗡️ 빌드와 설치
 
 ### 빌드하기
@@ -104,25 +123,8 @@ pnpm install && pnpm build && pnpm bundle`
 ```
 
 
+
 결과는 `/bundle/index.js` 디렉토리에 위치합니다.
 
 [pnpm]: https://pnpm.io/
 [node]: https://nodejs.org/
-
-
-
-### 브라우저에서 사용하기
-
-빌드한 파일 `index.js`를 원하는 디렉토리에 놓고, 다음과 같이 HTML 상에서 로드합니다.
-
-```HTML
-<script src="/your-directory/index.js"></script>
-```
-
-이후, _KAL_ 코드는 다음과 같이 `kal.execute(code-to-execute)`로 실행합니다.
-
-```HTML
-<script>
-  kal.execute("5+5"); // === 10
-</script>
-```
