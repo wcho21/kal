@@ -6,13 +6,11 @@
 
 
 
+# 🗡️ KAL
+
 <img src="./images/kal-logo.png" alt="KAL logo" width="128px" height="128px" />
 
 _KAL: Korean Algorithmic Language_.
-
-
-
-# 🗡️ KAL
 
 한국어를 지원하는 인터프리터 언어.
 
