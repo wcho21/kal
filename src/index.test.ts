@@ -1,7 +1,5 @@
 import { execute } from "./";
 
-it.todo("");
-
 it("execute -5", () => {
   expect(execute("-5")).toBe("-5");
 });
