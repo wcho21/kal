@@ -1,14 +1,15 @@
 const { resolve } = require("path");
 
 module.exports = {
-  entry: "./dist/index.js",
+  entry: "./tsc-out/index.js",
   output: {
-    filename: "index.js",
-    path: resolve("./bundle"),
+    filename: "index.min.js",
+    path: resolve("./dist"),
     library: {
       name: "kal",
       type: "window",
     },
   },
+  target: ["web", "es2015", "browserslist"],
   mode: "production",
 };

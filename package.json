@@ -1,10 +1,13 @@
 {
   "scripts": {
-    "build": "tsc",
-    "bundle": "webpack",
+    "build": "tsc && webpack && rm -rf tsc-out",
     "test": "jest",
     "test:watch": "jest --watchAll"
   },
+  "browserslist": [
+    "> 1%",
+    "not dead"
+  ],
   "devDependencies": {
     "@types/jest": "^29.5.10",
     "jest": "^29.7.0",
