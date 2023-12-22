@@ -218,6 +218,11 @@ export default class Evaluator {
       return value;
     }
 
+    if (node.type === "return statement") {
+      // TODO: implement
+      return {} as Evaluated;
+    }
+
     const exhaustiveCheck: never = node;
     return exhaustiveCheck;
   }
