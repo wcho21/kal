@@ -21,9 +21,10 @@ type BooleanLiteralValue = "참" | "거짓";
 type GroupDelimiterValue = "(" | ")";
 type BlockDelimiterValue = "{" | "}";
 type SeparatorValue = ",";
-type KeywordValue = BranchKeywordValue | FunctionKeywordValue;
+type KeywordValue = BranchKeywordValue | FunctionKeywordValue | ReturnKeywordValue;
 type BranchKeywordValue = "만약" | "아니면";
 type FunctionKeywordValue = "함수";
+type ReturnKeywordValue = "결과";
 type EndValue = typeof END_VALUE;
 
 export interface Operator {
