@@ -125,6 +125,7 @@ describe("getToken()", () => {
         { input: "만약", expected: keyword("만약") },
         { input: "아니면", expected: keyword("아니면") },
         { input: "함수", expected: keyword("함수") },
+        { input: "결과", expected: keyword("결과") },
       ];
 
       it.each(cases)("get group delimiter token '$input'", testLexing);
@@ -206,7 +207,7 @@ describe("getToken()", () => {
         ]
       },
       {
-        input: "함수(사과, 바나나) { 사과 + 바나나 }",
+        input: "함수(사과, 바나나) { 결과 사과 + 바나나 }",
         expectedTokens:[
           keyword("함수"),
           groupDelimiter("("),
@@ -215,6 +216,7 @@ describe("getToken()", () => {
           identifier("바나나"),
           groupDelimiter(")"),
           blockDelimiter("{"),
+          keyword("결과"),
           identifier("사과"),
           operator("+"),
           identifier("바나나"),

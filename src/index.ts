@@ -11,5 +11,5 @@ export const execute = (input: string): string => {
   const environment = new Environment();
   const evaluated = evaluator.evaluate(parsed, environment);
 
-  return String(evaluated);
+  return String(evaluated.representation);
 };

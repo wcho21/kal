@@ -7,6 +7,7 @@ import {
   makeBooleanNode,
   makeStringNode,
   makeBranchStatement,
+  makeReturnStatement,
   makeExpressionStatement,
   makePrefixExpression,
   makeInfixExpression,
@@ -21,6 +22,7 @@ import type {
   BooleanNode,
   StringNode,
   BranchStatement,
+  ReturnStatement,
   ExpressionStatement,
   Expression,
   FunctionExpression,
@@ -125,6 +127,12 @@ export default class Parser {
       return this.parseBranchStatement();
     }
 
+    if (token.type === "keyword" && token.value === "결과") {
+      this.buffer.next();
+
+      return this.parseReturnStatement();
+    }
+
     return this.parseExpressionStatement();
   }
 
@@ -144,6 +152,12 @@ export default class Parser {
     const alternative = this.parseBlock();
     const branchStatement = makeBranchStatement(predicate, consequence, alternative);
     return branchStatement;
+  }
+
+  private parseReturnStatement(): ReturnStatement {
+    const expression = this.parseExpression(bindingPower.lowest);
+
+    return makeReturnStatement(expression);
   }
 
   private parseExpressionStatement(): ExpressionStatement {
