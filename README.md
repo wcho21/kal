@@ -1,8 +1,8 @@
-[![English badge](https://img.shields.io/badge/LANG-en-green)][english-readme]
-[![Korean badge](https://img.shields.io/badge/LANG-ko-green)][korean-readme]
+[![English](https://img.shields.io/badge/Lang-en-green)][readme-en]
+[![Korean](https://img.shields.io/badge/Lang-ko-blue)][readme-ko]
 
-[english-readme]: ./
-[korean-readme]: ./docs/README_KR.md
+[readme-en]: ./
+[readme-ko]: ./docs/README_KR.md
 
 
 
