@@ -1,7 +1,6 @@
 {
   "scripts": {
-    "build": "tsc",
-    "bundle": "webpack",
+    "build": "tsc && webpack && rm -rf tsc-out",
     "test": "jest",
     "test:watch": "jest --watchAll"
   },
