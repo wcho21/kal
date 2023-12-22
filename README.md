@@ -1,12 +1,16 @@
-# 🗡️ KAL
-
-<img src="./docs/images/kal-logo.png" alt="KAL logo" width="128px" height="128px" />
-
-(You can read this in [Korean][korean-readme].)
+[![Korean badge](https://img.shields.io/badge/LANG-ko-green)][korean-readme]
 
 [korean-readme]: ./docs/README_KR.md
 
+
+
+<img src="./docs/images/kal-logo.png" alt="KAL logo" width="128px" height="128px" />
+
 _KAL: Korean Algorithmic Language_.
+
+
+
+# 🗡️ KAL
 
 A simple interpreted language which supports Korean.
 
