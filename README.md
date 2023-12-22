@@ -2,6 +2,10 @@
 
 <img src="./docs/images/kal-logo.png" alt="KAL logo" width="128px" height="128px" />
 
+(You can read this in [Korean][korean-readme].)
+
+[korean-readme]: ./docs/README_KR.md
+
 _KAL: Korean Algorithmic Language_.
 
 A simple interpreted language which supports Korean.
