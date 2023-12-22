@@ -22,6 +22,24 @@ Try _KAL_ at [KAL Playground][playground].
 
 
 
+## 🗡️ Installation
+
+Load the interpreter script in HTML as follows:
+
+```HTML
+<script src="https://cdn.jsdelivr.net/gh/wcho21/kal@latest/dist/index.min.js"></script>
+```
+
+After that, you can execute _KAL_ code with `kal.execute(code-to-execute)` as follows:
+
+```HTML
+<script>
+  kal.execute("5+5"); // === 10
+</script>
+```
+
+
+
 ## 🗡️ Examples
 
 ### Statements and expressions
@@ -91,9 +109,8 @@ _Boolean type_: `참`, `거짓`
 ```
 
 
-## 🗡️ Manual building and installation
 
-### How to build
+## 🗡️ Building
 
 Note that building process is based on [Node.js][node].
 
@@ -103,21 +120,3 @@ The output will be in the directory `/bundle/index.js`.
 
 [pnpm]: https://pnpm.io/
 [node]: https://nodejs.org/
-
-
-
-### How to use in browsers
-
-Put the bundled file `index.js` (see above) in your directory, and load the file in HTML as following:
-
-```HTML
-<script src="/your-directory/index.js"></script>
-```
-
-After that, you can execute _KAL_ code with `kal.execute(code-to-execute)` as follows:
-
-```HTML
-<script>
-  kal.execute("5+5"); // === 10
-</script>
-```
