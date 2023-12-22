@@ -101,7 +101,12 @@ export default class Lexer {
             return Token.booleanLiteral(read);
           }
 
-          if (read === "만약" || read === "아니면" || read === "함수") {
+          if (
+            read === "만약" ||
+            read === "아니면" ||
+            read === "함수" ||
+            read === "결과"
+          ) {
             return Token.keyword(read);
           }
 

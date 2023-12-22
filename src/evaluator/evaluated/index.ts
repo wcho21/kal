@@ -35,6 +35,11 @@ export interface EvaluatedEmpty extends EvaluatedBase {
   readonly type: "empty";
 }
 
+export interface ReturnValue {
+  readonly type: "return value";
+  readonly value: Evaluated;
+}
+
 export type Evaluated =
   EvaluatedPrimitive |
   EvaluatedFunction |
@@ -92,4 +97,10 @@ export const makeEvaluatedEmpty: MakeEvaluatedEmpty = () => ({
   get representation() {
     return "(비어있음)";
   },
+});
+
+export type WrapReturnValue = (value: Evaluated) => ReturnValue;
+export const wrapReturnValue: WrapReturnValue = value => ({
+  type: "return value",
+  value,
 });

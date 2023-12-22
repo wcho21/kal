@@ -3,6 +3,7 @@ import type { Expression } from "../expression";
 
 export type Statement =
   BranchStatement |
+  ReturnStatement |
   ExpressionStatement;
 
 export interface BranchStatement {
@@ -10,6 +11,11 @@ export interface BranchStatement {
   predicate: Expression;
   consequence: Block;
   alternative?: Block;
+}
+
+export interface ReturnStatement {
+  type: "return statement";
+  expression: Expression;
 }
 
 /** A wrapper type to treat a single expression as a statement. */
@@ -28,6 +34,12 @@ export const makeBranchStatement: MakeBranchStatement = (predicate, consequence,
   predicate,
   consequence,
   alternative,
+});
+
+type MakeReturnStatement = (expression: ReturnStatement["expression"]) => ReturnStatement;
+export const makeReturnStatement: MakeReturnStatement = expression => ({
+  type: "return statement",
+  expression,
 });
 
 export const makeExpressionStatement = (expression: ExpressionStatement["expression"]): ExpressionStatement => ({

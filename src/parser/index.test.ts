@@ -268,6 +268,76 @@ describe("parseProgram()", () => {
     it.each(cases)("parse $name", testParsing);
   });
 
+  describe("return statement", () => {
+    const cases: { name: string, input: string, expected: Program }[] = [
+      {
+        name: "return number literal",
+        input: "결과 42",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "return statement",
+              expression: { type: "number node", value: 42 },
+            },
+          ],
+        },
+      },
+      {
+        name: "return arithmetic expression",
+        input: "결과 사과 + 바나나",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "return statement",
+              expression: {
+                type: "infix expression",
+                infix: "+",
+                left: { type: "identifier", value: "사과" },
+                right: { type: "identifier", value: "바나나" },
+              },
+            },
+          ],
+        },
+      },
+      {
+        name: "return function",
+        input: "결과 함수(사과) { 결과 사과 + 1 }",
+        expected: {
+          type: "program",
+          statements: [
+            {
+              type: "return statement",
+              expression: {
+                type: "function expression",
+                parameter: [
+                  { type: "identifier", value: "사과" },
+                ],
+                body: {
+                  type: "block",
+                  statements: [
+                    {
+                      type: "return statement",
+                      expression: {
+                        type: "infix expression",
+                        infix: "+",
+                        left: { type: "identifier", value: "사과" },
+                        right: { type: "number node", value: 1 },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+        },
+      },
+    ];
+
+    it.each(cases)("parse $name", testParsing);
+  });
+
   describe("simple expression", () => {
     const cases: { name: string, input: string, expected: Program }[] = [
       {

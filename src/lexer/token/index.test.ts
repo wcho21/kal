@@ -127,6 +127,7 @@ describe("keywords", () => {
     { input: "만약", expected: keyword("만약") },
     { input: "아니면", expected: keyword("아니면") },
     { input: "함수", expected: keyword("함수") },
+    { input: "결과", expected: keyword("결과") },
   ];
 
   it.each(cases)("make keyword token for '$input'", ({ input, expected }) => {

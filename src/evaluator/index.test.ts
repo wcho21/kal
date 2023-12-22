@@ -329,8 +329,30 @@ describe("evaluate()", () => {
     const cases = [
       {
         name: "function call with function literal",
-        input: "함수(바나나) { 바나나 + 1 }(42)",
+        input: "함수(바나나) { 결과 바나나 + 1 }(42)",
         expected: 43,
+      },
+      {
+        name: "function call with identifier",
+        input: "더하기 = 함수(숫자1, 숫자2) { 결과 숫자1 + 숫자2 }  더하기(3, 4)",
+        expected: 7,
+      },
+    ];
+
+    it.each(cases)("evaluate $name", testEvaluatingPrimitive);
+  });
+
+  describe("complex statements with function and calls", () => {
+    const cases = [
+      {
+        name: "make and call function containing branch statement",
+        input: "과일 = 함수(색깔) { 만약 (색깔 == '빨강') { 결과 '사과' } 아니면 { '포도' } }  과일('빨강')",
+        expected: "사과",
+      },
+      {
+        name: "make and call closure",
+        input: "더하기 = 함수(숫자1) { 결과 함수(숫자2) { 결과 숫자1+숫자2 } }  하나더하기 = 더하기(1)  하나더하기(4)",
+        expected: 5,
       },
     ];
 
