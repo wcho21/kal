@@ -10,5 +10,6 @@ module.exports = {
       type: "window",
     },
   },
+  target: ["web", "es2015", "browserslist"],
   mode: "production",
 };
