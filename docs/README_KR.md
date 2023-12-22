@@ -1,8 +1,18 @@
-# 🗡️ KAL
+[![English](https://img.shields.io/badge/Lang-en-green)][readme-en]
+[![Korean](https://img.shields.io/badge/Lang-ko-blue)][readme-ko]
+
+[readme-en]: ./
+[readme-ko]: ./docs/README_KR.md
+
+
 
 <img src="./images/kal-logo.png" alt="KAL logo" width="128px" height="128px" />
 
 _KAL: Korean Algorithmic Language_.
+
+
+
+# 🗡️ KAL
 
 한국어를 지원하는 인터프리터 언어.
 
