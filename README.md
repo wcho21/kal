@@ -1,5 +1,7 @@
+[![English badge](https://img.shields.io/badge/LANG-en-green)][english-readme]
 [![Korean badge](https://img.shields.io/badge/LANG-ko-green)][korean-readme]
 
+[english-readme]: ./
 [korean-readme]: ./docs/README_KR.md
 
 
