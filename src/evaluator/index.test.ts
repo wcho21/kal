@@ -1,15 +1,56 @@
 import Lexer from "../lexer";
 import Parser from "../parser";
+import type { EvaluatedPrimitive, EvaluatedFunction, EvaluatedEmpty } from "./evaluated";
 import Evaluator from "./";
 import Environment from "./environment";
 
+const evaluateInput = (input: string) => {
+  const lexer = new Lexer(input);
+  const parser = new Parser(lexer);
+  const program = parser.parseProgram();
+
+  const evaluator = new Evaluator();
+  const environment = new Environment();
+  const evaluated = evaluator.evaluate(program, environment);
+
+  return evaluated;
+};
+
+const testEvaluatingPrimitive = ({ input, expected }: { input: string, expected: any }): void => {
+  const evaluated = evaluateInput(input) as EvaluatedPrimitive;
+
+  expect(evaluated.value).toBe(expected);
+};
+
+const testEvaluatingFunction = ({ input, expectedParamsLength }: { input: string, expectedParamsLength: number }): void => {
+  const evaluated = evaluateInput(input) as EvaluatedFunction;
+
+  expect(evaluated).toHaveProperty("parameters");
+  expect(evaluated.parameters.length).toBe(expectedParamsLength);
+  expect(evaluated).toHaveProperty("body");
+  expect(evaluated).toHaveProperty("environment");
+};
+
+const testEvaluatingEmpty = ({ input }: { input: string }): void => {
+  const evaluated = evaluateInput(input) as EvaluatedEmpty;
+
+  expect(evaluated.type).toBe("empty");
+};
+
 describe("evaluate()", () => {
-  describe("simple expression", () => {
+  describe("single numbers", () => {
     const cases = [
       { input: "5", expected: 5 },
       { input: "-5", expected: -5 },
       { input: "--5", expected: 5 },
       { input: "+5", expected: 5 },
+    ];
+
+    it.each(cases)("evaluate $input", testEvaluatingPrimitive);
+  });
+
+  describe("simple arithmetic expressions", () => {
+    const cases = [
       { input: "100+25", expected: 125 },
       { input: "100-25", expected: 75 },
       { input: "100*25", expected: 2500 },
@@ -17,15 +58,72 @@ describe("evaluate()", () => {
       { input: "100+25+4", expected: 129 },
       { input: "100+25-4", expected: 121 },
       { input: "100+25*4", expected: 200 },
+    ];
+
+    it.each(cases)("evaluate $input", testEvaluatingPrimitive);
+  });
+
+  describe("left associativity of arithmetic operation", () => {
+    const cases = [
+      { input: "100-25-4", expected: 71 },
+      { input: "100/25/4", expected: 1 },
+    ];
+
+    it.each(cases)("evaluate $input", testEvaluatingPrimitive);
+  });
+
+  describe("grouped arithmetic expressions", () => {
+    const cases = [
+      { input: "100-(25-4)", expected: 79 },
+      { input: "12-(34-56)", expected: 34 },
+      { input: "12*(12/6)", expected: 24 },
+      { input: "12+((30+4)-3*(12/(56-50)))", expected: 40 },
+    ];
+
+    it.each(cases)("evaluate $input", testEvaluatingPrimitive);
+  });
+
+  describe("arithmetic expressions with floating point number", () => {
+    const cases = [
+      { input: "0.75 + 1.25", expected: 2 },
+      { input: "2.5 / 0.5", expected: 5 },
+    ];
+
+    it.each(cases)("evaluate $input", testEvaluatingPrimitive);
+  });
+
+  describe("single boolean", () => {
+    const cases = [
       { input: "참", expected: true },
       { input: "거짓", expected: false },
-      { input: "'foo bar'", expected: "foo bar" },
+    ];
+
+    it.each(cases)("evaluate $input", testEvaluatingPrimitive);
+  });
+
+  describe("logical not expressions", () => {
+    const cases = [
       { input: "!참", expected: false },
       { input: "!거짓", expected: true },
       { input: "!!참", expected: true },
       { input: "!!거짓", expected: false },
+    ];
 
-      /* test case for comparison expressions */
+    it.each(cases)("evaluate $input", testEvaluatingPrimitive);
+  });
+
+  describe("single string", () => {
+    const cases = [
+      { input: "''", expected: "" },
+      { input: "'foo bar'", expected: "foo bar" },
+      { input: "'한글 단어'", expected: "한글 단어" },
+    ];
+
+    it.each(cases)("evaluate $input", testEvaluatingPrimitive);
+  });
+
+  describe("boolean comparison", () => {
+    const cases = [
       { input: "참 == 참", expected: true },
       { input: "거짓 == 참", expected: false },
       { input: "참 == 거짓", expected: false },
@@ -34,6 +132,13 @@ describe("evaluate()", () => {
       { input: "거짓 != 참", expected: true },
       { input: "참 != 거짓", expected: true },
       { input: "거짓 != 거짓", expected: false },
+    ];
+
+    it.each(cases)("evaluate $input", testEvaluatingPrimitive);
+  });
+
+  describe("number comparison", () => {
+    const cases = [
       { input: "2 > 1", expected: true },
       { input: "1 > 1", expected: false },
       { input: "1 > 2", expected: false },
@@ -46,37 +151,44 @@ describe("evaluate()", () => {
       { input: "2 <= 1", expected: false },
       { input: "1 <= 1", expected: true },
       { input: "1 <= 2", expected: true },
-      { input: "!(1 == 1)", expected: false },
-      { input: "!!(1 == 1)", expected: true },
-
-      /* test case for left associativity */
-      { input: "100-25-4", expected: 71 },
-      { input: "100/25/4", expected: 1 },
-
-      /* test case for grouped expression */
-      { input: "100-(25-4)", expected: 79 },
-      { input: "12-(34-56)", expected: 34 },
-      { input: "12*(12/6)", expected: 24 },
-      { input: "12+((30+4)-3*(12/(56-50)))", expected: 40 },
-
-      /* test case for floating point numbers */
-      { input: "0.75 + 1.25", expected: 2 },
-      { input: "2.5 / 0.5", expected: 5 },
     ];
 
-    it.each(cases)("evaluate $input", ({ input, expected }) => {
-      const lexer = new Lexer(input);
-      const parser = new Parser(lexer);
-      const program = parser.parseProgram();
-      const evaluator = new Evaluator();
-      const environment = new Environment();
-      const evaluated = evaluator.evaluate(program, environment);
-
-      expect(evaluated).toBe(expected);
-    });
+    it.each(cases)("evaluate $input", testEvaluatingPrimitive);
   });
 
-  describe("branch statements", () => {
+  describe("string comparison", () => {
+    const cases = [
+      { input: "'사과' == '사과'", expected: true },
+      { input: "'사과' != '사과'", expected: false },
+      { input: "'사과' == '바나나'", expected: false },
+      { input: "'사과' != '바나나'", expected: true },
+      { input: "'B' > 'A'", expected: true },
+      { input: "'A' > 'A'", expected: false },
+      { input: "'A' > 'B'", expected: false },
+      { input: "'B' >= 'A'", expected: true },
+      { input: "'A' >= 'A'", expected: true },
+      { input: "'A' >= 'B'", expected: false },
+      { input: "'B' < 'A'", expected: false },
+      { input: "'A' < 'A'", expected: false },
+      { input: "'A' < 'B'", expected: true },
+      { input: "'B' <= 'A'", expected: false },
+      { input: "'A' <= 'A'", expected: true },
+      { input: "'A' <= 'B'", expected: true },
+    ];
+
+    it.each(cases)("evaluate $input", testEvaluatingPrimitive);
+  });
+
+  describe("logical not operation to boolean expression", () => {
+    const cases = [
+      { input: "!(1 == 1)", expected: false },
+      { input: "!!(1 == 1)", expected: true },
+    ];
+
+    it.each(cases)("evaluate $input", testEvaluatingPrimitive);
+  });
+
+  describe("branch statements yielding something", () => {
     const cases = [
       {
         name: "simple if statement with boolean literal predicate",
@@ -110,79 +222,118 @@ describe("evaluate()", () => {
       },
     ];
 
-    it.each(cases)("evaluate $input", ({ input, expected }) => {
-      const lexer = new Lexer(input);
-      const parser = new Parser(lexer);
-      const program = parser.parseProgram();
-      const evaluator = new Evaluator();
-      const environment = new Environment();
-      const evaluated = evaluator.evaluate(program, environment);
+    it.each(cases)("evaluate $input", testEvaluatingPrimitive);
+  });
 
-      expect(evaluated).toBe(expected);
-    });
+  describe("branch statements yielding nothing", () => {
+    const cases = [
+      {
+        name: "simple if statement with boolean literal predicate",
+        input: "만약 거짓 { 3 }",
+      },
+      {
+        name: "simple if statement with boolean expression predicate",
+        input: "만약 1 == 2 { 4 }",
+      },
+      {
+        name: "simple if statement with variable comparison predicate",
+        input: "사과 = 3  바나나 = 4  만약 사과 > 바나나 { 5 }",
+      },
+    ];
+
+    it.each(cases)("evaluate $input", testEvaluatingEmpty);
+  });
+
+  describe("nested branch statements yielding something", () => {
+    const cases = [
+      {
+        name: "nested if statements",
+        input: "만약 참 { 만약 참 { 만약 참 { 1 } } }",
+        expected: 1,
+      },
+      {
+        name: "nested if-else statements",
+        input: "만약 거짓 { 0 } 아니면 { 만약 참 { 만약 거짓 { 1 } 아니면 { 2 } } 아니면 { 3 } }",
+        expected: 2,
+      },
+    ];
+
+    it.each(cases)("evaluate $input", testEvaluatingPrimitive);
+  });
+
+  describe("nested branch statements yielding nothing", () => {
+    const cases = [
+      {
+        name: "nested if statements",
+        input: "만약 참 { 만약 참 { 만약 거짓 { 1 } } }",
+      },
+      {
+        name: "nested if and if-else statements",
+        input: "만약 거짓 { 만약 참 { 만약 거짓 { 0 } 아니면 { 1 } } 아니면 { 2 } }",
+      },
+    ];
+
+    it.each(cases)("evaluate $input", testEvaluatingEmpty);
   });
 
   describe("variable statements", () => {
     const cases = [
-      { name: "integer variable with number literal", input: "foo = 42  foo", expected: 42 },
-      { name: "integer variable with arithmetic expression", input: "foo = 42 * (8 / 4) + (1 - (2 - 1))  foo", expected: 84 },
-      { name: "two integer variables with number literal", input: "foo = 42  bar = foo + 1  bar", expected: 43 },
-      { name: "arithmetic expression with variables", input: "foo = 42  bar = 43  baz = 44  qux = (bar * (baz - foo))", expected: 86 },
-      { name: "Korean integer variable with number literal", input: "변수 = 42  변수", expected: 42 },
+      {
+        name: "integer variable with number literal",
+        input: "foo = 42  foo",
+        expected: 42
+      },
+      {
+        name: "integer variable with arithmetic expression",
+        input: "foo = 42 * (8 / 4) + (1 - (2 - 1))  foo",
+        expected: 84
+      },
+      {
+        name: "two integer variables with number literal",
+        input: "foo = 42  bar = foo + 1  bar",
+        expected: 43
+      },
+      {
+        name: "arithmetic expression with variables",
+        input: "foo = 42  bar = 43  baz = 44  qux = (bar * (baz - foo))",
+        expected: 86
+      },
+      {
+        name: "Korean integer variable with number literal",
+        input: "변수 = 42  변수",
+        expected: 42
+      },
     ];
 
-    it.each(cases)("evaluate $name", ({ input, expected }) => {
-      const lexer = new Lexer(input);
-      const parser = new Parser(lexer);
-      const program = parser.parseProgram();
-      const evaluator = new Evaluator();
-      const environment = new Environment();
-      const evaluated = evaluator.evaluate(program, environment);
-
-      expect(evaluated).toBe(expected);
-    });
+    it.each(cases)("evaluate $name", testEvaluatingPrimitive);
   });
 
   describe("function expressions", () => {
     const cases = [
       {
         name: "simple function expression",
-        input: "함수 () { 1 }"
+        input: "함수 () { 1 }",
+        expectedParamsLength: 0,
+      },
+      {
+        name: "simple function expression",
+        input: "함수 (사과, 바나나, 포도) { 1 }",
+        expectedParamsLength: 3,
       },
     ];
 
-    it.each(cases)("evaluate $name", ({ input }) => {
-      const lexer = new Lexer(input);
-      const parser = new Parser(lexer);
-      const program = parser.parseProgram();
-      const evaluator = new Evaluator();
-      const environment = new Environment();
-      const evaluated = evaluator.evaluate(program, environment);
-
-      expect(evaluated).not.toBeUndefined();
-      expect(evaluated).toHaveProperty("parameters");
-      expect(evaluated).toHaveProperty("body");
-      expect(evaluated).toHaveProperty("environment");
-    });
+    it.each(cases)("evaluate $name", testEvaluatingFunction);
   });
 
   describe("call expressions", () => {
     const cases = [
       {
         name: "function call with function literal",
-        input: "함수(바나나) { 바나나 + 1 }(42)"
+        input: "함수(바나나) { 바나나 + 1 }(42)",
+        expected: 43,
       },
     ];
 
-    it.each(cases)("evaluate $name", ({ input }) => {
-      const lexer = new Lexer(input);
-      const parser = new Parser(lexer);
-      const program = parser.parseProgram();
-      const evaluator = new Evaluator();
-      const environment = new Environment();
-      const evaluated = evaluator.evaluate(program, environment);
-
-      expect(evaluated).toBe(43);
-    });
+    it.each(cases)("evaluate $name", testEvaluatingPrimitive);
   });
 });

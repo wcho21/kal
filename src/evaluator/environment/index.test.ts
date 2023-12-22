@@ -1,49 +1,52 @@
+import type { Evaluated } from "../evaluated";
 import Environment from "./";
 
 describe("set()", () => {
   it("set name and value", () => {
     const env = new Environment();
+    const varName = "foo";
+    const varValue = {} as Evaluated;
 
-    expect(() => env.set("foo", 42)).not.toThrow();
+    expect(() => env.set(varName, varValue)).not.toThrow();
   });
 });
 
 describe("get()", () => {
   it("get value after setting the value", () => {
     const env = new Environment();
+    const varName = "foo";
+    const varValue = {} as Evaluated;
 
-    env.set("foo", 42);
-    const value = env.get("foo");
+    env.set(varName, varValue);
 
-    expect(value).toBe(42);
+    expect(env.get(varName)).toBe(varValue);
   });
 
   it("get null if not found", () => {
     const env = new Environment();
+    const varNameNotSet = "foo";
 
-    const value = env.get("foo");
-
-    expect(value).toBe(null);
+    expect(env.get(varNameNotSet)).toBe(null);
   });
 });
 
 describe("linked environment", () => {
   it("set super environment and get via sub environment", () => {
+    const varNameInSuper = "foo";
+    const varValueInSuper = {} as Evaluated;
+
     const superEnv = new Environment();
-    superEnv.set("foo", 42);
+    superEnv.set(varNameInSuper, varValueInSuper);
     const subEnv = new Environment(superEnv);
 
-    const value = subEnv.get("foo");
-
-    expect(value).toBe(42);
+    expect(subEnv.get(varNameInSuper)).toBe(varValueInSuper);
   });
 
   it("get null if not found even in super environment", () => {
     const superEnv = new Environment();
     const subEnv = new Environment(superEnv);
 
-    const value = subEnv.get("foo");
-
-    expect(value).toBe(null);
+    const varNameSetNowhere = "foo";
+    expect(subEnv.get(varNameSetNowhere)).toBe(null);
   });
 });
