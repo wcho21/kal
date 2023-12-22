@@ -4,7 +4,9 @@ import {
   makeEvaluatedBoolean,
   makeEvaluatedFunction,
   makeEvaluatedEmpty,
+  wrapReturnValue,
 } from "./";
+import type { Evaluated } from "./";
 import type {
   FunctionExpression
 } from "../../parser/syntax-tree";
@@ -78,5 +80,15 @@ describe("makeEvaluatedEmpty()", () => {
 
     expect(evaluated.type).toBe("empty");
     expect(evaluated.representation).toBe("(비어있음)");
+  });
+});
+
+describe("wrapReturnValue()", () => {
+  it("wrap return value", () => {
+    const valueMock = {} as Evaluated;
+
+    const wrapped = wrapReturnValue(valueMock);
+
+    expect(wrapped.type).toBe("return value");
   });
 });

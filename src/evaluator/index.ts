@@ -18,12 +18,14 @@ import {
   makeEvaluatedString,
   makeEvaluatedFunction,
   makeEvaluatedEmpty,
+  wrapReturnValue,
 } from "./evaluated";
 import type {
   Evaluated,
   EvaluatedNumber,
   EvaluatedBoolean,
   EvaluatedFunction,
+  ReturnValue,
 } from "./evaluated";
 import Environment from "./environment";
 
@@ -33,24 +35,46 @@ export default class Evaluator {
   }
 
   private evaluateProgram(node: Program, env: Environment): Evaluated {
-    if (node.statements.length === 0) {
+    const { statements } = node;
+    if (statements.length === 0) {
       return makeEvaluatedEmpty();
     }
 
-    const evaluatedStatements = node.statements.map(statement => this.evaluateStatement(statement, env));
-    const evaluated = evaluatedStatements[evaluatedStatements.length-1];
+    // loop except the last statement
+    for (let i = 0; i < statements.length; ++i) {
+      const statement = statements[i];
+      const evaluated = this.evaluateStatement(statement, env);
+      if (evaluated.type === "return value") {
+        throw new Error(`return value cannot appear in top level scope`);
+      }
+    }
 
+    // return the last evaluated value
+    const lastStatement = statements[statements.length-1];
+    const evaluated = this.evaluateStatement(lastStatement, env);
+    if (evaluated.type === "return value") {
+      throw new Error(`return value cannot appear in top level scope`);
+    }
     return evaluated;
   }
 
-  private evaluateBlock(node: Block, env: Environment): Evaluated {
-    if (node.statements.length === 0) {
+  private evaluateBlock(node: Block, env: Environment): Evaluated | ReturnValue {
+    const { statements } = node;
+    if (statements.length === 0) {
       throw new Error(`block cannot be empty`);
     }
 
-    const evaluatedStatements = node.statements.map(statement => this.evaluateStatement(statement, env));
-    const evaluated = evaluatedStatements[evaluatedStatements.length-1];
+    // loop except the last statement
+    for (let i = 0; i < statements.length; ++i) {
+      const statement = statements[i];
+      const evaluated = this.evaluateStatement(statement, env);
+      if (evaluated.type === "return value") { // early return if return statement encoutered
+        return evaluated;
+      }
+    }
 
+    const lastStatement = statements[statements.length-1];
+    const evaluated = this.evaluateStatement(lastStatement, env);
     return evaluated;
   }
 
@@ -89,7 +113,7 @@ export default class Evaluator {
     throw new Error(`bad prefix ${prefix}`);
   }
 
-  private evaluateStatement(node: Statement, env: Environment): Evaluated {
+  private evaluateStatement(node: Statement, env: Environment): Evaluated | ReturnValue {
     if (node.type === "branch statement") {
       return this.evaluateBranchStatement(node, env);
     }
@@ -99,15 +123,15 @@ export default class Evaluator {
     }
 
     if (node.type === "return statement") {
-      // TODO: implement
-      return {} as Evaluated;
+      const value = this.evaluateExpression(node.expression, env);
+      return wrapReturnValue(value);
     }
 
     const nothing: never = node;
     return nothing;
   }
 
-  private evaluateBranchStatement(node: BranchStatement, env: Environment): Evaluated {
+  private evaluateBranchStatement(node: BranchStatement, env: Environment): Evaluated | ReturnValue {
     const predicate = this.evaluateExpression(node.predicate, env);
     if (predicate.type !== "boolean") {
       throw new Error(`expected boolean expression predicate, but received ${predicate.type}`);
@@ -283,8 +307,13 @@ export default class Evaluator {
       functionEnv.set(name, value);
     }
 
-    const value = this.evaluateBlock(functionToCall.body, functionEnv);
-    return value;
+    const evaluated = this.evaluateBlock(functionToCall.body, functionEnv);
+    if (evaluated.type !== "return value") {
+      throw new Error(`expected return value in function but it didn't`);
+    }
+
+    const returnValue = evaluated.value;
+    return returnValue;
   }
 }
 
