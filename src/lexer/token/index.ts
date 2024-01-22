@@ -82,51 +82,61 @@ export interface End {
   value: EndValue
 }
 
+/** @deprecated */
 export const operator = (value: Operator["value"]): Operator => ({
   type: "operator",
   value,
 });
 
+/** @deprecated */
 export const identifier = (value: Identifier["value"]): Identifier => ({
   type: "identifier",
   value,
 });
 
+/** @deprecated */
 export const numberLiteral = (value: NumberLiteral["value"]): NumberLiteral => ({
   type: "number literal",
   value,
 });
 
+/** @deprecated */
 export const booleanLiteral = (value: BooleanLiteral["value"]): BooleanLiteral => ({
   type: "boolean literal",
   value,
 });
 
+/** @deprecated */
 export const stringLiteral = (value: StringLiteral["value"]): StringLiteral => ({
   type: "string literal",
   value,
 });
 
+/** @deprecated */
 export const groupDelimiter = (value: GroupDelimiter["value"]): GroupDelimiter => ({
   type: "group delimiter",
   value,
 });
 
+/** @deprecated */
 export const blockDelimiter = (value: BlockDelimiter["value"]): BlockDelimiter => ({
   type: "block delimiter",
   value,
 });
 
+/** @deprecated */
 export const separator = (value: Separator["value"]): Separator => ({
   type: "separator",
   value,
 });
 
+/** @deprecated */
 export const keyword = (value: Keyword["value"]): Keyword => ({
   type: "keyword",
   value,
 });
 
+/** @deprecated */
 export const illegal = (value: Illegal["value"]): Illegal => ({
   type: "illegal",
   value,
