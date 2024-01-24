@@ -48,8 +48,10 @@ describe("getSourceToken()", () => {
           expected: {
             type: "operator",
             value: "+",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 0 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 0 },
+            },
           },
         },
         {
@@ -57,8 +59,10 @@ describe("getSourceToken()", () => {
           expected: {
             type: "operator",
             value: "-",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 0 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 0 },
+            },
           },
         },
         {
@@ -66,8 +70,10 @@ describe("getSourceToken()", () => {
           expected: {
             type: "operator",
             value: "*",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 0 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 0 },
+            },
           },
         },
         {
@@ -75,8 +81,10 @@ describe("getSourceToken()", () => {
           expected: {
             type: "operator",
             value: "/",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 0 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 0 },
+            },
           },
         },
         {
@@ -84,8 +92,10 @@ describe("getSourceToken()", () => {
           expected: {
             type: "operator",
             value: "=",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 0 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 0 },
+            },
           },
         },
         {
@@ -93,8 +103,10 @@ describe("getSourceToken()", () => {
           expected: {
             type: "operator",
             value: "==",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 1 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 1 },
+            },
           },
         },
         {
@@ -102,8 +114,10 @@ describe("getSourceToken()", () => {
           expected: {
             type: "operator",
             value: "!",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 0 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 0 },
+            },
           },
         },
         {
@@ -111,8 +125,10 @@ describe("getSourceToken()", () => {
           expected: {
             type: "operator",
             value: "!=",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 1 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 1 },
+            },
           },
         },
         {
@@ -120,8 +136,10 @@ describe("getSourceToken()", () => {
           expected: {
             type: "operator",
             value: ">",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 0 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 0 },
+            },
           },
         },
         {
@@ -129,8 +147,10 @@ describe("getSourceToken()", () => {
           expected: {
             type: "operator",
             value: ">=",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 1 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 1 },
+            },
           },
         },
         {
@@ -138,8 +158,10 @@ describe("getSourceToken()", () => {
           expected: {
             type: "operator",
             value: "<",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 0 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 0 },
+            },
           },
         },
         {
@@ -147,8 +169,10 @@ describe("getSourceToken()", () => {
           expected: {
             type: "operator",
             value: "<=",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 1 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 1 },
+            },
           },
         },
       ];
@@ -163,8 +187,10 @@ describe("getSourceToken()", () => {
           expected: {
             type: "group delimiter",
             value: "(",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 0 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 0 },
+            },
           },
         },
         {
@@ -172,8 +198,10 @@ describe("getSourceToken()", () => {
           expected: {
             type: "group delimiter",
             value: ")",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 0 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 0 },
+            },
           },
         },
         {
@@ -181,8 +209,10 @@ describe("getSourceToken()", () => {
           expected: {
             type: "block delimiter",
             value: "{",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 0 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 0 },
+            },
           },
         },
         {
@@ -190,8 +220,10 @@ describe("getSourceToken()", () => {
           expected: {
             type: "block delimiter",
             value: "}",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 0 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 0 },
+            },
           },
         },
         {
@@ -199,8 +231,10 @@ describe("getSourceToken()", () => {
           expected: {
             type: "separator",
             value: ",",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 0 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 0 },
+            },
           },
         },
       ];
@@ -215,8 +249,10 @@ describe("getSourceToken()", () => {
           expected: {
             type: "number literal",
             value: "0",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 0 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 0 },
+            },
           },
         },
         {
@@ -224,8 +260,10 @@ describe("getSourceToken()", () => {
           expected: {
             type: "number literal",
             value: "1",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 0 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 0 },
+            },
           },
         },
         {
@@ -233,8 +271,10 @@ describe("getSourceToken()", () => {
           expected: {
             type: "number literal",
             value: "1234",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 3 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 3 },
+            },
           },
         },
         {
@@ -242,8 +282,10 @@ describe("getSourceToken()", () => {
           expected: {
             type: "number literal",
             value: "12.34",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 4 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 4 },
+            },
           },
         },
       ];
@@ -258,8 +300,10 @@ describe("getSourceToken()", () => {
           expected: {
             type: "boolean literal",
             value: "참",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 0 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 0 },
+            },
           },
         },
         {
@@ -267,8 +311,10 @@ describe("getSourceToken()", () => {
           expected: {
             type: "boolean literal",
             value: "거짓",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 1 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 1 },
+            },
           },
         },
       ];
@@ -283,8 +329,10 @@ describe("getSourceToken()", () => {
           expected: {
             type: "string literal",
             value: "foo bar 123 !@# 참",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 18 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 18 },
+            },
           },
         },
         {
@@ -292,8 +340,10 @@ describe("getSourceToken()", () => {
           expected: {
             type: "string literal",
             value: "",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 1 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 1 },
+            },
           },
         },
       ];
@@ -308,8 +358,10 @@ describe("getSourceToken()", () => {
           expected: {
             type: "keyword",
             value: "만약",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 1 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 1 },
+            },
           },
         },
         {
@@ -317,8 +369,10 @@ describe("getSourceToken()", () => {
           expected: {
             type: "keyword",
             value: "아니면",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 2 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 2 },
+            },
           },
         },
         {
@@ -326,8 +380,10 @@ describe("getSourceToken()", () => {
           expected: {
             type: "keyword",
             value: "함수",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 1 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 1 },
+            },
           },
         },
         {
@@ -335,8 +391,10 @@ describe("getSourceToken()", () => {
           expected: {
             type: "keyword",
             value: "결과",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 1 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 1 },
+            },
           },
         },
       ];
@@ -351,8 +409,10 @@ describe("getSourceToken()", () => {
           expected: {
             type: "identifier",
             value: "Foo이름123_",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 8 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 8 },
+            },
           },
         },
         {
@@ -360,8 +420,10 @@ describe("getSourceToken()", () => {
           expected: {
             type: "identifier",
             value: "이름Foo123_",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 8 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 8 },
+            },
           },
         },
         {
@@ -369,8 +431,10 @@ describe("getSourceToken()", () => {
           expected: {
             type: "identifier",
             value: "_이름Foo123",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 8 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 8 },
+            },
           },
         },
       ];
@@ -385,8 +449,10 @@ describe("getSourceToken()", () => {
           expected: {
             type: "illegal",
             value: "$",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 0 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 0 },
+            },
           },
         },
         {
@@ -394,8 +460,10 @@ describe("getSourceToken()", () => {
           expected: {
             type: "illegal string",
             value: "foo",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 4 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 4 },
+            },
           },
         },
         {
@@ -403,8 +471,10 @@ describe("getSourceToken()", () => {
           expected: {
             type: "end",
             value: "$end",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 0 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 0 },
+            },
           },
         },
       ];
@@ -421,26 +491,34 @@ describe("getSourceToken()", () => {
           {
             type: "number literal",
             value: "12",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 1 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 1 },
+            },
           },
           {
             type: "operator",
             value: "+",
-            posBegin: { row: 0, col: 3 },
-            posEnd: { row: 0, col: 3 },
+            range: {
+              begin: { row: 0, col: 3 },
+              end: { row: 0, col: 3 },
+            },
           },
           {
             type: "number literal",
             value: "34",
-            posBegin: { row: 0, col: 5 },
-            posEnd: { row: 0, col: 6 },
+            range: {
+              begin: { row: 0, col: 5 },
+              end: { row: 0, col: 6 },
+            },
           },
           {
             type: "end",
             value: "$end",
-            posBegin: { row: 0, col: 7 },
-            posEnd: { row: 0, col: 7 },
+            range: {
+              begin: { row: 0, col: 7 },
+              end: { row: 0, col: 7 },
+            },
           },
         ]
       },
@@ -450,38 +528,50 @@ describe("getSourceToken()", () => {
           {
             type: "keyword",
             value: "만약",
-            posBegin: { row: 0, col: 0 },
-            posEnd: { row: 0, col: 1 },
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 1 },
+            },
           },
           {
             type: "boolean literal",
             value: "참",
-            posBegin: { row: 0, col: 3 },
-            posEnd: { row: 0, col: 3 },
+            range: {
+              begin: { row: 0, col: 3 },
+              end: { row: 0, col: 3 },
+            },
           },
           {
             type: "block delimiter",
             value: "{",
-            posBegin: { row: 0, col: 5 },
-            posEnd: { row: 0, col: 5 },
+            range: {
+              begin: { row: 0, col: 5 },
+              end: { row: 0, col: 5 },
+            },
           },
           {
             type: "number literal",
             value: "12",
-            posBegin: { row: 1, col: 2 },
-            posEnd: { row: 1, col: 3 },
+            range: {
+              begin: { row: 1, col: 2 },
+              end: { row: 1, col: 3 },
+            },
           },
           {
             type: "block delimiter",
             value: "}",
-            posBegin: { row: 2, col: 0 },
-            posEnd: { row: 2, col: 0 },
+            range: {
+              begin: { row: 2, col: 0 },
+              end: { row: 2, col: 0 },
+            },
           },
           {
             type: "end",
             value: "$end",
-            posBegin: { row: 2, col: 1 },
-            posEnd: { row: 2, col: 1 },
+            range: {
+              begin: { row: 2, col: 1 },
+              end: { row: 2, col: 1 },
+            },
           },
         ]
       },

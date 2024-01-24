@@ -123,8 +123,7 @@ export default class Lexer {
         {
           const { position: pos } = this.charBuffer.popChar();
 
-          // TODO
-          const token = createEndToken(pos, pos);
+          const token = createEndToken("$end", pos, pos);
           return token;
         }
 
@@ -564,3 +563,4 @@ export default class Lexer {
 }
 
 export type { TokenType } from "./token";
+export type { SourceToken } from "./source-token";
