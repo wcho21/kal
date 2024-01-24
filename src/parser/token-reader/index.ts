@@ -1,6 +1,7 @@
 import Lexer from "../../lexer";
 import type { TokenType } from "../../lexer";
 
+/** @deprecated */
 export default class TokenReader {
   private readonly lexer: Lexer;
   private token: TokenType;
@@ -10,14 +11,17 @@ export default class TokenReader {
     this.token = lexer.getToken();
   }
 
+  /** @deprecated */
   isEnd(): boolean {
     return this.token.type === "end";
   }
 
+  /** @deprecated */
   read(): TokenType {
     return this.token;
   }
 
+  /** @deprecated */
   next(): void {
     this.token = this.lexer.getToken();
   }
