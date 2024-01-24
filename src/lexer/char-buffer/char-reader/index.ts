@@ -20,33 +20,7 @@ export default class CharReader {
     this.col = 0;
   }
 
-  private peekNewLine(): string | null {
-    // return if end of input
-    if (this.index === this.chars.length) {
-      return null;
-    }
-
-    // return if no new line
-    const char = this.chars[this.index];
-    if (char !== "\r" && char !== "\n") {
-      return null;
-    }
-
-    // return if the last character
-    if (this.index+1 === this.chars.length) {
-      return char;
-    }
-
-    // return if single-character new line
-    const nextChar = this.chars[this.index+1];
-    if (nextChar !== "\r" && nextChar !== "\n") {
-      return char;
-    }
-
-    // return two-character new line
-    return char + nextChar;
-  }
-
+  /** return character at current position */
   readChar(): SourceChar {
     // return fallback character if end of input
     if (this.index === this.chars.length) {
@@ -85,6 +59,7 @@ export default class CharReader {
     return sourceChar;
   }
 
+  /** advance to next character */
   advance(): void {
     if (this.index === this.chars.length) {
       return;
@@ -102,6 +77,33 @@ export default class CharReader {
     // advance
     ++this.index;
     ++this.col;
+  }
+
+  private peekNewLine(): string | null {
+    // return if end of input
+    if (this.index === this.chars.length) {
+      return null;
+    }
+
+    // return if no new line
+    const char = this.chars[this.index];
+    if (char !== "\r" && char !== "\n") {
+      return null;
+    }
+
+    // return if the last character
+    if (this.index+1 === this.chars.length) {
+      return char;
+    }
+
+    // return if single-character new line
+    const nextChar = this.chars[this.index+1];
+    if (nextChar !== "\r" && nextChar !== "\n") {
+      return char;
+    }
+
+    // return two-character new line
+    return char + nextChar;
   }
 
   /** @deprecated Returns current character; if end of input, return fallback character */

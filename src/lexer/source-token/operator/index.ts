@@ -1,20 +1,11 @@
-import type Position from "../../../util/position";
-import type { SourceTokenBase } from "./../base";
+import type { SourceTokenBase, CreateToken } from "./../base";
+import { createTokenCreator } from "../base";
 
 export type OperatorValue = ArithmeticOperatorValue | AssignmentOperatorValue | LogicalOperatorValue;
 export type ArithmeticOperatorValue = "+" | "-" | "*" | "/";
 export type AssignmentOperatorValue = "=";
 export type LogicalOperatorValue = "!" | "!=" | "==" | ">" | "<" | ">=" | "<=";
 
-export interface OperatorToken extends SourceTokenBase {
-  type: "operator",
-  value: OperatorValue,
-}
+export type OperatorToken = SourceTokenBase<"operator", OperatorValue>;
 
-type CreateOperatorToken = (value: OperatorValue, posBegin: Position, posEnd: Position) => OperatorToken;
-export const createOperatorToken: CreateOperatorToken = (value, posBegin, posEnd) => ({
-  type: "operator",
-  value,
-  posBegin,
-  posEnd,
-});
+export const createOperatorToken: CreateToken<OperatorToken> = createTokenCreator<OperatorToken>("operator");
