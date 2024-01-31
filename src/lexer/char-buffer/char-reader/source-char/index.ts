@@ -1,4 +1,4 @@
-import Position from "../../../../util/position";
+import type { Position } from "../../../../util/position";
 
 export default interface SourceChar {
   value: string,
