@@ -29,6 +29,7 @@ import type {
 } from "./evaluated";
 import Environment from "./environment";
 
+/** @deprecated */
 export default class Evaluator {
   evaluate(node: Program, env: Environment): Evaluated {
     return this.evaluateProgram(node, env);
