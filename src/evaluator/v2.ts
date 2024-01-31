@@ -317,11 +317,11 @@ export default class Evaluator {
   // create value functions: wrappers for consistent representation
 
   private createNumberValue(val: number, range: Range): Value.NumberValue {
-    return value.createNumberValue({ value: val }, String(value), range);
+    return value.createNumberValue({ value: val }, String(val), range);
   }
 
   private createBooleanValue(val: boolean, range: Range): Value.BooleanValue {
-    return value.createBooleanValue({ value: val }, value ? "참" : "거짓", range);
+    return value.createBooleanValue({ value: val }, val ? "참" : "거짓", range);
   }
 
   private createStringValue(val: string, range: Range): Value.StringValue {
@@ -347,4 +347,4 @@ export default class Evaluator {
   }
 }
 
-export { default as Environment } from "./environment";
+export { default as Environment } from "./environment/v2";
