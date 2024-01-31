@@ -67,6 +67,7 @@ const getBindingPower = (infix: string): BindingPower => {
   }
 };
 
+/** @deprecated */
 export default class Parser {
   private buffer: TokenReader;
 
