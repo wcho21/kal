@@ -1,974 +1,627 @@
 import Lexer from "../lexer";
 import Parser from "./";
-import type { Program } from "./syntax-tree";
+import {
+  ParserError,
+  BadExpressionError,
+} from "./";
+import type {
+  ProgramNode,
+} from "./syntax-node";
 
-describe("parseProgram()", () => {
-  const testParsing = ({ input, expected }: { input: string, expected: Program }) => {
+type SuccessTestCase<E extends {} = any> = { name: string, input: string, expected: E };
+type FailureTestCase<E extends typeof ParserError = typeof ParserError> = { name: string, input: string, expected: E };
+
+describe("parseSource()", () => {
+  const createParser = (input: string) => {
     const lexer = new Lexer(input);
     const parser = new Parser(lexer);
 
-    const node = parser.parseProgram();
-
-    expect(node).toEqual(expected);
+    return parser;
   };
 
-  describe("assignment", () => {
-    const cases: { name: string, input: string, expected: Program }[] = [
-      {
-        name: "a single assignment statement",
-        input: "x = 42",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "assignment",
-                left: { type: "identifier", value: "x" },
-                right: { type: "number node", value: 42 },
-              },
-            },
-          ],
-        },
-      },
-      {
-        name: "multiple assignment statements",
-        input: "x = 42 한 = 9 _123 = 123",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "assignment",
-                left: { type: "identifier", value: "x" },
-                right: { type: "number node", value: 42 },
-              },
-            },
-            {
-              type: "expression statement",
-              expression: {
-                type: "assignment",
-                left: { type: "identifier", value: "한" },
-                right: { type: "number node", value: 9 },
-              },
-            },
-            {
-              type: "expression statement",
-              expression: {
-                type: "assignment",
-                left: { type: "identifier", value: "_123" },
-                right: { type: "number node", value: 123 },
-              },
-            },
-          ],
-        },
-      },
-    ];
+  const testSuccess = ({ input, expected }: { input: string, expected: ProgramNode }) => {
+    const parser = createParser(input);
 
-    it.each(cases)("parse $name", testParsing);
-  });
+    const node = parser.parseSource();
 
-  describe("logical expression", () => {
-    const cases: { name: string, input: string, expected: Program }[] = [
-      {
-        name: "not operator",
-        input: "!x",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "prefix expression",
-                prefix: "!",
-                expression: { type: "identifier", value: "x" },
-              },
-            },
-          ],
-        },
-      },
-      {
-        name: "double not operator",
-        input: "!!x",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "prefix expression",
-                prefix: "!",
+    expect(node).toMatchObject(expected);
+  };
+
+  const testFailure = ({ input, expected }: { input: string, expected: typeof ParserError }) => {
+    const parser = createParser(input);
+
+    expect(() => parser.parseSource()).toThrow(expected);
+  };
+
+  describe("creating nodes", () => {
+    describe("literal expressions", () => {
+      const cases: SuccessTestCase[] = [
+        {
+          name: "a number literal",
+          input: "42",
+          expected: {
+            type: "program",
+            statements: [
+              {
+                type: "expression statement",
                 expression: {
-                  type: "prefix expression",
-                  prefix: "!",
-                  expression: { type: "identifier", value: "x" },
-                },
+                  type: "number",
+                  value: 42,
+                }
               },
-            },
-          ],
+            ],
+          },
         },
-      },
-      {
-        name: "equal-to comparison",
-        input: "x == y",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "infix expression",
-                infix: "==",
-                left: { type: "identifier", value: "x" },
-                right: { type: "identifier", value: "y" },
-              },
-            },
-          ],
-        },
-      },
-      {
-        name: "not-equal-to comparison",
-        input: "x != y",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "infix expression",
-                infix: "!=",
-                left: { type: "identifier", value: "x" },
-                right: { type: "identifier", value: "y" },
-              },
-            },
-          ],
-        },
-      },
-      {
-        name: "greater-than comparison",
-        input: "x > y",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "infix expression",
-                infix: ">",
-                left: { type: "identifier", value: "x" },
-                right: { type: "identifier", value: "y" },
-              },
-            },
-          ],
-        },
-      },
-      {
-        name: "less-than comparison",
-        input: "x < y",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "infix expression",
-                infix: "<",
-                left: { type: "identifier", value: "x" },
-                right: { type: "identifier", value: "y" },
-              },
-            },
-          ],
-        },
-      },
-      {
-        name: "greater-than-or-equal-to comparison",
-        input: "x >= y",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "infix expression",
-                infix: ">=",
-                left: { type: "identifier", value: "x" },
-                right: { type: "identifier", value: "y" },
-              },
-            },
-          ],
-        },
-      },
-      {
-        name: "less-than-or-equal-to comparison",
-        input: "x <= y",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "infix expression",
-                infix: "<=",
-                left: { type: "identifier", value: "x" },
-                right: { type: "identifier", value: "y" },
-              },
-            },
-          ],
-        },
-      },
-      {
-        name: "left associative comparison",
-        input: "x <= y == z",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "infix expression",
-                infix: "==",
-                left: {
-                  type: "infix expression",
-                  infix: "<=",
-                  left: { type: "identifier", value: "x" },
-                  right: { type: "identifier", value: "y" },
-                },
-                right: { type: "identifier", value: "z" },
-              },
-            },
-          ],
-        },
-      },
-      {
-        name: "complex grouped comparison",
-        input: "x == (y >= z)",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "infix expression",
-                infix: "==",
-                left: { type: "identifier", value: "x" },
-                right: {
-                  type: "infix expression",
-                  infix: ">=",
-                  left: { type: "identifier", value: "y" },
-                  right: { type: "identifier", value: "z" },
-                },
-              },
-            },
-          ],
-        },
-      },
-    ];
-
-    it.each(cases)("parse $name", testParsing);
-  });
-
-  describe("return statement", () => {
-    const cases: { name: string, input: string, expected: Program }[] = [
-      {
-        name: "return number literal",
-        input: "결과 42",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "return statement",
-              expression: { type: "number node", value: 42 },
-            },
-          ],
-        },
-      },
-      {
-        name: "return arithmetic expression",
-        input: "결과 사과 + 바나나",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "return statement",
-              expression: {
-                type: "infix expression",
-                infix: "+",
-                left: { type: "identifier", value: "사과" },
-                right: { type: "identifier", value: "바나나" },
-              },
-            },
-          ],
-        },
-      },
-      {
-        name: "return function",
-        input: "결과 함수(사과) { 결과 사과 + 1 }",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "return statement",
-              expression: {
-                type: "function expression",
-                parameter: [
-                  { type: "identifier", value: "사과" },
-                ],
-                body: {
-                  type: "block",
-                  statements: [
-                    {
-                      type: "return statement",
-                      expression: {
-                        type: "infix expression",
-                        infix: "+",
-                        left: { type: "identifier", value: "사과" },
-                        right: { type: "number node", value: 1 },
-                      },
-                    },
-                  ],
-                },
-              },
-            },
-          ],
-        },
-      },
-    ];
-
-    it.each(cases)("parse $name", testParsing);
-  });
-
-  describe("simple expression", () => {
-    const cases: { name: string, input: string, expected: Program }[] = [
-      {
-        name: "an identifier",
-        input: "x",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: { type: "identifier", value: "x" },
-            },
-          ],
-        },
-      },
-      {
-        name: "a number",
-        input: "123",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: { type: "number node", value: 123 },
-            },
-          ],
-        },
-      },
-      {
-        name: "a negative number",
-        input: "-42",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "prefix expression",
-                prefix: "-",
-                expression: { type: "number node", value: 42 },
-              },
-            },
-          ],
-        },
-      },
-      {
-        name: "a doubly negative number",
-        input: "--42",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "prefix expression",
-                prefix: "-",
+        {
+          name: "a boolean literal",
+          input: "참",
+          expected: {
+            type: "program",
+            statements: [
+              {
+                type: "expression statement",
                 expression: {
-                  type: "prefix expression",
-                  prefix: "-",
-                  expression: { type: "number node", value: 42 },
+                  type: "boolean",
+                  value: true,
+                }
+              },
+            ],
+          },
+        },
+        {
+          name: "a string literal",
+          input: "'foo bar'",
+          expected: {
+            type: "program",
+            statements: [
+              {
+                type: "expression statement",
+                expression: {
+                  type: "string",
+                  value: "foo bar",
                 },
               },
-            },
-          ],
+            ],
+          },
         },
-      },
-      {
-        name: "a positive number",
-        input: "+42",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "prefix expression",
-                prefix: "+",
-                expression: { type: "number node", value: 42 },
+        {
+          name: "a identifer literal",
+          input: "foo",
+          expected: {
+            type: "program",
+            statements: [
+              {
+                type: "expression statement",
+                expression: {
+                  type: "identifier",
+                  value: "foo",
+                }
               },
-            },
-          ],
+            ],
+          },
         },
-      },
-      {
-        name: "an addition of two numbers",
-        input: "42+99",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "infix expression",
-                infix: "+",
-                left: { type: "number node", value: 42 },
-                right: { type: "number node", value: 99 },
-              },
-            },
-          ],
-        },
-      },
-      {
-        name: "an addition with the first negative number",
-        input: "-42+99",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "infix expression",
-                infix: "+",
-                left: {
-                  type: "prefix expression",
-                  prefix: "-",
-                  expression: { type: "number node", value: 42 },
-                },
-                right: { type: "number node", value: 99 },
-              },
-            },
-          ],
-        },
-      },
-      {
-        name: "an addition with the second negative number",
-        input: "42+-99",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "infix expression",
-                infix: "+",
-                left: { type: "number node", value: 42 },
-                right: {
-                  type: "prefix expression",
-                  prefix: "-",
-                  expression: { type: "number node", value: 99 },
-                },
-              },
-            },
-          ],
-        },
-      },
-      {
-        name: "an addition of two negative numbers",
-        input: "-42+-99",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "infix expression",
-                infix: "+",
-                left: {
-                  type: "prefix expression",
-                  prefix: "-",
-                  expression: { type: "number node", value: 42 },
-                },
-                right: {
-                  type: "prefix expression",
-                  prefix: "-",
-                  expression: { type: "number node", value: 99 },
-                },
-              },
-            },
-          ],
-        },
-      },
-      {
-        name: "an addition of two positive numbers",
-        input: "+42++99",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "infix expression",
-                infix: "+",
-                left: {
-                  type: "prefix expression",
-                  prefix: "+",
-                  expression: { type: "number node", value: 42 },
-                },
-                right: {
-                  type: "prefix expression",
-                  prefix: "+",
-                  expression: { type: "number node", value: 99 },
-                },
-              },
-            },
-          ],
-        },
-      },
-      {
-        name: "a subtraction of two numbers",
-        input: "42-99",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "infix expression",
-                infix: "-",
-                left: { type: "number node", value: 42 },
-                right: { type: "number node", value: 99 },
-              },
-            },
-          ],
-        },
-      },
-      {
-        name: "a multiplication of two numbers",
-        input: "42*99",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "infix expression",
-                infix: "*",
-                left: { type: "number node", value: 42 },
-                right: { type: "number node", value: 99 },
-              },
-            },
-          ],
-        },
-      },
-      {
-        name: "a division of two numbers",
-        input: "42/99",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "infix expression",
-                infix: "/",
-                left: { type: "number node", value: 42 },
-                right: { type: "number node", value: 99 },
-              },
-            },
-          ],
-        },
-      },
-      {
-        name: "an addition of three numbers, left associative",
-        input: "42+99+12",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "infix expression",
-                infix: "+",
-                left: {
-                  type: "infix expression",
-                  infix: "+",
-                  left: { type: "number node", value: 42 },
-                  right: { type: "number node", value: 99 },
-                },
-                right: { type: "number node", value: 12 },
-              },
-            },
-          ],
-        },
-      },
-      {
-        name: "addition and multiplication",
-        input: "42+99*12",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "infix expression",
-                infix: "+",
-                left: { type: "number node", value: 42 },
-                right: {
-                  type: "infix expression",
-                  infix: "*",
-                  left: { type: "number node", value: 99 },
-                  right: { type: "number node", value: 12 },
-                },
-              },
-            },
-          ],
-        },
-      },
-      {
-        name: "multiplication and addition",
-        input: "42*99+12",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "infix expression",
-                infix: "+",
-                left: {
-                  type: "infix expression",
-                  infix: "*",
-                  left: { type: "number node", value: 42 },
-                  right: { type: "number node", value: 99 },
-                },
-                right: { type: "number node", value: 12 },
-              },
-            },
-          ],
-        },
-      },
-      {
-        name: "an addition with grouped expression",
-        input: "12+(34+56)",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "infix expression",
-                infix: "+",
-                left: { type: "number node", value: 12 },
-                right: {
-                  type: "infix expression",
-                  infix: "+",
-                  left: { type: "number node", value: 34 },
-                  right: { type: "number node", value: 56 },
-                },
-              },
-            },
-          ],
-        },
-      },
-      {
-        name: "an addition with grouped more than once",
-        input: "12+(34+(56+(78+9)))",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "infix expression",
-                infix: "+",
-                left: { type: "number node", value: 12 },
-                right: {
-                  type: "infix expression",
-                  infix: "+",
-                  left: { type: "number node", value: 34 },
-                  right: {
-                    type: "infix expression",
-                    infix: "+",
-                    left: { type: "number node", value: 56 },
+      ];
+
+      it.each(cases)("$name", testSuccess);
+    });
+
+    describe("arithmetic expressions", () => {
+      describe("single number", () => {
+        const cases: SuccessTestCase[] = [
+          {
+            name: "positive number",
+            input: "+42",
+            expected: {
+              type: "program",
+              statements: [
+                {
+                  type: "expression statement",
+                  expression: {
+                    type: "prefix",
+                    prefix: "+",
                     right: {
-                      type: "infix expression",
-                      infix: "+",
-                      left: { type: "number node", value: 78 },
-                      right: { type: "number node", value: 9 },
+                      type: "number",
+                      value: 42,
+                    },
+                  }
+                },
+              ],
+            },
+          },
+          {
+            name: "negative number",
+            input: "-42",
+            expected: {
+              type: "program",
+              statements: [
+                {
+                  type: "expression statement",
+                  expression: {
+                    type: "prefix",
+                    prefix: "-",
+                    right: {
+                      type: "number",
+                      value: 42,
+                    },
+                  }
+                },
+              ],
+            },
+          },
+          {
+            name: "doubly negative number",
+            input: "--42",
+            expected: {
+              type: "program",
+              statements: [
+                {
+                  type: "expression statement",
+                  expression: {
+                    type: "prefix",
+                    prefix: "-",
+                    right: {
+                      type: "prefix",
+                      prefix: "-",
+                      right: {
+                        type: "number",
+                        value: 42,
+                      },
                     },
                   },
                 },
-              },
+              ],
             },
-          ],
-        },
-      },
-      {
-        name: "arithmetic expression with grouped more than once",
-        input: "(12*(34/56))+(7-((8+9)*10))",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "infix expression",
-                infix: "+",
-                left: {
-                  type: "infix expression",
-                  infix: "*",
-                  left: { type: "number node", value: 12 },
-                  right: {
-                    type: "infix expression",
-                    infix: "/",
-                    left: { type: "number node", value: 34 },
-                    right: { type: "number node", value: 56 },
-                  },
-                },
-                right: {
-                  type: "infix expression",
-                  infix: "-",
-                  left: { type: "number node", value: 7 },
-                  right: {
-                    type: "infix expression",
-                    infix: "*",
+          },
+        ];
+
+        it.each(cases)("$name", testSuccess);
+      });
+
+      describe("left associativity", () => {
+        const leftAssocCases = [
+          { infix: "+", name: "left associative addition" },
+          { infix: "-", name: "left associative subtraction" },
+          { infix: "*", name: "left associative multiplication" },
+          { infix: "/", name: "left associative division" },
+        ];
+        const leftAssocTestCases: SuccessTestCase[] = leftAssocCases.map(({ infix, name }) => ({
+          name,
+          input: `11 ${infix} 22 ${infix} 33`,
+          expected: {
+            type: "program",
+            statements: [
+              {
+                type: "expression statement",
+                expression: {
+                  type: "infix",
+                  infix,
+                  left: {
+                    type: "infix",
+                    infix,
                     left: {
-                      type: "infix expression",
+                      type: "number",
+                      value: 11,
+                    },
+                    right: {
+                      type: "number",
+                      value: 22,
+                    },
+                  },
+                  right: {
+                    type: "number",
+                    value: 33,
+                  },
+                },
+              },
+            ],
+          },
+        }));
+
+        it.each(leftAssocTestCases)("$name", testSuccess);
+      });
+
+      describe("associativity among different operations", () => {
+        const cases: SuccessTestCase[] = [
+          {
+            name: "four operations",
+            input: "11+22*33/44-55",
+            expected: {
+              type: "program",
+              statements: [
+                {
+                  type: "expression statement",
+                  expression: {
+                    type: "infix",
+                    infix: "-",
+                    left: {
+                      type: "infix",
                       infix: "+",
-                      left: { type: "number node", value: 8 },
-                      right: { type: "number node", value: 9 },
+                      left: {
+                        type: "number",
+                        value: 11,
+                      },
+                      right: {
+                        type: "infix",
+                        infix: "/",
+                        left: {
+                          type: "infix",
+                          infix: "*",
+                          left: {
+                            type: "number",
+                            value: 22
+                          },
+                          right: {
+                            type: "number",
+                            value: 33
+                          },
+                        },
+                        right: {
+                          type: "number",
+                          value: 44,
+                        },
+                      },
                     },
-                    right: { type: "number node", value: 10 },
+                    right: {
+                      type: "number",
+                      value: 55,
+                    },
                   },
                 },
-              },
+              ],
             },
-          ],
-        },
-      },
-      {
-        name: "arithmetic expression with floating point numbers",
-        input: "0.75 + 1.25",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "infix expression",
-                infix: "+",
-                left: { type: "number node", value: 0.75 },
-                right: { type: "number node", value: 1.25 },
-              },
-            },
-          ],
-        },
-      },
-      {
-        name: "true boolean literal",
-        input: "참",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: { type: "boolean node", value: true },
-            },
-          ],
-        },
-      },
-      {
-        name: "false boolean literal",
-        input: "거짓",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: { type: "boolean node", value: false },
-            },
-          ],
-        },
-      },
-      {
-        name: "string literal",
-        input: "'foo bar'",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: { type: "string node", value: "foo bar" },
-            },
-          ],
-        },
-      },
-    ];
-
-    it.each(cases)("parse $name", testParsing);
-  });
-
-  describe("functions", () => {
-    const cases: { name: string, input: string, expected: Program }[] = [
-      {
-        name: "function expression with parameters",
-        input: "함수 (사과, 바나나) { 사과 + 바나나 }",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "function expression",
-                parameter: [
-                  { type: "identifier", value: "사과" },
-                  { type: "identifier", value: "바나나" },
-                ],
-                body: {
-                  type: "block",
-                  statements: [
-                    {
-                      type: "expression statement",
-                      expression: {
-                        type: "infix expression",
-                        infix: "+",
-                        left: { type: "identifier", value: "사과" },
-                        right: { type: "identifier", value: "바나나" },
-                      },
-                    },
-                  ],
-                },
-              },
-            },
-          ],
-        },
-      },
-      {
-        name: "function expression with no parameters",
-        input: "함수 () { 사과 + 바나나 }",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "function expression",
-                parameter: [],
-                body: {
-                  type: "block",
-                  statements: [
-                    {
-                      type: "expression statement",
-                      expression: {
-                        type: "infix expression",
-                        infix: "+",
-                        left: { type: "identifier", value: "사과" },
-                        right: { type: "identifier", value: "바나나" },
-                      },
-                    },
-                  ],
-                },
-              },
-            },
-          ],
-        },
-      },
-    ];
-
-    it.each(cases)("parse $name", testParsing);
-  });
-
-  describe("calls", () => {
-    const cases: { name: string, input: string, expected: Program }[] = [
-      {
-        name: "call function without arguments",
-        input: "과일()",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "call",
-                functionToCall: { type: "identifier", value: "과일" },
-                callArguments: [],
-              },
-            },
-          ],
-        },
-      },
-      {
-        name: "call function with identifier arguments",
-        input: "과일(사과, 바나나, 포도)",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "call",
-                functionToCall: { type: "identifier", value: "과일" },
-                callArguments: [
-                  { type: "identifier", value: "사과" },
-                  { type: "identifier", value: "바나나" },
-                  { type: "identifier", value: "포도" },
-                ],
-              },
-            },
-          ],
-        },
-      },
-      {
-        name: "call function with expression arguments",
-        input: "과일(1, 2+3)",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "call",
-                functionToCall: { type: "identifier", value: "과일" },
-                callArguments: [
-                  { type: "number node", value: 1 },
-                  {
-                    type: "infix expression",
+          },
+          {
+            name: "with grouped",
+            input: "11+(22+33)",
+            expected: {
+              type: "program",
+              statements: [
+                {
+                  type: "expression statement",
+                  expression: {
+                    type: "infix",
                     infix: "+",
-                    left: { type: "number node", value: 2 },
-                    right: { type: "number node", value: 3 },
+                    left: {
+                      type: "number",
+                      value: 11,
+                    },
+                    right: {
+                      type: "infix",
+                      infix: "+",
+                      left: {
+                        type: "number",
+                        value: 22,
+                      },
+                      right: {
+                        type: "number",
+                        value: 33,
+                      },
+                    },
                   },
-                ],
-              },
+                },
+              ],
             },
-          ],
+          },
+        ];
+
+        it.each(cases)("$name", testSuccess);
+      });
+
+    });
+
+    describe("logical expressions", () => {
+      describe("unary operation", () => {
+        const cases: SuccessTestCase[] = [
+          {
+            name: "negation expression",
+            input: "!foo",
+            expected: {
+              type: "program",
+              statements: [
+                {
+                  type: "expression statement",
+                  expression: {
+                    type: "prefix",
+                    prefix: "!",
+                    right: {
+                      type: "identifier",
+                      value: "foo",
+                    },
+                  },
+                },
+              ],
+            },
+          },
+          {
+            name: "double negation expression",
+            input: "!!foo",
+            expected: {
+              type: "program",
+              statements: [
+                {
+                  type: "expression statement",
+                  expression: {
+                    type: "prefix",
+                    prefix: "!",
+                    right: {
+                      type: "prefix",
+                      prefix: "!",
+                      right: {
+                        type: "identifier",
+                        value: "foo",
+                      },
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        ];
+
+        it.each(cases)("$name", testSuccess);
+      });
+
+      describe("binary operation", () => {
+        const infixCases = [
+          { name: "equal-to expression", infix: "==" },
+          { name: "not-equal-to expression", infix: "!=" },
+          { name: "greater-than expression", infix: ">" },
+          { name: "less-than expression", infix: "<" },
+          { name: "greater-than-or-equal-to expression", infix: ">=" },
+          { name: "less-than-or-equal-to expression", infix: "<=" },
+        ];
+        const infixTestCases: SuccessTestCase[] = infixCases.map(({ name, infix }) => ({
+          name,
+          input: `foo ${infix} bar`,
+          expected: {
+            type: "program",
+            statements: [
+              {
+                type: "expression statement",
+                expression: {
+                  type: "infix",
+                  infix,
+                  left: {
+                    type: "identifier",
+                    value: "foo",
+                  },
+                  right: {
+                    type: "identifier",
+                    value: "bar",
+                  },
+                },
+              },
+            ],
+          },
+        }));
+
+        it.each(infixTestCases)("$name", testSuccess);
+      });
+
+      describe("right associativity", () => {
+        const infixCases = [
+          { name: "right associative equal-to expression", infix: "==" },
+          { name: "right associative not-equal-to expression", infix: "!=" },
+        ];
+        const infixTestCases: SuccessTestCase[] = infixCases.map(({ name, infix }) => ({
+          name,
+          input: `foo ${infix} bar ${infix} baz`,
+          expected: {
+            type: "program",
+            statements: [
+              {
+                type: "expression statement",
+                expression: {
+                  type: "infix",
+                  infix,
+                  left: {
+                    type: "identifier",
+                    value: "foo",
+                  },
+                  right: {
+                    type: "infix",
+                    infix,
+                    left: {
+                      type: "identifier",
+                      value: "bar",
+                    },
+                    right: {
+                      type: "identifier",
+                      value: "baz",
+                    },
+                  },
+                },
+              },
+            ],
+          },
+        }));
+
+        it.each(infixTestCases)("$name", testSuccess);
+      });
+
+      describe("grouped expression", () => {
+        const cases: SuccessTestCase[] = [
+          {
+            name: "equal-to and not-equal-to",
+            input: "(foo == bar) != baz",
+            expected: {
+              type: "program",
+              statements: [
+                {
+                  type: "expression statement",
+                  expression: {
+                    type: "infix",
+                    infix: "!=",
+                    left: {
+                      type: "infix",
+                      infix: "==",
+                      left: {
+                        type: "identifier",
+                        value: "foo",
+                      },
+                      right: {
+                        type: "identifier",
+                        value: "bar",
+                      },
+                    },
+                    right: {
+                      type: "identifier",
+                      value: "baz",
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        ];
+
+        it.each(cases)("$name", testSuccess);
+      });
+    });
+
+    describe("assignment", () => {
+      const cases: SuccessTestCase[] = [
+        {
+          name: "a single assignment statement",
+          input: "x = 42",
+          expected: {
+            type: "program",
+            statements: [
+              {
+                type: "expression statement",
+                expression: {
+                  type: "assignment",
+                  left: {
+                    type: "identifier",
+                    value: "x",
+                  },
+                  right: {
+                    type: "number",
+                    value: 42,
+                  },
+                },
+              },
+            ],
+          },
         },
-      },
-      {
-        name: "call function with function literal",
-        input: "함수(사과, 바나나){사과 + 바나나}(1, 2)",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "call",
-                functionToCall: {
-                  type: "function expression",
-                  parameter: [
-                    { type: "identifier", value: "사과" },
-                    { type: "identifier", value: "바나나" },
+        {
+          name: "right associative assignment",
+          input: "x = y = 42",
+          expected: {
+            type: "program",
+            statements: [
+              {
+                type: "expression statement",
+                expression: {
+                  type: "assignment",
+                  left: {
+                    type: "identifier",
+                    value: "x",
+                  },
+                  right: {
+                    type: "assignment",
+                    left: {
+                      type: "identifier",
+                      value: "y",
+                    },
+                    right: {
+                      type: "number",
+                      value: 42,
+                    },
+                  },
+                },
+              },
+            ],
+          },
+        },
+      ];
+
+      it.each(cases)("$name", testSuccess);
+    });
+
+    describe("call expressions", () => {
+      const cases: SuccessTestCase[] = [
+        {
+          name: "call function with identifier",
+          input: "foo(bar, 42)",
+          expected: {
+            type: "program",
+            statements: [
+              {
+                type: "expression statement",
+                expression: {
+                  type: "call",
+                  func: {
+                    type: "identifier",
+                    value: "foo",
+                  },
+                  args: [
+                    {
+                      type: "identifier",
+                      value: "bar",
+                    },
+                    {
+                      type: "number",
+                      value: 42,
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+        {
+          name: "call function with function literal",
+          input: "함수(foo){ foo }(42)",
+          expected: {
+            type: "program",
+            statements: [
+              {
+                type: "expression statement",
+                expression: {
+                  type: "call",
+                  func: {
+                    type: "function",
+                    parameters: {}, // omit
+                    body: {}, // omit
+                  },
+                  args: [
+                    {
+                      type: "number",
+                      value: 42,
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      ];
+
+      it.each(cases)("$name", testSuccess);
+    });
+
+    describe("function expressions", () => {
+      const cases: SuccessTestCase[] = [
+        {
+          name: "function expression with parameters",
+          input: "함수 (foo, bar) { foo + bar }",
+          expected: {
+            type: "program",
+            statements: [
+              {
+                type: "expression statement",
+                expression: {
+                  type: "function",
+                  parameters: [
+                    {
+                      type: "identifier",
+                      value: "foo",
+                    },
+                    {
+                      type: "identifier",
+                      value: "bar",
+                    },
                   ],
                   body: {
                     type: "block",
@@ -976,151 +629,418 @@ describe("parseProgram()", () => {
                       {
                         type: "expression statement",
                         expression: {
-                          type: "infix expression",
-                          infix: "+",
-                          left: { type: "identifier", value: "사과" },
-                          right: { type: "identifier", value: "바나나" },
+                          type: "infix",
                         },
                       },
                     ],
                   },
                 },
-                callArguments: [
-                  { type: "number node", value: 1 },
-                  { type: "number node", value: 2 },
-                ],
               },
-            },
-          ],
+            ],
+          },
         },
-      },
-    ];
+      ];
 
-    it.each(cases)("parse $name", testParsing);
-  });
+      it.each(cases)("$name", testSuccess);
+    });
 
-  describe("branch statements", () => {
-    const cases: { name: string, input: string, expected: Program }[] = [
-      {
-        name: "simple if statement with boolean predicate",
-        input: "만약 참 { 1 }",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "branch statement",
-              predicate: { type: "boolean node", value: true },
-              consequence: {
-                type: "block",
-                statements: [
-                  {
-                    type: "expression statement",
-                    expression: { type: "number node", value: 1 },
-                  },
-                ],
-              },
-            },
-          ],
-        },
-      },
-      {
-        name: "simple if statement with expression predicate",
-        input: "만약 사과 == 1 { 2 }",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "branch statement",
-              predicate: {
-                type: "infix expression",
-                infix: "==",
-                left: { type: "identifier", value: "사과" },
-                right:  { type: "number node", value: 1 },
-              },
-              consequence: {
-                type: "block",
-                statements: [
-                  {
-                    type: "expression statement",
-                    expression: { type: "number node", value: 2 },
-                  },
-                ],
-              },
-            },
-          ],
-        },
-      },
-      {
-        name: "simple if-else statement with boolean predicate",
-        input: "만약 참 { 3 } 아니면 { 4 }",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "branch statement",
-              predicate: { type: "boolean node", value: true },
-              consequence: {
-                type: "block",
-                statements: [
-                  {
-                    type: "expression statement",
-                    expression: { type: "number node", value: 3 },
-                  },
-                ],
-              },
-              alternative: {
-                type: "block",
-                statements: [
-                  {
-                    type: "expression statement",
-                    expression: { type: "number node", value: 4 },
-                  },
-                ],
-              },
-            },
-          ],
-        },
-      },
-    ];
-
-    it.each(cases)("parse $name", testParsing);
-  });
-
-  describe("complex expression", () => {
-    const cases: { name: string, input: string, expected: Program }[] = [
-      {
-        name: "assignment and arithmetic expression",
-        input: "변수1 = 1  ((변수1 + 변수1) * 변수1)",
-        expected: {
-          type: "program",
-          statements: [
-            {
-              type: "expression statement",
-              expression: {
-                type: "assignment",
-                left: { type: "identifier", value: "변수1" },
-                right: { type: "number node", value: 1 },
-              },
-            },
-            {
-              type: "expression statement",
-              expression: {
-                type: "infix expression",
-                infix: "*",
-                left: {
-                  type: "infix expression",
-                  infix: "+",
-                  left: { type: "identifier", value: "변수1" },
-                  right: { type: "identifier", value: "변수1" },
+    describe("return statement", () => {
+      const cases: SuccessTestCase[] = [
+        {
+          name: "return number literal",
+          input: "결과 42",
+          expected: {
+            type: "program",
+            statements: [
+              {
+                type: "return",
+                expression: {
+                  type: "number",
+                  value: 42,
                 },
-                right: { type: "identifier", value: "변수1" },
               },
-            },
-          ],
+            ],
+          },
         },
-      },
+      ];
+
+      it.each(cases)("$name", testSuccess);
+    });
+
+    describe("branch statement", () => {
+      const cases: SuccessTestCase[] = [
+        {
+          name: "predicate and consequence",
+          input: "만약 foo { bar }",
+          expected: {
+            type: "program",
+            statements: [
+              {
+                type: "branch",
+                predicate: {
+                  type: "identifier",
+                  value: "foo",
+                },
+                consequence: {
+                  type: "block",
+                  statements: [
+                    {
+                      type: "expression statement",
+                      expression: {
+                        type: "identifier",
+                        value: "bar",
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+        {
+          name: "predicate and consequence with alternative",
+          input: "만약 foo { bar } 아니면 { baz }",
+          expected: {
+            type: "program",
+            statements: [
+              {
+                type: "branch",
+                predicate: {
+                  type: "identifier",
+                  value: "foo",
+                },
+                consequence: {
+                  type: "block",
+                  statements: [
+                    {
+                      type: "expression statement",
+                      expression: {
+                        type: "identifier",
+                        value: "bar",
+                      },
+                    },
+                  ],
+                },
+                alternative: {
+                  type: "block",
+                  statements: [
+                    {
+                      type: "expression statement",
+                      expression: {
+                        type: "identifier",
+                        value: "baz",
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      ];
+
+      it.each(cases)("$name", testSuccess);
+    });
+  });
+
+  describe("marking positions", () => {
+    describe("single statements", () => {
+      describe("literal expressions", () => {
+        const literalCases = [
+          {
+            name: "number literal",
+            type: "number",
+            input: "12345",
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 4 },
+            },
+          },
+          {
+            name: "string literal",
+            type: "string",
+            input: "'foo bar'",
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 8 },
+            },
+          },
+          {
+            name: "boolean literal",
+            type: "boolean",
+            input: "거짓",
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 1 },
+            },
+          },
+          {
+            name: "identifier literal",
+            type: "identifier",
+            input: "foo",
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 2 },
+            },
+          },
+        ];
+        const cases: SuccessTestCase[] = literalCases.map(({ name, input, range, type }) => ({
+          name,
+          input,
+          expected: {
+            type: "program",
+            range,
+            statements: [
+              {
+                type: "expression statement",
+                range,
+                expression: {
+                  type,
+                  range,
+                },
+              },
+            ],
+          },
+        }));
+
+        it.each(cases)("$name", testSuccess);
+      });
+
+      describe("single expressions", () => {
+        const cases: SuccessTestCase[] = [
+          {
+            name: "assignment",
+            input: "x = 42",
+            expected: {
+              type: "program",
+              range: {
+                begin: { row: 0, col: 0 },
+                end: { row: 0, col: 5 },
+              },
+              statements: [
+                {
+                  type: "expression statement",
+                  range: {
+                    begin: { row: 0, col: 0 },
+                    end: { row: 0, col: 5 },
+                  },
+                  expression: {
+                    type: "assignment",
+                    range: {
+                      begin: { row: 0, col: 0 },
+                      end: { row: 0, col: 5 },
+                    },
+                    left: {
+                      type: "identifier",
+                      range: {
+                        begin: { row: 0, col: 0 },
+                        end: { row: 0, col: 0 },
+                      },
+                    },
+                    right: {
+                      type: "number",
+                      range: {
+                        begin: { row: 0, col: 4 },
+                        end: { row: 0, col: 5 },
+                      },
+                    },
+                  },
+                },
+              ],
+            },
+          },
+          {
+            name: "arithmetic expression",
+            input: "11 + 22",
+            expected: {
+              type: "program",
+              range: {
+                begin: { row: 0, col: 0 },
+                end: { row: 0, col: 6 },
+              },
+              statements: [
+                {
+                  type: "expression statement",
+                  range: {
+                    begin: { row: 0, col: 0 },
+                    end: { row: 0, col: 6 },
+                  },
+                  expression: {
+                    type: "infix",
+                    range: {
+                      begin: { row: 0, col: 0 },
+                      end: { row: 0, col: 6 },
+                    },
+                    left: {
+                      type: "number",
+                      range: {
+                        begin: { row: 0, col: 0 },
+                        end: { row: 0, col: 1 },
+                      },
+                    },
+                    right: {
+                      type: "number",
+                      range: {
+                        begin: { row: 0, col: 5 },
+                        end: { row: 0, col: 6 },
+                      },
+                    },
+                  },
+                },
+              ],
+            },
+          },
+          {
+            name: "grouped expression",
+            input: "(11 + 22)",
+            expected: {
+              type: "program",
+              range: {
+                begin: { row: 0, col: 0 },
+                end: { row: 0, col: 8 },
+              },
+              statements: [
+                {
+                  type: "expression statement",
+                  range: {
+                    begin: { row: 0, col: 0 },
+                    end: { row: 0, col: 8 },
+                  },
+                  expression: {
+                    type: "infix",
+                    range: {
+                      begin: { row: 0, col: 0 },
+                      end: { row: 0, col: 8 },
+                    },
+                    left: {
+                      type: "number",
+                      range: {
+                        begin: { row: 0, col: 1 },
+                        end: { row: 0, col: 2 },
+                      },
+                    },
+                    right: {
+                      type: "number",
+                      range: {
+                        begin: { row: 0, col: 6 },
+                        end: { row: 0, col: 7 },
+                      },
+                    },
+                  },
+                },
+              ],
+            },
+          },
+          {
+            name: "function expression",
+            input: "함수(foo) {\n  foo\n}",
+            expected: {
+              type: "program",
+              range: {
+                begin: { row: 0, col: 0, },
+                end: { row: 2, col: 0, },
+              },
+              statements: [
+                {
+                  type: "expression statement",
+                  expression: {
+                    type: "function",
+                    range: {
+                      begin: { row: 0, col: 0, },
+                      end: { row: 2, col: 0, },
+                    },
+                    body: {
+                      type: "block",
+                      range: {
+                        begin: { row: 0, col: 8, },
+                        end: { row: 2, col: 0, },
+                      },
+                    },
+                  },
+                },
+              ],
+            },
+          },
+          {
+            name: "call expression",
+            input: "foo(bar, baz)",
+            expected: {
+              type: "program",
+              range: {
+              },
+              statements: [
+                {
+                  type: "expression statement",
+                  expression: {
+                    type: "call",
+                    range: {
+                      begin: { row: 0, col: 0, },
+                      end: { row: 0, col: 12, },
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        ];
+
+        it.each(cases)("$name", testSuccess);
+      });
+
+      describe("single statements", () => {
+        const cases: SuccessTestCase[] = [
+          {
+            name: "branch statement",
+            input: "만약 foo {\n  11\n} 아니면 {\n  22\n}",
+            expected: {
+              type: "program",
+              range: {
+              },
+              statements: [
+                {
+                  type: "branch",
+                  range: {
+                  },
+                  predicate: {
+                    range: {
+                      begin: { row: 0, col: 3, },
+                      end: { row: 0, col: 5, },
+                    },
+                  },
+                  consequence: {
+                    type: "block",
+                    range: {
+                      begin: { row: 0, col: 7, },
+                      end: { row: 2, col: 0, },
+                    },
+                  },
+                  alternative: {
+                    type: "block",
+                    range: {
+                      begin: { row: 2, col: 6, },
+                      end: { row: 4, col: 0, },
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        ];
+
+        it.each(cases)("$name", testSuccess);
+      });
+    });
+  });
+
+  describe("error handling", () => {
+    const cases: FailureTestCase[] = [
+      {
+        name: "not parsable expression start",
+        input: "*3",
+        expected: BadExpressionError,
+      }
     ];
 
-    it.each(cases)("parse $name", testParsing);
+    it.each(cases)("$name", testFailure);
   });
 });

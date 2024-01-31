@@ -1,6 +1,6 @@
 import { copyRange, type Range } from "../../util/position";
-import type { FunctionNode } from "../../parser/v2";
-import Environment from "../environment/v2";
+import type { FunctionNode } from "../../parser";
+import Environment from "../environment";
 
 export interface ValueBase<T extends string = string> {
   readonly type: T,

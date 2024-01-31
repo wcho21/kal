@@ -105,24 +105,6 @@ export default class CharReader {
     // return two-character new line
     return char + nextChar;
   }
-
-  /** @deprecated Returns current character; if end of input, return fallback character */
-  read(): string {
-    if (this.index === this.chars.length) {
-      return this.fallbackChar;
-    }
-
-    return this.chars[this.index];
-  }
-
-  /** @deprecated Increment index to get next character with get() */
-  next(): void {
-    if (this.index === this.chars.length) {
-      return;
-    }
-
-    this.index++;
-  }
 }
 
 export type { SourceChar };
