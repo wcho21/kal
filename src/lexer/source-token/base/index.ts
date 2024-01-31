@@ -1,9 +1,4 @@
-import type Position from "../../../util/position";
-
-export interface Range {
-  readonly begin: Position,
-  readonly end: Position,
-};
+import type { Position, Range } from "../../../util/position";
 
 export interface SourceTokenBase<T extends string = string, V = unknown> {
   readonly type: T,

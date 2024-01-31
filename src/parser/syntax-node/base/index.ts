@@ -1,37 +1,30 @@
-import type Position from "../../../util/position";
+import type { Position, Range } from "../../../util/position";
+import { copyRange } from "../../../util/position";
 
-export interface Range {
-  readonly begin: Position,
-  readonly end: Position,
-};
-
-export interface SyntaxNodeBase<T extends string = string, F extends {} = {}> {
+export interface SyntaxNodeBase<T extends string> {
   readonly type: T,
   readonly range: Range,
-  readonly fields: F,
 };
 
-export function createNodeCreator<N extends SyntaxNodeBase>(type: N["type"]) {
-  type Node = { type: N["type"], range: N["range"], fields: N["fields"] };
+type AdditionalFields<T extends string, N extends SyntaxNodeBase<T>> = Omit<N, keyof SyntaxNodeBase<T>>;
 
-  function createNode(fields: N["fields"], range: Range): Node;
-  function createNode(fields: N["fields"], rangeBegin: Position, rangeEnd: Position): Node;
-  function createNode(fields: N["fields"], arg1: Range | Position, rangeEnd?: Position): Node {
+export function createNodeCreator<T extends string, N extends SyntaxNodeBase<T>>(type: T) {
+  type Node = { type: T, range: Range } & AdditionalFields<T, N>;
+
+  function createNode(fields: AdditionalFields<T, N>, range: Range): Node;
+  function createNode(fields: AdditionalFields<T, N>, rangeBegin: Position, rangeEnd: Position): Node;
+  function createNode(fields: AdditionalFields<T, N>, arg1: Range | Position, rangeEnd?: Position): Node {
     if (rangeEnd !== undefined) {
-      const range = {
-        begin: arg1 as Position,
-        end: rangeEnd,
-      };
-
-      return { type, range, fields };
+      return { type, range: copyRange(arg1 as Position, rangeEnd), ...fields };
     }
 
-    return { type, range: arg1 as Range, fields };
+    const range = arg1 as Range;
+    return { type, range: copyRange(range.begin, range.end), ...fields };
   };
 
   return createNode;
 };
 
-declare function createNode<N extends SyntaxNodeBase>(fields: N["fields"], range: Range): N;
-declare function createNode<N extends SyntaxNodeBase>(fields: N["fields"], rangeBegin: Position, rangeEnd: Position): N;
-export type CreateNode<N extends SyntaxNodeBase> = typeof createNode<N>;
+declare function createNode<T extends string, N extends SyntaxNodeBase<T>>(fields: AdditionalFields<T, N>, range: Range): N;
+declare function createNode<T extends string, N extends SyntaxNodeBase<T>>(fields: AdditionalFields<T, N>, rangeBegin: Position, rangeEnd: Position): N;
+export type CreateNode<T extends string, N extends SyntaxNodeBase<T>> = typeof createNode<T, N>;

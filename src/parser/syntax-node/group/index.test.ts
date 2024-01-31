@@ -10,9 +10,7 @@ const cases = [
     node: createProgramNode({ statements: [] }, fakePos, fakePos),
     expected: {
       type: "program",
-      fields: {
-        statements: [],
-      },
+      statements: [],
       range: { begin: fakePos, end: fakePos },
     },
   },
@@ -21,13 +19,12 @@ const cases = [
     node: createBlockNode({ statements: [] }, fakePos, fakePos),
     expected: {
       type: "block",
-      fields: {
-        statements: [],
-      },
+      statements: [],
       range: { begin: fakePos, end: fakePos },
     },
   },
 ];
+
 it.each(cases)("create $name node", ({ node, expected }) => {
   expect(node).toEqual(expected);
 });

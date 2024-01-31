@@ -23,9 +23,7 @@ const cases = [
     node: createIdentifierNode({ value: "foo" }, fakePos, fakePos),
     expected: {
       type: "identifier",
-      fields: {
-        value: "foo",
-      },
+      value: "foo",
       range: { begin: fakePos, end: fakePos },
     },
   },
@@ -34,9 +32,7 @@ const cases = [
     node: createNumberNode({ value: 42 }, fakePos, fakePos),
     expected: {
       type: "number",
-      fields: {
-        value: 42,
-      },
+      value: 42,
       range: { begin: fakePos, end: fakePos },
     },
   },
@@ -45,9 +41,7 @@ const cases = [
     node: createStringNode({ value: "foo" }, fakePos, fakePos),
     expected: {
       type: "string",
-      fields: {
-        value: "foo",
-      },
+      value: "foo",
       range: { begin: fakePos, end: fakePos },
     },
   },
@@ -56,10 +50,8 @@ const cases = [
     node: createPrefixNode({ prefix: "+", right: {} as ExpressionNode }, fakePos, fakePos),
     expected: {
       type: "prefix",
-      fields: {
-        prefix: "+",
-        right: {},
-      },
+      prefix: "+",
+      right: {},
       range: { begin: fakePos, end: fakePos },
     },
   },
@@ -68,11 +60,9 @@ const cases = [
     node: createInfixNode({ infix: "+", left: {} as ExpressionNode, right: {} as ExpressionNode }, fakePos, fakePos),
     expected: {
       type: "infix",
-      fields: {
-        infix: "+",
-        left: {},
-        right: {},
-      },
+      infix: "+",
+      left: {},
+      right: {},
       range: { begin: fakePos, end: fakePos },
     },
   },
@@ -81,10 +71,8 @@ const cases = [
     node: createFunctionNode({ parameters: [] as IdentifierNode[], body: {} as BlockNode }, fakePos, fakePos),
     expected: {
       type: "function",
-      fields: {
-        parameters: [],
-        body: {},
-      },
+      parameters: [],
+      body: {},
       range: { begin: fakePos, end: fakePos },
     },
   },
@@ -93,10 +81,8 @@ const cases = [
     node: createCallNode({ func: {} as IdentifierNode, args: [] as ExpressionNode[] }, fakePos, fakePos),
     expected: {
       type: "call",
-      fields: {
-        func: {},
-        args: [],
-      },
+      func: {},
+      args: [],
       range: { begin: fakePos, end: fakePos },
     },
   },
@@ -105,14 +91,13 @@ const cases = [
     node: createAssignmentNode({ left: {} as IdentifierNode, right: {} as ExpressionNode }, fakePos, fakePos),
     expected: {
       type: "assignment",
-      fields: {
-        left: {},
-        right: {},
-      },
+      left: {},
+      right: {},
       range: { begin: fakePos, end: fakePos },
     },
   },
 ];
+
 it.each(cases)("create $name node", ({ node, expected }) => {
   expect(node).toEqual(expected);
 });

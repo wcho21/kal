@@ -7,7 +7,7 @@ import { copyRange, type Range } from "../util/position";
 export class ParserError extends Error {
   public received: string;
   public expected: string;
-  public range: { begin: { col: number, row: number }, end: { col: number, row: number }};
+  public range: Range;
 
   constructor(received: string, expected: string, range: Range) {
     super();
