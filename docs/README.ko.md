@@ -6,17 +6,21 @@
 
 
 
-# 🗡️ KAL
+# 🗡️ KALANG
 
-<img src="./images/kal-logo.png" alt="KAL logo" width="128px" height="128px" />
+<img src="./images/kal-logo.png" alt="KALANG logo" width="192px" height="192px" />
 
-_KAL: Korean Algorithmic Language_.
+_KALANG: Korean Programming Language_.
 
-한국어를 지원하는 인터프리터 언어.
+한국어 프로그래밍 언어.
 
-_KAL_ 인터프리터를 브라우저에 로드하거나 직접 빌드하는 방법은 아래를 참고하세요.
+- < 0.03 MB.
+- 자바스크립트로 작성되어 브라우저에서 바로 동작합니다.
+- 한국어 키워드로 구성된 간단한 문법을 갖습니다.
 
-_KAL_ 을 [플레이그라운드][playground]에서 체험해보세요.
+_KALANG_ 을 [플레이그라운드][playground]에서 체험해보세요.
+
+_KALANG_ 인터프리터를 브라우저에 로드하거나 직접 빌드하는 방법은 아래를 참고하세요.
 
 [playground]: https://kal-playground.rooi.dev/
 
@@ -30,7 +34,7 @@ _KAL_ 을 [플레이그라운드][playground]에서 체험해보세요.
 <script src="https://cdn.jsdelivr.net/gh/wcho21/kal@latest/dist/index.min.js"></script>
 ```
 
-이후, _KAL_ 코드는 다음과 같이 `kal.execute(code-to-execute)`로 실행합니다.
+이후, _KALANG_ 코드는 다음과 같이 `kal.execute(code-to-execute)`로 실행합니다.
 
 ```HTML
 <script>
@@ -116,7 +120,7 @@ _불리언 타입_: `참`, `거짓`
 
 빌드 과정은 [Node.js][node]를 기반으로 합니다.
 
-_KAL_ 인터프리터를 다음 커맨드로 [`pnpm`]을 이용해 빌드합니다.
+_KALANG_ 인터프리터를 다음 커맨드로 [`pnpm`]을 이용해 빌드합니다.
 
 ```
 pnpm install && pnpm build && pnpm bundle`

@@ -2,21 +2,23 @@
 [![Korean](https://img.shields.io/badge/Lang-ko-blue)][readme-ko]
 
 [readme-en]: ./
-[readme-ko]: ./docs/README_KR.md
+[readme-ko]: ./docs/README.ko.md
 
 
 
-# 🗡️ KAL
+# 🗡️ KALANG
 
-<img src="./docs/images/kal-logo.png" alt="KAL logo" width="128px" height="128px" />
+<img src="./docs/images/kal-logo.png" alt="KALANG logo" width="192px" height="192px" />
 
-_KAL: Korean Algorithmic Language_.
+_KALANG: Korean Programming Language_.
 
-A simple interpreted language which supports Korean.
+- < 0.03 MB.
+- Written in JavaScript. Natively runs on web browsers.
+- Minimal syntax with Korean keywords.
 
-You can load a _KAL_ interpreter in browsers, or build manually (see below).
+Try _KALANG_ at [Playground][playground].
 
-Try _KAL_ at [KAL Playground][playground].
+You can load a _KALANG_ interpreter in browsers, or build manually (see below).
 
 [playground]: https://kal-playground.rooi.dev/
 
@@ -30,7 +32,7 @@ Load the interpreter script in HTML as follows:
 <script src="https://cdn.jsdelivr.net/gh/wcho21/kal@latest/dist/index.min.js"></script>
 ```
 
-After that, you can execute _KAL_ code with `kal.execute(code-to-execute)` as follows:
+After that, you can execute _KALANG_ code with `kal.execute(code-to-execute)` as follows:
 
 ```HTML
 <script>
@@ -114,7 +116,7 @@ _Boolean type_: `참`, `거짓`
 
 Note that building process is based on [Node.js][node].
 
-With [`pnpm`][pnpm], you can build a _KAL_ interpreter by running `pnpm install && pnpm build && pnpm bundle`.
+With [`pnpm`][pnpm], you can build a _KALANG_ interpreter by running `pnpm install && pnpm build && pnpm bundle`.
 
 The output will be in the directory `/bundle/index.js`.
 
