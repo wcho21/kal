@@ -27,6 +27,7 @@ export interface AssignmentNode extends SyntaxNodeBase<"assignment", { left: Ide
 
 export const createIdentifierNode: CreateNode<IdentifierNode> = createNodeCreator<IdentifierNode>("identifier");
 export const createNumberNode: CreateNode<NumberNode> = createNodeCreator<NumberNode>("number");
+export const createBooleanNode: CreateNode<BooleanNode> = createNodeCreator<BooleanNode>("boolean");
 export const createStringNode: CreateNode<StringNode> = createNodeCreator<StringNode>("string");
 export const createPrefixNode: CreateNode<PrefixNode> = createNodeCreator<PrefixNode>("prefix");
 export const createInfixNode: CreateNode<InfixNode> = createNodeCreator<InfixNode>("infix");
