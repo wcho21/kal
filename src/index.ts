@@ -5,7 +5,7 @@ import Evaluator, { Environment } from "./evaluator";
 export const execute = (input: string): string => {
   const lexer = new Lexer(input);
   const parser = new Parser(lexer);
-  const parsed = parser.parseProgram();
+  const parsed = parser.parseSource();
 
   const evaluator = new Evaluator();
   const environment = new Environment();

@@ -1,182 +1,193 @@
-import type {
-  Program,
-  Block,
-  Statement,
-  BranchStatement,
-  ExpressionStatement,
-  Expression,
-  Identifier,
-  PrefixExpression,
-  InfixExpression,
-  FunctionExpression,
-  Call,
-  Assignment,
-} from "../parser";
-import {
-  makeEvaluatedNumber,
-  makeEvaluatedBoolean,
-  makeEvaluatedString,
-  makeEvaluatedFunction,
-  makeEvaluatedEmpty,
-  wrapReturnValue,
-} from "./evaluated";
-import type {
-  Evaluated,
-  EvaluatedNumber,
-  EvaluatedBoolean,
-  EvaluatedFunction,
-  ReturnValue,
-} from "./evaluated";
+import type * as Node from "../parser";
+import type * as Value from "./value";
+import * as value from "./value";
 import Environment from "./environment";
+import type { Range } from "../util/position";
+
+export class EvalError extends Error {
+  public range: Range;
+  public received?: string;
+
+  constructor(range: Range, received?: string) {
+    super();
+    this.range = range;
+    this.received = received;
+  }
+}
+
+export class TopLevelReturnError extends EvalError {};
+export class BadPredicateError extends EvalError {};
+export class BadAssignmentLeftError extends EvalError {};
+export class BadPrefixExpressionError extends EvalError {};
+export class BadInfixExpressionError extends EvalError {};
+export class BadIdentifierError extends EvalError {};
+
+type ComparisonOperator = "==" | "!=" | ">" | "<" | ">=" | "<=";
 
 export default class Evaluator {
-  evaluate(node: Program, env: Environment): Evaluated {
+  evaluate(node: Node.ProgramNode, env: Environment): Value.Value {
     return this.evaluateProgram(node, env);
   }
 
-  private evaluateProgram(node: Program, env: Environment): Evaluated {
+  private evaluateProgram(node: Node.ProgramNode, env: Environment): Value.Value {
     const { statements } = node;
-    if (statements.length === 0) {
-      return makeEvaluatedEmpty();
-    }
 
-    // loop except the last statement
+    let lastEvaluated: Value.Value | null = null;
     for (let i = 0; i < statements.length; ++i) {
-      const statement = statements[i];
-      const evaluated = this.evaluateStatement(statement, env);
-      if (evaluated.type === "return value") {
-        throw new Error(`return value cannot appear in top level scope`);
+      const evaluated = this.evaluateStatement(statements[i], env);
+
+      if (evaluated.type === "return") {
+        throw new TopLevelReturnError(node.range);
       }
+
+      lastEvaluated = evaluated;
     }
 
-    // return the last evaluated value
-    const lastStatement = statements[statements.length-1];
-    const evaluated = this.evaluateStatement(lastStatement, env);
-    if (evaluated.type === "return value") {
-      throw new Error(`return value cannot appear in top level scope`);
-    }
-    return evaluated;
+    return lastEvaluated ?? this.createEmptyValue(node.range);
   }
 
-  private evaluateBlock(node: Block, env: Environment): Evaluated | ReturnValue {
-    const { statements } = node;
-    if (statements.length === 0) {
-      throw new Error(`block cannot be empty`);
-    }
-
-    // loop except the last statement
-    for (let i = 0; i < statements.length; ++i) {
-      const statement = statements[i];
-      const evaluated = this.evaluateStatement(statement, env);
-      if (evaluated.type === "return value") { // early return if return statement encoutered
-        return evaluated;
-      }
-    }
-
-    const lastStatement = statements[statements.length-1];
-    const evaluated = this.evaluateStatement(lastStatement, env);
-    return evaluated;
-  }
-
-  private evaluatePrefixExpression(node: PrefixExpression, env: Environment): Evaluated {
-    const subExpression = this.evaluateExpression(node.expression, env);
-
-    if (
-      (node.prefix === "+" || node.prefix === "-") &&
-      subExpression.type == "number"
-    ) {
-      return this.evaluatePrefixNumberExpression(node.prefix, subExpression);
-    }
-    if (node.prefix === "!" && subExpression.type === "boolean") {
-      return this.evaluatePrefixBooleanExpression(node.prefix, subExpression);
-    }
-
-    throw new Error(`bad prefix expression: prefix: '${node.prefix}' with type: '${typeof subExpression}'`);
-  }
-
-  private evaluatePrefixNumberExpression(prefix: string, operand: EvaluatedNumber): EvaluatedNumber {
-    if (prefix === "+") {
-      return operand;
-    }
-    if (prefix === "-") {
-      return makeEvaluatedNumber(-operand.value);
-    }
-
-    throw new Error(`bad prefix ${prefix}`);
-  }
-
-  private evaluatePrefixBooleanExpression(prefix: string, operand: EvaluatedBoolean): EvaluatedBoolean {
-    if (prefix === "!") {
-      return makeEvaluatedBoolean(!operand.value);
-    }
-
-    throw new Error(`bad prefix ${prefix}`);
-  }
-
-  private evaluateStatement(node: Statement, env: Environment): Evaluated | ReturnValue {
-    if (node.type === "branch statement") {
+  private evaluateStatement(node: Node.StatementNode, env: Environment): Value.Value | Value.ReturnValue {
+    if (node.type === "branch") {
       return this.evaluateBranchStatement(node, env);
     }
-
     if (node.type === "expression statement") {
       return this.evaluateExpressionStatement(node, env);
     }
-
-    if (node.type === "return statement") {
-      const value = this.evaluateExpression(node.expression, env);
-      return wrapReturnValue(value);
+    if (node.type === "return") {
+      const val = this.evaluateExpression(node.expression, env);
+      return value.createReturnValue(val);
     }
 
     const nothing: never = node;
     return nothing;
   }
 
-  private evaluateBranchStatement(node: BranchStatement, env: Environment): Evaluated | ReturnValue {
-    const predicate = this.evaluateExpression(node.predicate, env);
-    if (predicate.type !== "boolean") {
-      throw new Error(`expected boolean expression predicate, but received ${predicate.type}`);
+  private evaluateBranchStatement(node: Node.BranchNode, env: Environment): Value.Value | Value.ReturnValue {
+    const pred = this.evaluateExpression(node.predicate, env);
+    if (pred.type !== "boolean") {
+      throw new BadPredicateError(pred.range, pred.representation);
     }
 
-    if (predicate.value) {
-      const consequence = this.evaluateBlock(node.consequence, env);
-      return consequence;
+    if (pred.value) {
+      return this.evaluateBlock(node.consequence, env);
     }
 
-    // early return if no else block
-    if (typeof node.alternative === "undefined") {
-      return makeEvaluatedEmpty();
+    if (node.alternative === undefined) {
+      return this.createEmptyValue(node.range);
     }
 
-    const alternative = this.evaluateBlock(node.alternative, env);
-    return alternative;
+    return this.evaluateBlock(node.alternative, env);
   }
 
-  private evaluateExpressionStatement(node: ExpressionStatement, env: Environment): Evaluated {
+  private evaluateBlock(node: Node.BlockNode, env: Environment): Value.Value | Value.ReturnValue {
+    let lastEvaluated: Value.Value | null = null;
+
+    for (let i = 0; i < node.statements.length; ++i) {
+      const evaluated = this.evaluateStatement(node.statements[i], env);
+
+      if (evaluated.type === "return") {
+        return evaluated;
+      }
+
+      lastEvaluated = evaluated;
+    }
+
+    return lastEvaluated ?? this.createEmptyValue(node.range);
+  }
+
+  private evaluateExpressionStatement(node: Node.ExpressionStatementNode, env: Environment): Value.Value {
     return this.evaluateExpression(node.expression, env);
   }
 
-  private evaluateFunctionExpression(node: FunctionExpression, env: Environment): Evaluated {
-    const parameters = node.parameter;
-    const body = node.body;
-    return makeEvaluatedFunction(parameters, body, env);
-  }
-
-  private evaluateCall(node: Call, env: Environment): Evaluated {
-    const functionToCall = this.evaluateExpression(node.functionToCall, env);
-    if (functionToCall.type !== "function") {
-      throw new Error(`expected function but received ${functionToCall.type}`);
+  private evaluateExpression(node: Node.ExpressionNode, env: Environment): Value.Value {
+    if (node.type === "number") {
+      return this.createNumberValue(node.value, node.range);
+    }
+    if (node.type === "boolean") {
+      return this.createBooleanValue(node.value, node.range);
+    }
+    if (node.type === "string") {
+      return this.createStringValue(node.value, node.range);
+    }
+    if (node.type === "prefix") {
+      return this.evaluatePrefixExpression(node, env);
+    }
+    if (node.type === "infix") {
+      return this.evaluateInfixExpression(node, env);
+    }
+    if (node.type === "assignment") {
+      return this.evaluateAssignment(node, env);
+    }
+    if (node.type === "identifier") {
+      return this.evaluateIdentifier(node, env);
+    }
+    if (node.type === "function") {
+      return this.evaluateFunctionExpression(node, env);
+    }
+    if (node.type === "call") {
+      return this.evaluateCall(node, env);
     }
 
-    const callArguments = this.parseCallArguments(node.callArguments, env);
+    const _never: never = node;
+    return _never;
+  }
 
-    const value = this.evaluateFunctionCall(functionToCall, callArguments);
+  private evaluatePrefixExpression(node: Node.PrefixNode, env: Environment): Value.Value {
+    const right = this.evaluateExpression(node.right, env);
+
+    if ((node.prefix === "+" || node.prefix === "-") && right.type == "number") {
+      return this.evaluatePrefixNumberExpression(node.prefix, right);
+    }
+    if (node.prefix === "!" && right.type === "boolean") {
+      return this.evaluatePrefixBooleanExpression(node.prefix, right);
+    }
+
+    throw new BadPrefixExpressionError(node.range);
+  }
+
+  private evaluateInfixExpression(node: Node.InfixNode, env: Environment): Value.Value {
+    const left = this.evaluateExpression(node.left, env);
+    const right = this.evaluateExpression(node.right, env);
+
+    if (left.type === "number" && right.type === "number" && this.isArithmeticInfixOperator(node.infix)) {
+      const value = this.getArithmeticInfixOperationValue(left.value, right.value, node.infix);
+      return this.createNumberValue(value, node.range);
+    }
+
+    if (left.type === "number" && right.type === "number" && this.isComparisonInfixOperator(node.infix)) {
+      const value = this.getNumericComparisonInfixOperationValue(left.value, right.value, node.infix);
+      return this.createBooleanValue(value, node.range);
+    }
+
+    if (left.type === "boolean" && right.type === "boolean" && this.isComparisonInfixOperator(node.infix)) {
+      const value = this.getBooleanComparisonInfixOperationValue(left.value, right.value, node.infix);
+      return this.createBooleanValue(value, node.range);
+    }
+
+    if (left.type === "string" && right.type === "string" && this.isComparisonInfixOperator(node.infix)) {
+      const value = this.getStringComparisonInfixOperationValue(left.value, right.value, node.infix);
+      return this.createBooleanValue(value, node.range);
+    }
+
+    throw new BadInfixExpressionError(node.range);
+  }
+
+  private evaluateIdentifier(node: Node.IdentifierNode, env: Environment): Value.Value {
+    const varName = node.value;
+    const value = env.get(varName);
+
+    if (value === null) {
+      throw new BadIdentifierError(node.range, varName);
+    }
+
     return value;
   }
 
-  private evaluateAssignment(node: Assignment, env: Environment): Evaluated {
+  private evaluateAssignment(node: Node.AssignmentNode, env: Environment): Value.Value {
     if (node.left.type !== "identifier") {
-      throw new Error(`expected identifier on left value, but received ${typeof node.left.type}`);
+      throw new BadAssignmentLeftError(node.range);
     }
+
     const varName = node.left.value;
     const varValue = this.evaluateExpression(node.right, env);
 
@@ -185,135 +196,156 @@ export default class Evaluator {
     return varValue; // evaluated value of assignment is the evaluated value of variable
   }
 
-  private evaluateIdentifier(node: Identifier, env: Environment): Evaluated {
-    const varName = node.value;
-    const value = env.get(varName);
+  private evaluateFunctionExpression(node: Node.FunctionNode, env: Environment): Value.Value {
+    return this.createFunctionValue(node.parameters, node.body, env, node.range);
+  }
 
-    if (value === null) {
-      throw new Error(`identifier '${varName}' not found`);
+  private evaluateCall(node: Node.CallNode, env: Environment): Value.Value {
+    const func = this.evaluateExpression(node.func, env);
+    if (func.type !== "function") {
+      throw new Error(`expected function but received ${func.type}`);
     }
 
+    const callArguments = this.evaluateCallArguments(node.args, env);
+
+    const value = this.evaluateFunctionCall(func, callArguments);
     return value;
   }
 
-  private evaluateExpression(node: Expression, env: Environment): Evaluated {
-    if (node.type === "number node") {
-      return makeEvaluatedNumber(node.value);
-    }
-
-    if (node.type === "boolean node") {
-      return makeEvaluatedBoolean(node.value);
-    }
-
-    if (node.type === "string node") {
-      return makeEvaluatedString(node.value);
-    }
-
-    if (node.type === "infix expression") {
-      return this.evaluateInfixExpression(node, env);
-    }
-
-    if (node.type === "prefix expression") {
-      return this.evaluatePrefixExpression(node, env);
-    }
-
-    if (node.type === "function expression") {
-      return this.evaluateFunctionExpression(node, env);
-    }
-
-    if (node.type === "call") {
-      return this.evaluateCall(node, env);
-    }
-
-    if (node.type === "assignment") {
-      return this.evaluateAssignment(node, env);
-    }
-
-    if (node.type === "identifier") {
-      return this.evaluateIdentifier(node, env);
-    }
-
-    const nothing: never = node;
-    return nothing;
+  private evaluateCallArguments(args: Node.ExpressionNode[], env: Environment): Value.Value[] {
+    return args.map(arg => this.evaluateExpression(arg, env));
   }
 
-  private evaluateInfixExpression(node: InfixExpression, env: Environment): Evaluated {
-    const infix = node.infix;
-    const left = this.evaluateExpression(node.left, env);
-    const right = this.evaluateExpression(node.right, env);
+  private evaluateFunctionCall(func: Value.FunctionValue, callArguments: Value.Value[]): Value.Value {
+    const env = this.createExtendedEnvironment(func.environment, func.parameters, callArguments);
 
-    // type matching order is important: more inclusive case first
-
-    if (
-      (left.type === "boolean" && right.type === "boolean") ||
-      (left.type === "number" && right.type === "number") ||
-      (left.type === "string" && right.type === "string")
-    ) {
-      if (infix === "==") {
-        return makeEvaluatedBoolean(left.value == right.value);
-      }
-      if (infix === "!=") {
-        return makeEvaluatedBoolean(left.value != right.value);
-      }
-      if (infix === ">") {
-        return makeEvaluatedBoolean(left.value > right.value);
-      }
-      if (infix === "<") {
-        return makeEvaluatedBoolean(left.value < right.value);
-      }
-      if (infix === ">=") {
-        return makeEvaluatedBoolean(left.value >= right.value);
-      }
-      if (infix === "<=") {
-        return makeEvaluatedBoolean(left.value <= right.value);
-      }
-    }
-
-    if (left.type === "number" && right.type === "number") {
-      if (infix === "+") {
-        return makeEvaluatedNumber(left.value + right.value);
-      }
-      if (infix === "-") {
-        return makeEvaluatedNumber(left.value - right.value);
-      }
-      if (infix === "*") {
-        return makeEvaluatedNumber(left.value * right.value);
-      }
-      if (infix === "/") {
-        // TODO: guard division by zero
-        return makeEvaluatedNumber(left.value / right.value);
-      }
-
-      throw new Error(`bad infix ${infix} for number operands`);
-    }
-
-    throw new Error(`bad infix ${infix}, with left '${left}' and right '${right}'`);
-  }
-
-  private parseCallArguments(callArguments: Expression[], env: Environment): Evaluated[] {
-    const values = [];
-    for (const arg of callArguments) {
-      const value = this.evaluateExpression(arg, env);
-      values.push(value);
-    }
-    return values;
-  }
-
-  private evaluateFunctionCall(functionToCall: EvaluatedFunction, callArguments: Evaluated[]): Evaluated {
-    const functionEnv = new Environment(functionToCall.environment);
-    for (let i = 0; i < functionToCall.parameters.length; ++i) {
-      const name = functionToCall.parameters[i].value;
-      const value = callArguments[i];
-      functionEnv.set(name, value);
-    }
-
-    const evaluated = this.evaluateBlock(functionToCall.body, functionEnv);
-    if (evaluated.type !== "return value") {
+    const blockValue = this.evaluateBlock(func.body, env);
+    if (blockValue.type !== "return") {
+      // TODO: better error with range
       throw new Error(`expected return value in function but it didn't`);
     }
 
-    const returnValue = evaluated.value;
+    const returnValue = blockValue.value;
     return returnValue;
+  }
+
+  private getBooleanComparisonInfixOperationValue(left: boolean, right: boolean, operator: ComparisonOperator): boolean {
+    return this.getComparisonInfixOperationValue<boolean>(left, right, operator);
+  }
+
+  private getNumericComparisonInfixOperationValue(left: number, right: number, operator: ComparisonOperator): boolean {
+    return this.getComparisonInfixOperationValue<number>(left, right, operator);
+  }
+
+  private getStringComparisonInfixOperationValue(left: string, right: string, operator: ComparisonOperator): boolean {
+    return this.getComparisonInfixOperationValue<string>(left, right, operator);
+  }
+
+  private getComparisonInfixOperationValue<T>(left: T, right: T, operator: ComparisonOperator): boolean {
+    if (operator === "==") {
+      return left === right;
+    }
+    if (operator === "!=") {
+      return left !== right;
+    }
+    if (operator === ">") {
+      return left > right;
+    }
+    if (operator === "<") {
+      return left < right;
+    }
+    if (operator === ">=") {
+      return left >= right;
+    }
+    if (operator === "<=") {
+      return left <= right;
+    }
+
+    const _never: never = operator;
+    return _never;
+  }
+
+  private getArithmeticInfixOperationValue(left: number, right: number, operator: "+" | "-" | "*" | "/"): number {
+    if (operator === "+") {
+      return left + right;
+    }
+    if (operator === "-") {
+      return left - right;
+    }
+    if (operator === "*") {
+      return left * right;
+    }
+    if (operator === "/") {
+      return left / right;
+    }
+
+    const _never: never = operator;
+    return _never;
+  }
+
+  private evaluatePrefixNumberExpression(prefix: "+" | "-", node: Node.NumberNode): Value.NumberValue {
+    if (prefix === "+") {
+      return this.createNumberValue(node.value, node.range);
+    }
+    if (prefix === "-") {
+      return this.createNumberValue(-node.value, node.range);
+    }
+
+    const _never: never = prefix;
+    return _never;
+  }
+
+  private evaluatePrefixBooleanExpression(prefix: "!", node: Node.BooleanNode): Value.BooleanValue {
+    if (prefix === "!") {
+      return this.createBooleanValue(!node.value, node.range);
+    }
+
+    const _never: never = prefix;
+    return _never;
+  }
+
+  private createExtendedEnvironment(oldEnv: Environment, identifiers: Node.IdentifierNode[], values: Value.Value[]): Environment {
+    const newEnv = new Environment(oldEnv);
+
+    for (let i = 0; i < identifiers.length; ++i) {
+      const name = identifiers[i].value;
+      const value = values[i];
+      newEnv.set(name, value);
+    }
+
+    return newEnv;
+  }
+
+  // create value functions: wrappers for consistent representation
+
+  private createNumberValue(val: number, range: Range): Value.NumberValue {
+    return value.createNumberValue({ value: val }, String(val), range);
+  }
+
+  private createBooleanValue(val: boolean, range: Range): Value.BooleanValue {
+    return value.createBooleanValue({ value: val }, val ? "참" : "거짓", range);
+  }
+
+  private createStringValue(val: string, range: Range): Value.StringValue {
+    return value.createStringValue({ value: val }, val, range);
+  }
+
+  private createEmptyValue(range: Range): Value.EmptyValue {
+    return value.createEmptyValue({ value: null }, "(없음)", range);
+  }
+
+  private createFunctionValue(parameters: Node.FunctionNode["parameters"], body: Node.FunctionNode["body"], environment: Environment, range: Range): Value.FunctionValue {
+    return value.createFunctionValue({ parameters, body, environment }, "(함수)", range);
+  }
+
+  // util predicate functions
+
+  private isArithmeticInfixOperator(operator: string): operator is "+" | "-" | "*" | "/" {
+    return ["+", "-", "*", "/"].some(infix => infix === operator);
+  }
+
+  private isComparisonInfixOperator(operator: string): operator is ComparisonOperator {
+    return ["==", "!=", ">", "<", ">=", "<="].some(infix => infix === operator);
   }
 }
 

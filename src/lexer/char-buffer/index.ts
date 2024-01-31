@@ -1,24 +1,26 @@
-import Reader from "./reader";
+import CharReader, { type SourceChar } from "./char-reader";
 
 export default class CharBuffer {
   static readonly END_OF_INPUT = "\0";
 
-  private readonly reader: Reader;
+  private readonly reader: CharReader;
 
   constructor(input: string) {
-    this.reader = new Reader(input, CharBuffer.END_OF_INPUT);
+    this.reader = new CharReader(input, CharBuffer.END_OF_INPUT);
   }
 
-  pop(): string {
-    const char = this.reader.read();
-    this.reader.next();
+  popChar(): SourceChar {
+    const char = this.reader.readChar();
+    this.reader.advance();
 
     return char;
   }
 
-  peek(): string {
-    const char = this.reader.read();
+  peekChar(): SourceChar {
+    const char = this.reader.readChar();
 
     return char;
   }
 }
+
+export type { SourceChar } from "./char-reader";

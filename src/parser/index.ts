@@ -1,410 +1,400 @@
-import {
-  makeProgram,
-  makeBlock,
-  makeIdentifier,
-  makeAssignment,
-  makeNumberNode,
-  makeBooleanNode,
-  makeStringNode,
-  makeBranchStatement,
-  makeReturnStatement,
-  makeExpressionStatement,
-  makePrefixExpression,
-  makeInfixExpression,
-  makeFunctionExpression,
-  makeCall,
-} from "./syntax-tree";
-import type {
-  Program,
-  Block,
-  Statement,
-  NumberNode,
-  BooleanNode,
-  StringNode,
-  BranchStatement,
-  ReturnStatement,
-  ExpressionStatement,
-  Expression,
-  FunctionExpression,
-  Call,
-  Identifier,
-  InfixExpression,
-} from "./syntax-tree";
-import Lexer from "../lexer";
-import TokenReader from "./token-reader";
+import type * as Node from "./syntax-node";
+import * as node from "./syntax-node";
+import { getInfixBindingPower, bindingPowers, type BindingPowerEntry } from "./binding-power";
 
-type BindingPower = number;
-const bindingPower = {
-  lowest: 0,
-  assignment: 30,
-  comparison: 40,
-  summative: 50,
-  productive: 60,
-  prefix: 70,
-  call: 80,
-};
-const getBindingPower = (infix: string): BindingPower => {
-  switch (infix) {
-    case "=":
-      return bindingPower.assignment;
-    case "==":
-    case "!=":
-    case ">":
-    case "<":
-    case ">=":
-    case "<=":
-      return bindingPower.comparison;
-    case "+":
-    case "-":
-      return bindingPower.summative;
-    case "*":
-    case "/":
-      return bindingPower.productive;
-    case "(": // when '(' is used infix operator, it behaves as call operator
-      return bindingPower.call;
-    default:
-      return bindingPower.lowest;
+import { copyRange, type Range } from "../util/position";
+
+export class ParserError extends Error {
+  public received: string;
+  public expected: string;
+  public range: Range;
+
+  constructor(received: string, expected: string, range: Range) {
+    super();
+    this.received = received;
+    this.expected = expected;
+    this.range = range;
   }
 };
+
+export class BadNumberLiteralError extends ParserError {};
+export class BadBooleanLiteralError extends ParserError {};
+export class BadPrefixError extends ParserError {};
+export class BadInfixError extends ParserError {};
+export class BadExpressionError extends ParserError {};
+export class BadGroupDelimiterError extends ParserError {};
+export class BadBlockDelimiterError extends ParserError {};
+export class BadAssignmentError extends ParserError {};
+export class BadFunctionKeywordError extends ParserError {};
+export class BadIdentifierError extends ParserError {};
+export class BadSeparatorError extends ParserError {};
+
+import Lexer from "../lexer";
+import SourceTokenReader from "./source-token-reader";
+
+type PrefixOperator = "+" | "-" | "!";
+type InfixOperator = "+" | "-" | "*" | "/" | "!=" | "==" | ">" | "<" | ">=" | "<=";
 
 export default class Parser {
-  private buffer: TokenReader;
+  private static readonly PREFIX_OPERATORS = ["+", "-", "!"] as const;
+  private static readonly INFIX_OPERATORS = ["+", "-", "*", "/", "!=", "==", ">", "<", ">=", "<="] as const;
+
+  private reader: SourceTokenReader;
 
   constructor(lexer: Lexer) {
-    this.buffer = new TokenReader(lexer);
+    this.reader = new SourceTokenReader(lexer);
   }
 
-  parseProgram(): Program {
-    const program = makeProgram();
+  parseSource(): Node.ProgramNode {
+    const statements: Node.StatementNode[] = [];
 
-    while (!this.buffer.isEnd()) {
-      const statement = this.parseStatement();
-      if (statement !== null) {
-        program.statements.push(statement);
-      }
+    while (!this.reader.isEnd()) {
+      statements.push(this.parseStatement());
     }
+
+    const firstPos = { row: 0, col: 0 };
+    const posBegin = statements.length > 0 ? statements[0].range.begin : firstPos;
+    const posEnd = statements.length > 0 ? statements[statements.length-1].range.end : firstPos;
+
+    const program = node.createProgramNode({ statements }, posBegin, posEnd);
 
     return program;
   }
 
-  private parseBlock(): Block {
-    // eat token if block start delimiter; otherwise throw error
-    const maybeBlockStart = this.buffer.read();
-    if (maybeBlockStart.type !== "block delimiter" || maybeBlockStart.value !== "{") {
-      throw new Error(`expected { but received ${maybeBlockStart.type}`);
-    }
-    this.buffer.next();
+  private parseBlock(): Node.BlockNode {
+    const firstToken = this.reader.read();
+    this.advanceOrThrow("block delimiter", "{", BadBlockDelimiterError);
 
-    // populate statements in block
-    const statements: Statement[] = [];
+    const statements: Node.StatementNode[] = [];
     while (true) {
-      const token = this.buffer.read();
-
-      // end block delimiter token and break loop if end of block
+      const token = this.reader.read();
       if (token.type === "block delimiter" && token.value === "}") {
-        this.buffer.next();
-        break;
+        this.reader.advance();
+
+        const range = copyRange(firstToken.range.begin, token.range.end);
+        return node.createBlockNode({ statements }, range);
       }
 
-      // append statement to block
       const statement = this.parseStatement();
-      if (statement !== null) {
-        statements.push(statement);
-      }
+      statements.push(statement);
     }
-
-    // make and return block
-    const block = makeBlock(statements);
-    return block;
   }
 
-  private parseStatement(): Statement {
-    const token = this.buffer.read();
+  private parseStatement(): Node.StatementNode {
+    const token = this.reader.read();
+    const { type, value } = token;
 
-    if (token.type === "keyword" && token.value === "만약") {
-      this.buffer.next();
-
+    if (type === "keyword" && value === "만약") {
       return this.parseBranchStatement();
     }
 
-    if (token.type === "keyword" && token.value === "결과") {
-      this.buffer.next();
-
+    if (type === "keyword" && value === "결과") {
       return this.parseReturnStatement();
     }
 
     return this.parseExpressionStatement();
   }
 
-  private parseBranchStatement(): BranchStatement {
-    const predicate = this.parseExpression(bindingPower.lowest);
+  private parseBranchStatement(): Node.BranchNode {
+    const firstToken = this.reader.read();
+    this.reader.advance();
+
+    const predicate = this.parseExpression(bindingPowers.lowest);
     const consequence = this.parseBlock();
 
-    // eat token if else token; otherwise early return without else block
-    const maybeElseToken = this.buffer.read();
+    const maybeElseToken = this.reader.read();
     if (maybeElseToken.type !== "keyword" || maybeElseToken.value !== "아니면") {
-      const branchStatement = makeBranchStatement(predicate, consequence);
-      return branchStatement;
+      const range = { begin: firstToken.range.begin, end: consequence.range.end };
+      return node.createBranchNode({ predicate, consequence }, range);
     }
-    this.buffer.next();
+    this.reader.advance();
 
-    // return statement with else block
     const alternative = this.parseBlock();
-    const branchStatement = makeBranchStatement(predicate, consequence, alternative);
-    return branchStatement;
+    const range = { begin: firstToken.range.begin, end: alternative.range.end };
+    return node.createBranchNode({ predicate, consequence, alternative }, range);
   }
 
-  private parseReturnStatement(): ReturnStatement {
-    const expression = this.parseExpression(bindingPower.lowest);
+  private parseReturnStatement(): Node.ReturnNode {
+    const firstToken = this.reader.read();
+    this.reader.advance();
 
-    return makeReturnStatement(expression);
+    const expression = this.parseExpression(bindingPowers.lowest);
+    const range = { begin: firstToken.range.begin, end: expression.range.end };
+    return node.createReturnNode({ expression }, range);
   }
 
-  private parseExpressionStatement(): ExpressionStatement {
-    const expression = this.parseExpression(bindingPower.lowest);
+  /** return expression statement node, which is just a statement wrapper for an expression */
+  private parseExpressionStatement(): Node.ExpressionStatementNode {
+    const expression = this.parseExpression(bindingPowers.lowest);
 
-    return makeExpressionStatement(expression);
+    const range = expression.range;
+    return node.createExpressionStatementNode({ expression }, range);
   }
 
-  private parseExpression(threshold: BindingPower): Expression  {
-    let expression = this.parsePrefixExpression();
+  private parseExpression(threshold: BindingPowerEntry): Node.ExpressionNode {
+    let topNode = this.parseExpressionStart();
 
     while (true) {
-      const nextBindingPower = getBindingPower(this.buffer.read().value);
-      if (nextBindingPower <= threshold) {
+      const nextBindingPower = getInfixBindingPower(this.reader.read().value);
+      if (nextBindingPower.left <= threshold.right) {
         break;
       }
 
-      const infixExpression = this.parseInfixExpression(expression);
+      const infixExpression = this.parseExpressionMiddle(topNode);
       if (infixExpression === null) {
         break;
       }
 
-      expression = infixExpression;
+      topNode = infixExpression;
     }
 
-    return expression;
+    return topNode;
   }
 
-  private parsePrefixExpression(): Expression {
-    const token = this.buffer.read();
-    this.buffer.next(); // eat token
+  private parseExpressionStart(): Node.ExpressionNode {
+    const { type, value, range } = this.reader.read();
 
-    if (token.type === "number literal") {
-      const numberNode = this.parseNumberLiteral(token.value);
-      return numberNode;
+    if (type === "number literal") {
+      return this.parseNumberLiteral();
     }
-    if (token.type === "boolean literal") {
-      const booleanNode = this.parseBooleanLiteral(token.value);
-      return booleanNode;
+    if (type === "boolean literal") {
+      return this.parseBooleanLiteral();
     }
-    if (token.type === "string literal") {
-      const stringNode = this.parseStringLiteral(token.value);
-      return stringNode;
+    if (type === "string literal") {
+      return this.parseStringLiteral();
     }
-    if (token.type === "identifier") {
-      const identifier = makeIdentifier(token.value);
-      return identifier;
+    if (type === "identifier") {
+      return this.parseIdentifier();
     }
-    if (
-      token.type === "operator" &&
-      (token.value === "+" || token.value === "-" || token.value === "!")
-    ) {
-      const subExpression = this.parseExpression(bindingPower.prefix);
-      const prefix = token.value;
-      const expression = makePrefixExpression(prefix, subExpression);
-      return expression;
+    if (type === "operator" && this.isPrefixOperator(value)) {
+      return this.parsePrefix();
     }
-    if (token.type === "keyword" && token.value === "함수") {
-      const parameters = this.parseParameters();
-      const body = this.parseBlock();
-
-      const functionExpression = makeFunctionExpression(body, parameters);
-      return functionExpression;
+    if (type === "keyword" && value === "함수") {
+      return this.parseFunction();
     }
-    if (token.type === "group delimiter" && token.value === "(") {
-      const groupedExpression = this.parseExpression(bindingPower.lowest);
-
-      const nextToken = this.buffer.read();
-      this.buffer.next(); // eat token
-      if (nextToken.type !== "group delimiter" || nextToken.value !== ")") {
-        throw new Error(`expected ) but received ${nextToken.type}`);
-      }
-
-      return groupedExpression;
+    if (type === "group delimiter" && value === "(") {
+      return this.parseGroupedExpression();
     }
 
-    throw new Error(`bad token type ${token.type} (${token.value}) for prefix expression`);
+    throw new BadExpressionError(type, "expression", range);
   }
 
-  private parseParameters(): Identifier[] {
-    const parameters: Identifier[] = [];
+  /** return node if parsable; null otherwise **/
+  private parseExpressionMiddle(left: Node.ExpressionNode): Node.ExpressionNode | null {
+    const { type, value } = this.reader.read();
 
-    const maybeGroupStart = this.buffer.read();
-    if (maybeGroupStart.type !== "group delimiter" || maybeGroupStart.value !== "(") {
-      throw new Error(`expected ( but received ${maybeGroupStart.type}`);
-    }
-    this.buffer.next();
-
-    // early return empty parameters if end of parameter list
-    const maybeIdentifierOrGroupEnd = this.buffer.read();
-    this.buffer.next();
-    if (maybeIdentifierOrGroupEnd.type === "group delimiter" && maybeIdentifierOrGroupEnd.value === ")") {
-      return [];
-    }
-    const maybeIdentifier = maybeIdentifierOrGroupEnd;
-
-    // read first parameter
-    if (maybeIdentifier.type !== "identifier") {
-      throw new Error(`expected identifier but received ${maybeIdentifier}`);
-    }
-    const identifier = maybeIdentifier;
-    parameters.push(identifier);
-
-    // read the rest parameters
-    while (true) {
-      const maybeCommaOrGroupEnd = this.buffer.read();
-      this.buffer.next();
-
-      // break if end of parameter list
-      if (maybeCommaOrGroupEnd.type === "group delimiter" && maybeCommaOrGroupEnd.value === ")") {
-        break;
-      }
-      const maybeComma = maybeCommaOrGroupEnd;
-
-      // read comma
-      if (maybeComma.type !== "separator") {
-        throw new Error(`expected comma but received ${maybeComma}`);
-      }
-
-      // read next identifier
-      const maybeIdentifier = this.buffer.read();
-      this.buffer.next();
-      if (maybeIdentifier.type !== "identifier") {
-        throw new Error(`expected identifier but received ${maybeIdentifier}`);
-      }
-      const identifier = maybeIdentifier;
-
-      parameters.push(identifier);
-    }
-
-    return parameters;
-  }
-
-  private parseInfixExpression(left: Expression): Expression | null {
-    // note: do not eat token and just return null if not parsable
-    const token = this.buffer.read();
-
-    if (token.type === "group delimiter" && token.value === "(") {
-      if (left.type !== "function expression" && left.type !== "identifier") {
+    if (type === "group delimiter" && value === "(") {
+      if (left.type !== "function" && left.type !== "identifier") {
         return null;
       }
 
-      this.buffer.next(); // eat infix token
       return this.parseCall(left);
     }
 
-    if (token.type !== "operator") {
-      return null;
+    if (type === "operator" && this.isInfixOperator(value)) {
+      return this.parseInfix(left);
     }
 
-    const infix = token.value;
-    if (infix === "=" && left.type === "identifier") {
-      this.buffer.next(); // eat infix token
-      const a=  this.parseAssignment(left);
-      return a;
+    if (type === "operator" && value === "=" && left.type === "identifier") {
+      return this.parseAssignment(left);
     }
-    if (
-      infix === "+" ||
-      infix === "-" ||
-      infix === "*" ||
-      infix === "/" ||
-      infix === "!=" ||
-      infix === "==" ||
-      infix === ">" ||
-      infix === "<" ||
-      infix === ">=" ||
-      infix === "<="
-    ) {
-      this.buffer.next(); // eat infix token
-      return this.parseArithmeticInfixExpression(left, infix);
-    }
+
     return null;
   }
 
-  private parseCall(functionToCall: Identifier | FunctionExpression): Call {
-    const callArguments = this.parseCallArguments();
+  private parseCall(left: Node.FunctionNode | Node.IdentifierNode): Node.CallNode {
+    this.advanceOrThrow("group delimiter", "(", BadGroupDelimiterError);
 
-    return makeCall(functionToCall, callArguments);
+    const secondToken = this.reader.read();
+    if (secondToken.type === "group delimiter" && secondToken.value === ")") {
+      this.reader.advance(); // eat delimiter
+
+      const range = copyRange(left.range.begin, secondToken.range.end);
+      return node.createCallNode({ func: left, args: [] }, range);
+    }
+
+    const args = [this.parseExpression(bindingPowers.lowest)];
+    while (true) {
+      const token = this.reader.read();
+      if (token.type !== "separator") {
+        break;
+      }
+      this.reader.advance(); // eat comma
+
+      args.push(this.parseExpression(bindingPowers.lowest));
+    }
+
+    const lastToken = this.reader.read();
+    this.advanceOrThrow("group delimiter", ")", BadGroupDelimiterError);
+
+    const range = copyRange(left.range.begin, lastToken.range.end);
+
+    return node.createCallNode({ func: left, args }, range);
   }
 
-  private parseCallArguments(): Expression[] {
-    const maybeExpressionOrGroupEnd = this.buffer.read();
-    if (maybeExpressionOrGroupEnd.type === "group delimiter" && maybeExpressionOrGroupEnd.value === ")") {
-      this.buffer.next();
+  private parseAssignment(left: Node.IdentifierNode): Node.ExpressionNode {
+    const { value, range } = this.reader.read();
+    this.reader.advance();
 
+    if (value !== "=") {
+      throw new BadAssignmentError(value, "=", range);
+    }
+    const infix = value;
+
+    const infixBindingPower = getInfixBindingPower(infix);
+    const right = this.parseExpression(infixBindingPower);
+    const assignmentRange = { begin: left.range.begin, end: right.range.end };
+
+    return node.createAssignmentNode({ left, right }, assignmentRange);
+  }
+
+  private parseNumberLiteral(): Node.NumberNode {
+    const { value, range } = this.reader.read();
+    this.reader.advance();
+
+    const parsed = Number(value);
+    if (Number.isNaN(parsed)) {
+      throw new BadNumberLiteralError(value, "non NaN", range);
+    }
+
+    return node.createNumberNode({ value: parsed }, range);
+  }
+
+  private parseBooleanLiteral(): Node.BooleanNode {
+    const { value, range } = this.reader.read();
+    this.reader.advance();
+
+    let parsed: boolean;
+    if (value === "참") {
+      parsed = true;
+    } else if (value === "거짓") {
+      parsed = false;
+    } else {
+      throw new BadBooleanLiteralError(value, "참, 거짓", range);
+    }
+
+    return node.createBooleanNode({ value: parsed }, range);
+  }
+
+  private parseStringLiteral(): Node.StringNode {
+    const { value, range } = this.reader.read();
+    this.reader.advance();
+
+    return node.createStringNode({ value }, range);
+  }
+
+  private parseIdentifier(): Node.IdentifierNode {
+    const { type, value, range } = this.reader.read();
+    this.reader.advance();
+
+    if (type !== "identifier") {
+      throw new BadIdentifierError(type, "identifier", range);
+    }
+
+    return node.createIdentifierNode({ value }, range);
+  }
+
+  private parsePrefix(): Node.PrefixNode {
+    const { value, range } = this.reader.read();
+    this.reader.advance();
+
+    if (!this.isPrefixOperator(value)) {
+      throw new BadPrefixError(value, "prefix operator", range);
+    }
+
+    const prefix = value;
+    const right = this.parseExpression(bindingPowers.prefix);
+
+    return node.createPrefixNode({ prefix, right }, range);
+  }
+
+  private parseInfix(left: Node.ExpressionNode): Node.InfixNode {
+    const { value, range } = this.reader.read();
+    this.reader.advance();
+
+    if (!this.isInfixOperator(value)) {
+      throw new BadInfixError(value, "infix operator", range);
+    }
+    const infix = value;
+
+    const infixBindingPower = getInfixBindingPower(infix);
+    const right = this.parseExpression(infixBindingPower);
+    const infixRange = copyRange(left.range.begin, right.range.end);
+
+    return node.createInfixNode({ infix, left, right }, infixRange);
+  }
+
+  private parseFunction(): Node.FunctionNode {
+    const firstToken = this.reader.read();
+
+    this.advanceOrThrow("keyword", "함수", BadFunctionKeywordError);
+
+    const parameters = this.parseParameters();
+    const body = this.parseBlock();
+
+    const range = copyRange(firstToken.range.begin, body.range.end);
+    return node.createFunctionNode({ parameters, body }, range);
+  }
+
+  private parseParameters(): Node.IdentifierNode[] {
+    this.advanceOrThrow("group delimiter", "(", BadGroupDelimiterError);
+
+    const groupEndOrIdentifier = this.reader.read();
+
+    // early return if empty parameter list
+    if (groupEndOrIdentifier.type === "group delimiter" && groupEndOrIdentifier.value === ")") {
+      this.reader.advance();
       return [];
     }
 
-    const firstArgument = this.parseExpression(bindingPower.lowest);
+    const parameters = [this.parseIdentifier()];
 
-    const callArguments = [firstArgument];
     while (true) {
-      const maybeComma = this.buffer.read();
-      if (maybeComma.type !== "separator") {
-        break;
+      const commaOrGroupEnd = this.reader.read();
+      this.reader.advance();
+
+      if (commaOrGroupEnd.type === "group delimiter" && commaOrGroupEnd.value === ")") {
+        return parameters;
       }
-      this.buffer.next();
 
-      const argument = this.parseExpression(bindingPower.lowest);
-      callArguments.push(argument);
+      if (commaOrGroupEnd.type !== "separator") {
+        throw new BadSeparatorError(commaOrGroupEnd.type, ",", commaOrGroupEnd.range);
+      }
+
+      parameters.push(this.parseIdentifier());
     }
+  }
 
-    // expect ')'
-    const maybeGroupEnd = this.buffer.read();
-    this.buffer.next();
-    if (maybeGroupEnd.type !== "group delimiter" || maybeGroupEnd.value !== ")") {
-      throw new Error(`expect ) but received ${maybeGroupEnd.type}`);
+  private parseGroupedExpression(): Node.ExpressionNode {
+    this.advanceOrThrow("group delimiter", "(", BadGroupDelimiterError);
+
+    const expression = this.parseExpression(bindingPowers.lowest);
+
+    this.advanceOrThrow("group delimiter", ")", BadGroupDelimiterError);
+
+    // range change due to group delimiters
+    const offset = { begin: { row: 0, col: -1 }, end: { row: 0, col: 1 } };
+    const range = copyRange(expression.range.begin, expression.range.end, offset);
+
+    return { ...expression, range };
+  }
+
+  private advanceOrThrow(type: string, value: string, ErrorClass: typeof ParserError): void {
+    const token = this.reader.read();
+    this.reader.advance();
+
+    if (token.type !== type || token.value !== value) {
+      throw new ErrorClass(token.value, value, token.range);
     }
-
-    return callArguments;
   }
 
-  private parseAssignment(left: Identifier): Expression {
-    const infix = "=";
-    const infixBindingPower = getBindingPower(infix);
-
-    const right = this.parseExpression(infixBindingPower);
-
-    return makeAssignment(left, right);
+  private isPrefixOperator(operator: string): operator is PrefixOperator {
+    return Parser.PREFIX_OPERATORS.some(prefix => prefix === operator);
   }
 
-  private parseArithmeticInfixExpression(left: Expression, infix: InfixExpression["infix"]): Expression {
-    const infixBindingPower = getBindingPower(infix);
-
-    const right = this.parseExpression(infixBindingPower);
-
-    return makeInfixExpression(infix, left, right);
+  private isInfixOperator(operator: string): operator is InfixOperator {
+    return Parser.INFIX_OPERATORS.some(infix => infix === operator);
   }
+};
 
-  private parseNumberLiteral(literal: string): NumberNode {
-    const parsedNumber = Number(literal);
-    if (Number.isNaN(parsedNumber)) {
-      throw new Error(`expected non-NaN number, but received '${literal}'`);
-    }
-
-    return makeNumberNode(parsedNumber);
-  }
-
-  private parseBooleanLiteral(literal: "참" | "거짓"): BooleanNode {
-    const parsedValue = literal === "참";
-
-    return makeBooleanNode(parsedValue);
-  }
-
-  private parseStringLiteral(literal: string): StringNode {
-    return makeStringNode(literal);
-  }
-}
-
-export type * from "./syntax-tree";
+export type * from "./syntax-node";

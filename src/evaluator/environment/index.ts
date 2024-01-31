@@ -1,8 +1,8 @@
-import type { Evaluated } from "../evaluated";
+import type { Value } from "../value";
 
 export interface EnvironmentType {
-  get: (name: string) => Evaluated | null;
-  set: (name: string, value: Evaluated) => void;
+  get: (name: string) => Value | null;
+  set: (name: string, value: Value) => void;
 }
 
 export default class Environment implements EnvironmentType {
@@ -14,7 +14,7 @@ export default class Environment implements EnvironmentType {
     this.table = new Map<string, any>;
   }
 
-  get(name: string): Evaluated | null {
+  get(name: string): Value | null {
     // return if found in current environment
     const fetched = this.table.get(name);
     if (fetched !== undefined) {
@@ -28,7 +28,7 @@ export default class Environment implements EnvironmentType {
     return this.superEnvironment.get(name);
   }
 
-  set(name: string, value: Evaluated): void {
+  set(name: string, value: Value): void {
     this.table.set(name, value);
   }
 }

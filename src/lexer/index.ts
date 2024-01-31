@@ -1,6 +1,28 @@
-import CharBuffer from "./char-buffer";
-import * as Token from "./token";
-import * as Util from "./util";
+import CharBuffer, { type SourceChar } from "./char-buffer";
+
+import {
+  createOperatorToken,
+  createGroupDelimiterToken,
+  createBlockDelimiterToken,
+  createSeparatorToken,
+  createIllegalToken,
+  createIllegalStringLiteralToken,
+  createNumberLiteralToken,
+  createBooleanLiteralToken,
+  createStringLiteralToken,
+  createKeywordToken,
+  createIdentifierToken,
+  createEndToken,
+} from "./source-token";
+import type {
+  SourceToken,
+  OperatorToken,
+  NumberLiteralToken,
+  StringLiteralToken,
+  IllegalStringLiteralToken,
+} from "./source-token";
+import type { Position } from "../util/position";
+import { isDigit, isLetter, isWhitespace } from "./util";
 
 export default class Lexer {
   private readonly charBuffer: CharBuffer;
@@ -9,233 +31,300 @@ export default class Lexer {
     this.charBuffer = new CharBuffer(input);
   }
 
-  getToken(): Token.TokenType {
-    this.skipWhitespaces();
+  getSourceToken(): SourceToken {
+    this.skipWhitespaceChars();
 
-    const char = this.charBuffer.peek();
-    switch (char) {
+    const char = this.charBuffer.peekChar();
+    switch (char.value) {
       case "+":
       case "-":
       case "*":
       case "/":
         {
-          const operator = this.charBuffer.pop() as typeof char;
-          return Token.operator(operator);
+          const { position } = this.charBuffer.popChar();
+          const value = char.value;
+
+          const token = createOperatorToken(value, position, position);
+          return token;
         }
 
       case "(":
       case ")":
         {
-          const delimiter = this.charBuffer.pop() as typeof char;
-          return Token.groupDelimiter(delimiter);
+          const { position } = this.charBuffer.popChar();
+          const value = char.value;
+
+          const token = createGroupDelimiterToken(value, position, position);
+          return token;
         }
 
       case "{":
       case "}":
         {
-          const delimiter = this.charBuffer.pop() as typeof char;
-          return Token.blockDelimiter(delimiter);
+          const { position } = this.charBuffer.popChar();
+          const value = char.value;
+
+          const token = createBlockDelimiterToken(value, position, position);
+          return token;
         }
 
       case ",":
         {
-          const separator = this.charBuffer.pop() as typeof char;
-          return Token.separator(separator);
+          const { position } = this.charBuffer.popChar();
+          const value = char.value;
+
+          const token = createSeparatorToken(value, position, position);
+          return token;
         }
 
       case "!":
         {
-          this.charBuffer.pop();
+          const { position: pos } = this.charBuffer.popChar();
 
-          const operator = this.readOperatorStartingWithBang();
-          return Token.operator(operator);
+          const token = this.lexCharsStartingWithBang(pos);
+          return token;
         }
 
       case "=":
         {
-          this.charBuffer.pop();
+          const { position: pos } = this.charBuffer.popChar();
 
-          const operator: "=" | "==" = this.readOperatorStartingWithEqual();
-          return Token.operator(operator);
+          const token = this.lexCharsStartingWithEqual(pos);
+          return token;
         }
 
       case ">":
         {
-          this.charBuffer.pop();
+          const { position: pos } = this.charBuffer.popChar();
 
-          const operator: ">" | ">=" = this.readOperatorStartingWithGreaterThan();
-          return Token.operator(operator);
+          const token = this.lexCharsStartingWithGreaterThan(pos);
+          return token;
         }
 
       case "<":
         {
-          this.charBuffer.pop();
+          const { position: pos } = this.charBuffer.popChar();
 
-          const operator: "<" | "<=" = this.readOperatorStartingWithLessThan();
-          return Token.operator(operator);
+          const token = this.lexCharsStartingWithLessThan(pos);
+          return token;
         }
 
       case "'":
         {
-          this.charBuffer.pop();
+          const { position: pos } = this.charBuffer.popChar();
 
-          const [str, ok] = this.readStringLiteral();
-          return ok ? Token.stringLiteral(str) : Token.illegal("'" + str);
+          const token = this.lexCharsStartingWithSingleQuote(pos);
+          return token;
         }
 
       case CharBuffer.END_OF_INPUT:
-        return Token.end;
+        {
+          const { position: pos } = this.charBuffer.popChar();
 
-      default:
-        if (Util.isDigit(char)) {
-          const number = this.readNumberLiteral();
-
-          return Token.numberLiteral(number);
+          const token = createEndToken("$end", pos, pos);
+          return token;
         }
 
-        if (Util.isLetter(char)) {
-          const read = this.readLettersAndDigits();
-
-          // order is important: match keywords first, before identifier
-          if (read === "참" || read === "거짓") {
-            return Token.booleanLiteral(read);
+      default:
+        {
+          if (isDigit(char.value)) {
+            const token = this.lexNumberLiteral();
+            return token;
           }
 
-          if (
-            read === "만약" ||
-            read === "아니면" ||
-            read === "함수" ||
-            read === "결과"
-          ) {
-            return Token.keyword(read);
+          if (isLetter(char.value)) {
+            const token = this.lexLetters();
+            return token;
           }
 
-          return Token.identifier(read);
+          const { position } = this.charBuffer.popChar();
+          const token = createIllegalToken(char.value, position, position);
+          return token;
+        }
+    }
+  }
+
+  private skipWhitespaceChars(): void {
+    while (true) {
+      const char = this.charBuffer.peekChar();
+      if (!isWhitespace(char.value)) {
+        break;
+      }
+
+      this.charBuffer.popChar();
+    }
+  }
+
+  /** assumes the bang character popped */
+  private lexCharsStartingWithBang(bangPos: Position): OperatorToken {
+    const peek = this.charBuffer.peekChar();
+    switch (peek.value) {
+      case "=":
+        {
+          const { position: posEnd } = this.charBuffer.popChar();
+          return createOperatorToken("!=", bangPos, posEnd);
         }
 
-        this.charBuffer.pop();
-        return Token.illegal(char);
+      default:
+        return createOperatorToken("!", bangPos, bangPos);
     }
   }
 
-  private skipWhitespaces(): void {
-    while (Util.isWhitespace(this.charBuffer.peek())) {
-      this.charBuffer.pop();
-    }
-  }
-
-  /** assume the bang character popped */
-  private readOperatorStartingWithBang(): "!" | "!=" {
-    switch (this.charBuffer.peek()) {
+  /** assumes the equal character popped */
+  private lexCharsStartingWithEqual(equalPos: Position): OperatorToken {
+    const peek = this.charBuffer.peekChar();
+    switch (peek.value) {
       case "=":
-        this.charBuffer.pop();
-        return "!=";
+        {
+          const { position: posEnd } = this.charBuffer.popChar();
+          return createOperatorToken("==", equalPos, posEnd);
+        }
 
       default:
-        return "!";
-    }
-  }
-
-  /** assume the equal character popped */
-  private readOperatorStartingWithEqual(): "=" | "==" {
-    switch (this.charBuffer.peek()) {
-      case "=":
-        this.charBuffer.pop();
-        return "==";
-
-      default:
-        return "=";
+        return createOperatorToken("=", equalPos, equalPos);
     }
   }
 
   /** assume the greater-than character popped */
-  private readOperatorStartingWithGreaterThan(): ">" | ">=" {
-    switch (this.charBuffer.peek()) {
+  private lexCharsStartingWithGreaterThan(greaterThanPos: Position): OperatorToken {
+    const peek = this.charBuffer.peekChar();
+    switch (peek.value) {
       case "=":
-        this.charBuffer.pop();
-        return ">=";
+        {
+          const { position: posEnd } = this.charBuffer.popChar();
+          return createOperatorToken(">=", greaterThanPos, posEnd);
+        }
 
       default:
-        return ">";
+          return createOperatorToken(">", greaterThanPos, greaterThanPos);
     }
   }
 
   /** assume the less-than character popped */
-  private readOperatorStartingWithLessThan(): "<" | "<=" {
-    switch (this.charBuffer.peek()) {
+  private lexCharsStartingWithLessThan(lessThanPos: Position): OperatorToken {
+    const peek = this.charBuffer.peekChar();
+    switch (peek.value) {
       case "=":
-        this.charBuffer.pop();
-        return "<=";
+        {
+          const { position: posEnd } = this.charBuffer.popChar();
+          return createOperatorToken("<=", lessThanPos, posEnd);
+        }
 
       default:
-        return "<";
+        return createOperatorToken("<", lessThanPos, lessThanPos);
     }
   }
 
-  /** return [string-literal, true] if ok; otherwise [string-read-so-far, false] */
-  private readStringLiteral(): [string, boolean] {
-    const read: string[] = [];
+  /** assume the single quote character popped */
+  private lexCharsStartingWithSingleQuote(quotePos: Position): StringLiteralToken | IllegalStringLiteralToken {
+    const chars: SourceChar[] = [];
 
-    // read string until string closing symbol (')
     while (true) {
-      const char = this.charBuffer.pop();
+      const char = this.charBuffer.popChar();
 
-      if (char === "'" || char === CharBuffer.END_OF_INPUT) {
-        const str = read.join("");
-        const legalString = char === "'"; // true if closing quote encoutered
+      const value = chars.map(char => char.value).join("");
+      const posBegin = quotePos;
+      const posEnd = char.position;
 
-        return [str, legalString];
+      if (char.value === "'") {
+        return createStringLiteralToken(value, posBegin, posEnd);
       }
 
-      read.push(char);
+      if (char.value === CharBuffer.END_OF_INPUT) {
+        return createIllegalStringLiteralToken(value, posBegin, posEnd);
+      }
+
+      chars.push(char);
     }
   }
 
-  private readNumberLiteral(): string {
-    const wholeNumberPart = this.readDigits();
-    const decimalPart = this.readDecimalPart();
+  private lexNumberLiteral(): NumberLiteralToken {
+    const wholeNumberPart = this.readDigitChars();
+    const decimalPart = this.readDecimalChars();
+    const numberChars = wholeNumberPart.concat(decimalPart);
 
-    const number = wholeNumberPart + decimalPart;
+    const value = numberChars.map(char => char.value).join("");
+    const posBegin = numberChars[0].position;
+    const posEnd = numberChars[numberChars.length-1].position;
 
-    return number;
+    const token = createNumberLiteralToken(value, posBegin, posEnd);
+    return token;
   }
 
-  private readDigits(): string {
-    const read: string[] = [];
-    while (Util.isDigit(this.charBuffer.peek())) {
-      read.push(this.charBuffer.pop());
+  private lexLetters(): any {
+    const letterChars = this.readLetterChars();
+
+    const value = letterChars.map(char => char.value).join("");
+    const posBegin = letterChars[0].position;
+    const posEnd = letterChars[letterChars.length-1].position;
+
+    // order is important; match keywords first, then identifier
+    switch (value) {
+      case "참":
+      case "거짓":
+        {
+          const token = createBooleanLiteralToken(value, posBegin, posEnd);
+          return token;
+        }
+
+      case "만약":
+      case "아니면":
+      case "함수":
+      case "결과":
+        {
+          const token = createKeywordToken(value, posBegin, posEnd);
+          return token;
+        }
+
+      default:
+        {
+          const token = createIdentifierToken(value, posBegin, posEnd);
+          return token;
+        }
+    }
+  }
+
+  private readDigitChars(): SourceChar[] {
+    const chars: SourceChar[] = [];
+    while (true) {
+      const peek = this.charBuffer.peekChar();
+      if (!isDigit(peek.value)) {
+        break;
+      }
+
+      chars.push(this.charBuffer.popChar());
     }
 
-    const digits = read.join("");
-    return digits;
+    return chars;
   }
 
-  /** helper function for readNumberLiteral() method */
-  private readDecimalPart(): string {
+  private readDecimalChars(): SourceChar[] {
     // read decimal point; if not, early return
-    const maybeDecimalPoint = this.charBuffer.peek();
-    if (maybeDecimalPoint !== ".") {
-      return "";
+    const maybeDot = this.charBuffer.peekChar();
+    if (maybeDot.value !== ".") {
+      return [];
     }
-    const decimalPoint = this.charBuffer.pop();
+    const dot = this.charBuffer.popChar();
 
     // read and return decimal part
-    const digits = this.readDigits();
-    const decimalPart = decimalPoint + digits;
-    return decimalPart;
+    const digits = this.readDigitChars();
+    const decimalChars = [dot].concat(digits);
+    return decimalChars;
   }
 
-  private readLettersAndDigits(): string {
-    const read = [];
-    while (
-      Util.isLetter(this.charBuffer.peek()) ||
-      Util.isDigit(this.charBuffer.peek())
-    ) {
-      read.push(this.charBuffer.pop());
+  private readLetterChars(): SourceChar[] {
+    const chars: SourceChar[] = [];
+    while (true) {
+      const peek = this.charBuffer.peekChar();
+      if (!isLetter(peek.value) && !isDigit(peek.value)) {
+        break;
+      }
+
+      chars.push(this.charBuffer.popChar());
     }
 
-    return read.join("");
+    return chars;
   }
 }
 
-export type { TokenType } from "./token";
+export type { SourceToken } from "./source-token";
