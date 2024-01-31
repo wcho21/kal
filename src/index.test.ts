@@ -24,12 +24,12 @@ it("execute 1 == 2", () => {
   expect(execute("1 == 2")).toBe("거짓");
 });
 
-it("execute 2 > 1 == 참", () => {
-  expect(execute("2 > 1 == 참")).toBe("참");
+it("execute 참 == 2 > 1", () => {
+  expect(execute("참 == 2 > 1")).toBe("참");
 });
 
-it("execute 1 != 1 == 거짓", () => { // note that comparison is left associative
-  expect(execute("1 != 1 == 거짓")).toBe("참");
+it("execute 거짓 == 1 != 1", () => { // note that comparison is left associative
+  expect(execute("거짓 == 1 != 1")).toBe("참");
 });
 
 it("execute 거짓 == (1 < 1+1)", () => {
