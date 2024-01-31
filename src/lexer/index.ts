@@ -23,7 +23,7 @@ import type {
   StringLiteralToken,
   IllegalStringLiteralToken,
 } from "./source-token";
-import type Position from "../util/position";
+import type { Position } from "../util/position";
 import { isDigit, isLetter, isWhitespace } from "./util";
 
 export default class Lexer {

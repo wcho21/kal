@@ -2,14 +2,10 @@ import Lexer from "../lexer";
 import Parser from "./v2";
 import {
   ParserError,
-  BadPrefixError,
   BadExpressionError,
 } from "./v2";
 import type {
   ProgramNode,
-  AssignmentNode,
-  IdentifierNode,
-  ExpressionStatementNode,
 } from "./syntax-node";
 
 type SuccessTestCase<E extends {} = any> = { name: string, input: string, expected: E };
@@ -45,21 +41,15 @@ describe("parseSource()", () => {
           input: "42",
           expected: {
             type: "program",
-            fields: {
-              statements: [
-                {
-                  type: "expression statement",
-                  fields: {
-                    expression: {
-                      type: "number",
-                      fields: {
-                        value: 42,
-                      },
-                    }
-                  },
-                },
-              ],
-            },
+            statements: [
+              {
+                type: "expression statement",
+                expression: {
+                  type: "number",
+                  value: 42,
+                }
+              },
+            ],
           },
         },
         {
@@ -67,21 +57,15 @@ describe("parseSource()", () => {
           input: "참",
           expected: {
             type: "program",
-            fields: {
-              statements: [
-                {
-                  type: "expression statement",
-                  fields: {
-                    expression: {
-                      type: "boolean",
-                      fields: {
-                        value: true,
-                      },
-                    }
-                  },
-                },
-              ],
-            },
+            statements: [
+              {
+                type: "expression statement",
+                expression: {
+                  type: "boolean",
+                  value: true,
+                }
+              },
+            ],
           },
         },
         {
@@ -89,21 +73,15 @@ describe("parseSource()", () => {
           input: "'foo bar'",
           expected: {
             type: "program",
-            fields: {
-              statements: [
-                {
-                  type: "expression statement",
-                  fields: {
-                    expression: {
-                      type: "string",
-                      fields: {
-                        value: "foo bar",
-                      },
-                    }
-                  },
+            statements: [
+              {
+                type: "expression statement",
+                expression: {
+                  type: "string",
+                  value: "foo bar",
                 },
-              ],
-            },
+              },
+            ],
           },
         },
         {
@@ -111,21 +89,15 @@ describe("parseSource()", () => {
           input: "foo",
           expected: {
             type: "program",
-            fields: {
-              statements: [
-                {
-                  type: "expression statement",
-                  fields: {
-                    expression: {
-                      type: "identifier",
-                      fields: {
-                        value: "foo",
-                      },
-                    }
-                  },
-                },
-              ],
-            },
+            statements: [
+              {
+                type: "expression statement",
+                expression: {
+                  type: "identifier",
+                  value: "foo",
+                }
+              },
+            ],
           },
         },
       ];
@@ -141,27 +113,19 @@ describe("parseSource()", () => {
             input: "+42",
             expected: {
               type: "program",
-              fields: {
-                statements: [
-                  {
-                    type: "expression statement",
-                    fields: {
-                      expression: {
-                        type: "prefix",
-                        fields: {
-                          prefix: "+",
-                          right: {
-                            type: "number",
-                            fields: {
-                              value: 42,
-                            },
-                          },
-                        },
-                      }
+              statements: [
+                {
+                  type: "expression statement",
+                  expression: {
+                    type: "prefix",
+                    prefix: "+",
+                    right: {
+                      type: "number",
+                      value: 42,
                     },
-                  },
-                ],
-              },
+                  }
+                },
+              ],
             },
           },
           {
@@ -169,27 +133,19 @@ describe("parseSource()", () => {
             input: "-42",
             expected: {
               type: "program",
-              fields: {
-                statements: [
-                  {
-                    type: "expression statement",
-                    fields: {
-                      expression: {
-                        type: "prefix",
-                        fields: {
-                          prefix: "-",
-                          right: {
-                            type: "number",
-                            fields: {
-                              value: 42,
-                            },
-                          },
-                        },
-                      }
+              statements: [
+                {
+                  type: "expression statement",
+                  expression: {
+                    type: "prefix",
+                    prefix: "-",
+                    right: {
+                      type: "number",
+                      value: 42,
                     },
-                  },
-                ],
-              },
+                  }
+                },
+              ],
             },
           },
           {
@@ -197,33 +153,23 @@ describe("parseSource()", () => {
             input: "--42",
             expected: {
               type: "program",
-              fields: {
-                statements: [
-                  {
-                    type: "expression statement",
-                    fields: {
-                      expression: {
-                        type: "prefix",
-                        fields: {
-                          prefix: "-",
-                          right: {
-                            type: "prefix",
-                            fields: {
-                              prefix: "-",
-                              right: {
-                                type: "number",
-                                fields: {
-                                  value: 42,
-                                },
-                              },
-                            },
-                          },
-                        },
-                      }
+              statements: [
+                {
+                  type: "expression statement",
+                  expression: {
+                    type: "prefix",
+                    prefix: "-",
+                    right: {
+                      type: "prefix",
+                      prefix: "-",
+                      right: {
+                        type: "number",
+                        value: 42,
+                      },
                     },
                   },
-                ],
-              },
+                },
+              ],
             },
           },
         ];
@@ -243,45 +189,31 @@ describe("parseSource()", () => {
           input: `11 ${infix} 22 ${infix} 33`,
           expected: {
             type: "program",
-            fields: {
-              statements: [
-                {
-                  type: "expression statement",
-                  fields: {
-                    expression: {
-                      type: "infix",
-                      fields: {
-                        infix,
-                        left: {
-                          type: "infix",
-                          fields: {
-                            infix,
-                            left: {
-                              type: "number",
-                              fields: {
-                                value: 11,
-                              },
-                            },
-                            right: {
-                              type: "number",
-                              fields: {
-                                value: 22,
-                              },
-                            },
-                          },
-                        },
-                        right: {
-                          type: "number",
-                          fields: {
-                            value: 33,
-                          },
-                        },
-                      },
-                    }
+            statements: [
+              {
+                type: "expression statement",
+                expression: {
+                  type: "infix",
+                  infix,
+                  left: {
+                    type: "infix",
+                    infix,
+                    left: {
+                      type: "number",
+                      value: 11,
+                    },
+                    right: {
+                      type: "number",
+                      value: 22,
+                    },
+                  },
+                  right: {
+                    type: "number",
+                    value: 33,
                   },
                 },
-              ],
-            },
+              },
+            ],
           },
         }));
 
@@ -295,67 +227,47 @@ describe("parseSource()", () => {
             input: "11+22*33/44-55",
             expected: {
               type: "program",
-              fields: {
-                statements: [
-                  {
-                    type: "expression statement",
-                    fields: {
-                      expression: {
+              statements: [
+                {
+                  type: "expression statement",
+                  expression: {
+                    type: "infix",
+                    infix: "-",
+                    left: {
+                      type: "infix",
+                      infix: "+",
+                      left: {
+                        type: "number",
+                        value: 11,
+                      },
+                      right: {
                         type: "infix",
-                        fields: {
-                          infix: "-",
+                        infix: "/",
+                        left: {
+                          type: "infix",
+                          infix: "*",
                           left: {
-                            type: "infix",
-                            fields: {
-                              infix: "+",
-                              left: {
-                                type: "number",
-                                fields: { value: 11 },
-                              },
-                              right: {
-                                type: "infix",
-                                fields: {
-                                  infix: "/",
-                                  left: {
-                                    type: "infix",
-                                    fields: {
-                                      infix: "*",
-                                      left: {
-                                        type: "number",
-                                        fields: {
-                                          value: 22
-                                        },
-                                      },
-                                      right: {
-                                        type: "number",
-                                        fields: {
-                                          value: 33
-                                        },
-                                      },
-                                    },
-                                  },
-                                  right: {
-                                    type: "number",
-                                    fields: {
-                                      value: 44
-                                    },
-                                  },
-                                },
-                              },
-                            },
+                            type: "number",
+                            value: 22
                           },
                           right: {
                             type: "number",
-                            fields: {
-                              value: 55,
-                            },
+                            value: 33
                           },
                         },
-                      }
+                        right: {
+                          type: "number",
+                          value: 44,
+                        },
+                      },
+                    },
+                    right: {
+                      type: "number",
+                      value: 55,
                     },
                   },
-                ],
-              },
+                },
+              ],
             },
           },
           {
@@ -363,45 +275,31 @@ describe("parseSource()", () => {
             input: "11+(22+33)",
             expected: {
               type: "program",
-              fields: {
-                statements: [
-                  {
-                    type: "expression statement",
-                    fields: {
-                      expression: {
-                        type: "infix",
-                        fields: {
-                          infix: "+",
-                          left: {
-                            type: "number",
-                            fields: {
-                              value: 11,
-                            },
-                          },
-                          right: {
-                            type: "infix",
-                            fields: {
-                              infix: "+",
-                              left: {
-                                type: "number",
-                                fields: {
-                                  value: 22,
-                                },
-                              },
-                              right: {
-                                type: "number",
-                                fields: {
-                                  value: 33,
-                                },
-                              },
-                            },
-                          },
-                        },
-                      }
+              statements: [
+                {
+                  type: "expression statement",
+                  expression: {
+                    type: "infix",
+                    infix: "+",
+                    left: {
+                      type: "number",
+                      value: 11,
+                    },
+                    right: {
+                      type: "infix",
+                      infix: "+",
+                      left: {
+                        type: "number",
+                        value: 22,
+                      },
+                      right: {
+                        type: "number",
+                        value: 33,
+                      },
                     },
                   },
-                ],
-              },
+                },
+              ],
             },
           },
         ];
@@ -419,27 +317,19 @@ describe("parseSource()", () => {
             input: "!foo",
             expected: {
               type: "program",
-              fields: {
-                statements: [
-                  {
-                    type: "expression statement",
-                    fields: {
-                      expression: {
-                        type: "prefix",
-                        fields: {
-                          prefix: "!",
-                          right: {
-                            type: "identifier",
-                            fields: {
-                              value: "foo",
-                            },
-                          },
-                        },
-                      }
+              statements: [
+                {
+                  type: "expression statement",
+                  expression: {
+                    type: "prefix",
+                    prefix: "!",
+                    right: {
+                      type: "identifier",
+                      value: "foo",
                     },
                   },
-                ],
-              },
+                },
+              ],
             },
           },
           {
@@ -447,33 +337,23 @@ describe("parseSource()", () => {
             input: "!!foo",
             expected: {
               type: "program",
-              fields: {
-                statements: [
-                  {
-                    type: "expression statement",
-                    fields: {
-                      expression: {
-                        type: "prefix",
-                        fields: {
-                          prefix: "!",
-                          right: {
-                            type: "prefix",
-                            fields: {
-                              prefix: "!",
-                              right: {
-                                type: "identifier",
-                                fields: {
-                                  value: "foo",
-                                },
-                              },
-                            },
-                          },
-                        },
+              statements: [
+                {
+                  type: "expression statement",
+                  expression: {
+                    type: "prefix",
+                    prefix: "!",
+                    right: {
+                      type: "prefix",
+                      prefix: "!",
+                      right: {
+                        type: "identifier",
+                        value: "foo",
                       },
                     },
                   },
-                ],
-              },
+                },
+              ],
             },
           },
         ];
@@ -495,33 +375,23 @@ describe("parseSource()", () => {
           input: `foo ${infix} bar`,
           expected: {
             type: "program",
-            fields: {
-              statements: [
-                {
-                  type: "expression statement",
-                  fields: {
-                    expression: {
-                      type: "infix",
-                      fields: {
-                        infix,
-                        left: {
-                          type: "identifier",
-                          fields: {
-                            value: "foo",
-                          },
-                        },
-                        right: {
-                          type: "identifier",
-                          fields: {
-                            value: "bar",
-                          },
-                        },
-                      },
-                    },
+            statements: [
+              {
+                type: "expression statement",
+                expression: {
+                  type: "infix",
+                  infix,
+                  left: {
+                    type: "identifier",
+                    value: "foo",
+                  },
+                  right: {
+                    type: "identifier",
+                    value: "bar",
                   },
                 },
-              ],
-            },
+              },
+            ],
           },
         }));
 
@@ -538,45 +408,31 @@ describe("parseSource()", () => {
           input: `foo ${infix} bar ${infix} baz`,
           expected: {
             type: "program",
-            fields: {
-              statements: [
-                {
-                  type: "expression statement",
-                  fields: {
-                    expression: {
-                      type: "infix",
-                      fields: {
-                        infix,
-                        left: {
-                          type: "identifier",
-                          fields: {
-                            value: "foo",
-                          },
-                        },
-                        right: {
-                          type: "infix",
-                          fields: {
-                            infix,
-                            left: {
-                              type: "identifier",
-                              fields: {
-                                value: "bar",
-                              },
-                            },
-                            right: {
-                              type: "identifier",
-                              fields: {
-                                value: "baz",
-                              },
-                            },
-                          },
-                        },
-                      },
+            statements: [
+              {
+                type: "expression statement",
+                expression: {
+                  type: "infix",
+                  infix,
+                  left: {
+                    type: "identifier",
+                    value: "foo",
+                  },
+                  right: {
+                    type: "infix",
+                    infix,
+                    left: {
+                      type: "identifier",
+                      value: "bar",
+                    },
+                    right: {
+                      type: "identifier",
+                      value: "baz",
                     },
                   },
                 },
-              ],
-            },
+              },
+            ],
           },
         }));
 
@@ -590,45 +446,31 @@ describe("parseSource()", () => {
             input: "(foo == bar) != baz",
             expected: {
               type: "program",
-              fields: {
-                statements: [
-                  {
-                    type: "expression statement",
-                    fields: {
-                      expression: {
-                        type: "infix",
-                        fields: {
-                          infix: "!=",
-                          left: {
-                            type: "infix",
-                            fields: {
-                              infix: "==",
-                              left: {
-                                type: "identifier",
-                                fields: {
-                                  value: "foo",
-                                },
-                              },
-                              right: {
-                                type: "identifier",
-                                fields: {
-                                  value: "bar",
-                                },
-                              },
-                            },
-                          },
-                          right: {
-                            type: "identifier",
-                            fields: {
-                              value: "baz"
-                            },
-                          },
-                        },
+              statements: [
+                {
+                  type: "expression statement",
+                  expression: {
+                    type: "infix",
+                    infix: "!=",
+                    left: {
+                      type: "infix",
+                      infix: "==",
+                      left: {
+                        type: "identifier",
+                        value: "foo",
+                      },
+                      right: {
+                        type: "identifier",
+                        value: "bar",
                       },
                     },
+                    right: {
+                      type: "identifier",
+                      value: "baz",
+                    },
                   },
-                ],
-              },
+                },
+              ],
             },
           },
         ];
@@ -644,32 +486,22 @@ describe("parseSource()", () => {
           input: "x = 42",
           expected: {
             type: "program",
-            fields: {
-              statements: [
-                {
-                  type: "expression statement",
-                  fields: {
-                    expression: {
-                      type: "assignment",
-                      fields: {
-                        left: {
-                          type: "identifier",
-                          fields: {
-                            value: "x",
-                          },
-                        },
-                        right: {
-                          type: "number",
-                          fields: {
-                            value: 42,
-                          },
-                        },
-                      },
-                    },
+            statements: [
+              {
+                type: "expression statement",
+                expression: {
+                  type: "assignment",
+                  left: {
+                    type: "identifier",
+                    value: "x",
+                  },
+                  right: {
+                    type: "number",
+                    value: 42,
                   },
                 },
-              ],
-            },
+              },
+            ],
           },
         },
         {
@@ -677,43 +509,29 @@ describe("parseSource()", () => {
           input: "x = y = 42",
           expected: {
             type: "program",
-            fields: {
-              statements: [
-                {
-                  type: "expression statement",
-                  fields: {
-                    expression: {
-                      type: "assignment",
-                      fields: {
-                        left: {
-                          type: "identifier",
-                          fields: {
-                            value: "x",
-                          },
-                        },
-                        right: {
-                          type: "assignment",
-                          fields: {
-                            left: {
-                              type: "identifier",
-                              fields: {
-                                value: "y",
-                              },
-                            },
-                            right: {
-                              type: "number",
-                              fields: {
-                                value: 42,
-                              },
-                            },
-                          },
-                        },
-                      },
-                    }
+            statements: [
+              {
+                type: "expression statement",
+                expression: {
+                  type: "assignment",
+                  left: {
+                    type: "identifier",
+                    value: "x",
+                  },
+                  right: {
+                    type: "assignment",
+                    left: {
+                      type: "identifier",
+                      value: "y",
+                    },
+                    right: {
+                      type: "number",
+                      value: 42,
+                    },
                   },
                 },
-              ],
-            },
+              },
+            ],
           },
         },
       ];
@@ -728,40 +546,28 @@ describe("parseSource()", () => {
           input: "foo(bar, 42)",
           expected: {
             type: "program",
-            fields: {
-              statements: [
-                {
-                  type: "expression statement",
-                  fields: {
-                    expression: {
-                      type: "call",
-                      fields: {
-                        func: {
-                          type: "identifier",
-                          fields: {
-                            value: "foo",
-                          },
-                        },
-                        args: [
-                          {
-                            type: "identifier",
-                            fields: {
-                              value: "bar",
-                            },
-                          },
-                          {
-                            type: "number",
-                            fields: {
-                              value: 42,
-                            },
-                          },
-                        ],
-                      },
-                    },
+            statements: [
+              {
+                type: "expression statement",
+                expression: {
+                  type: "call",
+                  func: {
+                    type: "identifier",
+                    value: "foo",
                   },
+                  args: [
+                    {
+                      type: "identifier",
+                      value: "bar",
+                    },
+                    {
+                      type: "number",
+                      value: 42,
+                    },
+                  ],
                 },
-              ],
-            },
+              },
+            ],
           },
         },
         {
@@ -769,35 +575,25 @@ describe("parseSource()", () => {
           input: "함수(foo){ foo }(42)",
           expected: {
             type: "program",
-            fields: {
-              statements: [
-                {
-                  type: "expression statement",
-                  fields: {
-                    expression: {
-                      type: "call",
-                      fields: {
-                        func: {
-                          type: "function",
-                          fields: {
-                            parameters: {}, // omit
-                            body: {}, // omit
-                          },
-                        },
-                        args: [
-                          {
-                            type: "number",
-                            fields: {
-                              value: 42,
-                            },
-                          },
-                        ],
-                      },
-                    },
+            statements: [
+              {
+                type: "expression statement",
+                expression: {
+                  type: "call",
+                  func: {
+                    type: "function",
+                    parameters: {}, // omit
+                    body: {}, // omit
                   },
+                  args: [
+                    {
+                      type: "number",
+                      value: 42,
+                    },
+                  ],
                 },
-              ],
-            },
+              },
+            ],
           },
         },
       ];
@@ -812,56 +608,42 @@ describe("parseSource()", () => {
           input: "함수 (foo, bar) { foo + bar }",
           expected: {
             type: "program",
-            fields: {
-              statements: [
-                {
-                  type: "expression statement",
-                  fields: {
-                    expression: {
-                      type: "function",
-                      fields: {
-                        parameters: [
-                          {
-                            type: "identifier",
-                            fields: {
-                              value: "foo",
-                            },
-                          },
-                          {
-                            type: "identifier",
-                            fields: {
-                              value: "bar",
-                            },
-                          },
-                        ],
-                        body: {
-                          type: "block",
-                          fields: {
-                            statements: [
-                              {
-                                type: "expression statement",
-                                fields: {
-                                  expression: {
-                                    type: "infix",
-                                    fields: {}, // omit
-                                  },
-                                },
-                              },
-                            ],
-                          },
+            statements: [
+              {
+                type: "expression statement",
+                expression: {
+                  type: "function",
+                  parameters: [
+                    {
+                      type: "identifier",
+                      value: "foo",
+                    },
+                    {
+                      type: "identifier",
+                      value: "bar",
+                    },
+                  ],
+                  body: {
+                    type: "block",
+                    statements: [
+                      {
+                        type: "expression statement",
+                        expression: {
+                          type: "infix",
                         },
                       },
-                    },
+                    ],
                   },
                 },
-              ],
-            },
+              },
+            ],
           },
         },
       ];
 
       it.each(cases)("$name", testSuccess);
     });
+
     describe("return statement", () => {
       const cases: SuccessTestCase[] = [
         {
@@ -869,21 +651,15 @@ describe("parseSource()", () => {
           input: "결과 42",
           expected: {
             type: "program",
-            fields: {
-              statements: [
-                {
-                  type: "return",
-                  fields: {
-                    expression: {
-                      type: "number",
-                      fields: {
-                        value: 42,
-                      },
-                    },
-                  },
+            statements: [
+              {
+                type: "return",
+                expression: {
+                  type: "number",
+                  value: 42,
                 },
-              ],
-            },
+              },
+            ],
           },
         },
       ];
@@ -898,39 +674,27 @@ describe("parseSource()", () => {
           input: "만약 foo { bar }",
           expected: {
             type: "program",
-            fields: {
-              statements: [
-                {
-                  type: "branch",
-                  fields: {
-                    predicate: {
-                      type: "identifier",
-                      fields: {
-                        value: "foo",
-                      },
-                    },
-                    consequence: {
-                      type: "block",
-                      fields: {
-                        statements: [
-                          {
-                            type: "expression statement",
-                            fields: {
-                              expression: {
-                                type: "identifier",
-                                fields: {
-                                  value: "bar",
-                                },
-                              },
-                            },
-                          },
-                        ],
-                      },
-                    },
-                  },
+            statements: [
+              {
+                type: "branch",
+                predicate: {
+                  type: "identifier",
+                  value: "foo",
                 },
-              ],
-            },
+                consequence: {
+                  type: "block",
+                  statements: [
+                    {
+                      type: "expression statement",
+                      expression: {
+                        type: "identifier",
+                        value: "bar",
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
           },
         },
         {
@@ -938,57 +702,39 @@ describe("parseSource()", () => {
           input: "만약 foo { bar } 아니면 { baz }",
           expected: {
             type: "program",
-            fields: {
-              statements: [
-                {
-                  type: "branch",
-                  fields: {
-                    predicate: {
-                      type: "identifier",
-                      fields: {
-                        value: "foo",
-                      },
-                    },
-                    consequence: {
-                      type: "block",
-                      fields: {
-                        statements: [
-                          {
-                            type: "expression statement",
-                            fields: {
-                              expression: {
-                                type: "identifier",
-                                fields: {
-                                  value: "bar",
-                                },
-                              },
-                            },
-                          },
-                        ],
-                      },
-                    },
-                    alternative: {
-                      type: "block",
-                      fields: {
-                        statements: [
-                          {
-                            type: "expression statement",
-                            fields: {
-                              expression: {
-                                type: "identifier",
-                                fields: {
-                                  value: "baz",
-                                },
-                              },
-                            },
-                          },
-                        ],
-                      },
-                    },
-                  },
+            statements: [
+              {
+                type: "branch",
+                predicate: {
+                  type: "identifier",
+                  value: "foo",
                 },
-              ],
-            },
+                consequence: {
+                  type: "block",
+                  statements: [
+                    {
+                      type: "expression statement",
+                      expression: {
+                        type: "identifier",
+                        value: "bar",
+                      },
+                    },
+                  ],
+                },
+                alternative: {
+                  type: "block",
+                  statements: [
+                    {
+                      type: "expression statement",
+                      expression: {
+                        type: "identifier",
+                        value: "baz",
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
           },
         },
       ];
@@ -1044,20 +790,16 @@ describe("parseSource()", () => {
           expected: {
             type: "program",
             range,
-            fields: {
-              statements: [
-                {
-                  type: "expression statement",
+            statements: [
+              {
+                type: "expression statement",
+                range,
+                expression: {
+                  type,
                   range,
-                  fields: {
-                    expression: {
-                      type,
-                      range,
-                    }
-                  },
                 },
-              ],
-            },
+              },
+            ],
           },
         }));
 
@@ -1075,42 +817,36 @@ describe("parseSource()", () => {
                 begin: { row: 0, col: 0 },
                 end: { row: 0, col: 5 },
               },
-              fields: {
-                statements: [
-                  {
-                    type: "expression statement",
+              statements: [
+                {
+                  type: "expression statement",
+                  range: {
+                    begin: { row: 0, col: 0 },
+                    end: { row: 0, col: 5 },
+                  },
+                  expression: {
+                    type: "assignment",
                     range: {
                       begin: { row: 0, col: 0 },
                       end: { row: 0, col: 5 },
                     },
-                    fields: {
-                      expression: {
-                        type: "assignment",
-                        range: {
-                          begin: { row: 0, col: 0 },
-                          end: { row: 0, col: 5 },
-                        },
-                        fields: {
-                          left: {
-                            type: "identifier",
-                            range: {
-                              begin: { row: 0, col: 0 },
-                              end: { row: 0, col: 0 },
-                            },
-                          },
-                          right: {
-                            type: "number",
-                            range: {
-                              begin: { row: 0, col: 4 },
-                              end: { row: 0, col: 5 },
-                            },
-                          },
-                        },
+                    left: {
+                      type: "identifier",
+                      range: {
+                        begin: { row: 0, col: 0 },
+                        end: { row: 0, col: 0 },
+                      },
+                    },
+                    right: {
+                      type: "number",
+                      range: {
+                        begin: { row: 0, col: 4 },
+                        end: { row: 0, col: 5 },
                       },
                     },
                   },
-                ],
-              },
+                },
+              ],
             },
           },
           {
@@ -1122,42 +858,36 @@ describe("parseSource()", () => {
                 begin: { row: 0, col: 0 },
                 end: { row: 0, col: 6 },
               },
-              fields: {
-                statements: [
-                  {
-                    type: "expression statement",
+              statements: [
+                {
+                  type: "expression statement",
+                  range: {
+                    begin: { row: 0, col: 0 },
+                    end: { row: 0, col: 6 },
+                  },
+                  expression: {
+                    type: "infix",
                     range: {
                       begin: { row: 0, col: 0 },
                       end: { row: 0, col: 6 },
                     },
-                    fields: {
-                      expression: {
-                        type: "infix",
-                        range: {
-                          begin: { row: 0, col: 0 },
-                          end: { row: 0, col: 6 },
-                        },
-                        fields: {
-                          left: {
-                            type: "number",
-                            range: {
-                              begin: { row: 0, col: 0 },
-                              end: { row: 0, col: 1 },
-                            },
-                          },
-                          right: {
-                            type: "number",
-                            range: {
-                              begin: { row: 0, col: 5 },
-                              end: { row: 0, col: 6 },
-                            },
-                          },
-                        },
+                    left: {
+                      type: "number",
+                      range: {
+                        begin: { row: 0, col: 0 },
+                        end: { row: 0, col: 1 },
+                      },
+                    },
+                    right: {
+                      type: "number",
+                      range: {
+                        begin: { row: 0, col: 5 },
+                        end: { row: 0, col: 6 },
                       },
                     },
                   },
-                ],
-              },
+                },
+              ],
             },
           },
           {
@@ -1166,41 +896,39 @@ describe("parseSource()", () => {
             expected: {
               type: "program",
               range: {
+                begin: { row: 0, col: 0 },
+                end: { row: 0, col: 8 },
               },
-              fields: {
-                statements: [
-                  {
-                    type: "expression statement",
+              statements: [
+                {
+                  type: "expression statement",
+                  range: {
+                    begin: { row: 0, col: 0 },
+                    end: { row: 0, col: 8 },
+                  },
+                  expression: {
+                    type: "infix",
                     range: {
+                      begin: { row: 0, col: 0 },
+                      end: { row: 0, col: 8 },
                     },
-                    fields: {
-                      expression: {
-                        type: "infix",
-                        range: {
-                          begin: { row: 0, col: 0 },
-                          end: { row: 0, col: 8 },
-                        },
-                        fields: {
-                          left: {
-                            type: "number",
-                            range: {
-                              begin: { row: 0, col: 1 },
-                              end: { row: 0, col: 2 },
-                            },
-                          },
-                          right: {
-                            type: "number",
-                            range: {
-                              begin: { row: 0, col: 6 },
-                              end: { row: 0, col: 7 },
-                            },
-                          },
-                        },
+                    left: {
+                      type: "number",
+                      range: {
+                        begin: { row: 0, col: 1 },
+                        end: { row: 0, col: 2 },
+                      },
+                    },
+                    right: {
+                      type: "number",
+                      range: {
+                        begin: { row: 0, col: 6 },
+                        end: { row: 0, col: 7 },
                       },
                     },
                   },
-                ],
-              },
+                },
+              ],
             },
           },
           {
@@ -1209,52 +937,28 @@ describe("parseSource()", () => {
             expected: {
               type: "program",
               range: {
-                begin: {
-                  row: 0,
-                  col: 0,
-                },
-                end: {
-                  row: 2,
-                  col: 0,
-                },
+                begin: { row: 0, col: 0, },
+                end: { row: 2, col: 0, },
               },
-              fields: {
-                statements: [
-                  {
-                    type: "expression statement",
-                    fields: {
-                      expression: {
-                        type: "function",
-                        range: {
-                          begin: {
-                            row: 0,
-                            col: 0,
-                          },
-                          end: {
-                            row: 2,
-                            col: 0,
-                          },
-                        },
-                        fields: {
-                          body: {
-                            type: "block",
-                            range: {
-                              begin: {
-                                row: 0,
-                                col: 8,
-                              },
-                              end: {
-                                row: 2,
-                                col: 0,
-                              },
-                            },
-                          },
-                        },
+              statements: [
+                {
+                  type: "expression statement",
+                  expression: {
+                    type: "function",
+                    range: {
+                      begin: { row: 0, col: 0, },
+                      end: { row: 2, col: 0, },
+                    },
+                    body: {
+                      type: "block",
+                      range: {
+                        begin: { row: 0, col: 8, },
+                        end: { row: 2, col: 0, },
                       },
                     },
                   },
-                ],
-              },
+                },
+              ],
             },
           },
           {
@@ -1264,33 +968,23 @@ describe("parseSource()", () => {
               type: "program",
               range: {
               },
-              fields: {
-                statements: [
-                  {
-                    type: "expression statement",
-                    fields: {
-                      expression: {
-                        type: "call",
-                        range: {
-                          begin: {
-                            row: 0,
-                            col: 0,
-                          },
-                          end: {
-                            row: 0,
-                            col: 12,
-                          },
-                        },
-                      },
+              statements: [
+                {
+                  type: "expression statement",
+                  expression: {
+                    type: "call",
+                    range: {
+                      begin: { row: 0, col: 0, },
+                      end: { row: 0, col: 12, },
                     },
                   },
-                ],
-              },
+                },
+              ],
             },
           },
         ];
 
-        it.each(cases.slice(4))("$name", testSuccess);
+        it.each(cases)("$name", testSuccess);
       });
 
       describe("single statements", () => {
@@ -1302,55 +996,33 @@ describe("parseSource()", () => {
               type: "program",
               range: {
               },
-              fields: {
-                statements: [
-                  {
-                    type: "branch",
+              statements: [
+                {
+                  type: "branch",
+                  range: {
+                  },
+                  predicate: {
                     range: {
-                    },
-                    fields: {
-                      predicate: {
-                        range: {
-                          begin: {
-                            row: 0,
-                            col: 3,
-                          },
-                          end: {
-                            row: 0,
-                            col: 5,
-                          },
-                        },
-                      },
-                      consequence: {
-                        type: "block",
-                        range: {
-                          begin: {
-                            row: 0,
-                            col: 7,
-                          },
-                          end: {
-                            row: 2,
-                            col: 0,
-                          },
-                        },
-                      },
-                      alternative: {
-                        type: "block",
-                        range: {
-                          begin: {
-                            row: 2,
-                            col: 6,
-                          },
-                          end: {
-                            row: 4,
-                            col: 0,
-                          },
-                        },
-                      },
+                      begin: { row: 0, col: 3, },
+                      end: { row: 0, col: 5, },
                     },
                   },
-                ],
-              },
+                  consequence: {
+                    type: "block",
+                    range: {
+                      begin: { row: 0, col: 7, },
+                      end: { row: 2, col: 0, },
+                    },
+                  },
+                  alternative: {
+                    type: "block",
+                    range: {
+                      begin: { row: 2, col: 6, },
+                      end: { row: 4, col: 0, },
+                    },
+                  },
+                },
+              ],
             },
           },
         ];

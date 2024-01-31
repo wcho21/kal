@@ -1,4 +1,4 @@
-export default interface Position {
+export interface Position {
   readonly row: number,
   readonly col: number,
 }

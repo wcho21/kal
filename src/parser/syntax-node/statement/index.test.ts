@@ -17,10 +17,8 @@ const cases = [
     node: createBranchNode({ predicate: {} as ExpressionNode, consequence: {} as BlockNode }, fakePos, fakePos),
     expected: {
       type: "branch",
-      fields: {
-        predicate: {},
-        consequence: {},
-      },
+      predicate: {},
+      consequence: {},
       range: { begin: fakePos, end: fakePos },
     },
   },
@@ -29,11 +27,9 @@ const cases = [
     node: createBranchNode({ predicate: {} as ExpressionNode, consequence: {} as BlockNode, alternative: {} as BlockNode }, fakePos, fakePos),
     expected: {
       type: "branch",
-      fields: {
-        predicate: {},
-        consequence: {},
-        alternative: {},
-      },
+      predicate: {},
+      consequence: {},
+      alternative: {},
       range: { begin: fakePos, end: fakePos },
     },
   },
@@ -42,9 +38,7 @@ const cases = [
     node: createReturnNode({ expression: {} as ExpressionNode }, fakePos, fakePos),
     expected: {
       type: "return",
-      fields: {
-        expression: {},
-      },
+      expression: {},
       range: { begin: fakePos, end: fakePos },
     },
   },
@@ -53,13 +47,12 @@ const cases = [
     node: createExpressionStatementNode({ expression: {} as ExpressionNode }, fakePos, fakePos),
     expected: {
       type: "expression statement",
-      fields: {
-        expression: {},
-      },
+      expression: {},
       range: { begin: fakePos, end: fakePos },
     },
   },
 ];
+
 it.each(cases)("create $name node", ({ node, expected }) => {
   expect(node).toEqual(expected);
 });
