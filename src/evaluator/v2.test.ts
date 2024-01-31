@@ -1,6 +1,6 @@
 import Lexer from "../lexer";
 import Parser from "../parser/v2";
-import Evaluator from "./v2";
+import Evaluator, * as Eval from "./v2";
 import Environment from "./environment/v2";
 
 const evaluateInput = (input: string) => {
@@ -20,7 +20,7 @@ const testEvaluatingPrimitive = ({ input, expected }: { input: string, expected:
   expect(evaluated.value).toBe(expected);
 };
 
-const testEvaluatingEmpty= ({ input }: { input: string }): void => {
+const testEvaluatingEmpty = ({ input }: { input: string }): void => {
   const evaluated = evaluateInput(input) as any;
 
   expect(evaluated.value).toBe(null);
@@ -355,5 +355,44 @@ describe("evaluate()", () => {
     ];
 
     it.each(cases)("evaluate $name", testEvaluatingPrimitive);
+  });
+
+  describe("errors", () => {
+    const cases = [
+      {
+        name: "top level return error",
+        input: "결과 11",
+        expected: Eval.TopLevelReturnError,
+        range: { begin: { row: 0, col: 0 }, end: { row: 0, col: 4 } },
+      },
+      {
+        name: "bad predicate error",
+        input: "만약 11 {\n  22\n}",
+        expected: Eval.BadPredicateError,
+        range: { begin: { row: 0, col: 3 }, end: { row: 0, col: 4 } },
+        received: "11",
+      },
+      {
+        name: "bad identifier error",
+        input: "사과",
+        expected: Eval.BadIdentifierError,
+        range: { begin: { row: 0, col: 0 }, end: { row: 0, col: 1 } },
+        received: "사과",
+      },
+    ];
+
+    it.each(cases)("$name", ({ input, expected, range, received }) => {
+      expect(() => evaluateInput(input)).toThrow(expected);
+      try {
+        evaluateInput(input);
+      } catch (err) {
+        const e = err as typeof expected;
+
+        expect(e).toMatchObject({ range });
+        if (received !== undefined) {
+          expect(e).toMatchObject({ received });
+        }
+      }
+    });
   });
 });

@@ -4,21 +4,23 @@ import * as value from "./value";
 import Environment from "./environment/v2";
 import type { Range } from "../util/position";
 
-class EvalError extends Error {
+export class EvalError extends Error {
   public range: Range;
+  public received?: string;
 
-  constructor(range: Range) {
+  constructor(range: Range, received?: string) {
     super();
     this.range = range;
+    this.received = received;
   }
 }
 
-class TopLevelReturnError extends EvalError {};
-class BadPredicateError extends EvalError {};
-class BadAssignmentLeftError extends EvalError {};
-class BadPrefixExpressionError extends EvalError {};
-class BadInfixExpressionError extends EvalError {};
-class BadIdentifierError extends EvalError {};
+export class TopLevelReturnError extends EvalError {};
+export class BadPredicateError extends EvalError {};
+export class BadAssignmentLeftError extends EvalError {};
+export class BadPrefixExpressionError extends EvalError {};
+export class BadInfixExpressionError extends EvalError {};
+export class BadIdentifierError extends EvalError {};
 
 type ComparisonOperator = "==" | "!=" | ">" | "<" | ">=" | "<=";
 
@@ -63,7 +65,7 @@ export default class Evaluator {
   private evaluateBranchStatement(node: Node.BranchNode, env: Environment): Value.Value | Value.ReturnValue {
     const pred = this.evaluateExpression(node.predicate, env);
     if (pred.type !== "boolean") {
-      throw new BadPredicateError(node.range);
+      throw new BadPredicateError(pred.range, pred.representation);
     }
 
     if (pred.value) {
@@ -175,7 +177,7 @@ export default class Evaluator {
     const value = env.get(varName);
 
     if (value === null) {
-      throw new BadIdentifierError(node.range);
+      throw new BadIdentifierError(node.range, varName);
     }
 
     return value;

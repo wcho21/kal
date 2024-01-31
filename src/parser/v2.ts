@@ -96,7 +96,7 @@ export default class Parser {
   }
 
   private parseBranchStatement(): Node.BranchNode {
-    const { range } = this.reader.read();
+    const firstToken = this.reader.read();
     this.reader.advance();
 
     const predicate = this.parseExpression(bindingPowers.lowest);
@@ -104,19 +104,22 @@ export default class Parser {
 
     const maybeElseToken = this.reader.read();
     if (maybeElseToken.type !== "keyword" || maybeElseToken.value !== "아니면") {
+      const range = { begin: firstToken.range.begin, end: consequence.range.end };
       return node.createBranchNode({ predicate, consequence }, range);
     }
     this.reader.advance();
 
     const alternative = this.parseBlock();
+    const range = { begin: firstToken.range.begin, end: alternative.range.end };
     return node.createBranchNode({ predicate, consequence, alternative }, range);
   }
 
   private parseReturnStatement(): Node.ReturnNode {
-    const { range } = this.reader.read();
+    const firstToken = this.reader.read();
     this.reader.advance();
 
     const expression = this.parseExpression(bindingPowers.lowest);
+    const range = { begin: firstToken.range.begin, end: expression.range.end };
     return node.createReturnNode({ expression }, range);
   }
 
