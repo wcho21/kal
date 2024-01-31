@@ -21,21 +21,6 @@ export default class CharBuffer {
 
     return char;
   }
-
-  /** @deprecated */
-  pop(): string {
-    const char = this.reader.read();
-    this.reader.next();
-
-    return char;
-  }
-
-  /** @deprecated */
-  peek(): string {
-    const char = this.reader.read();
-
-    return char;
-  }
 }
 
 export type { SourceChar } from "./char-reader";

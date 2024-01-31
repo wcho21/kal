@@ -1,6 +1,6 @@
 import Lexer from "./lexer";
-import Parser from "./parser/v2";
-import Evaluator, { Environment } from "./evaluator/v2";
+import Parser from "./parser";
+import Evaluator, { Environment } from "./evaluator";
 
 export const execute = (input: string): string => {
   const lexer = new Lexer(input);

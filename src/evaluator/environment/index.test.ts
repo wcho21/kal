@@ -1,11 +1,11 @@
-import type { Evaluated } from "../evaluated";
+import type { Value } from "../value";
 import Environment from "./";
 
 describe("set()", () => {
   it("set name and value", () => {
     const env = new Environment();
     const varName = "foo";
-    const varValue = {} as Evaluated;
+    const varValue = {} as Value;
 
     expect(() => env.set(varName, varValue)).not.toThrow();
   });
@@ -15,7 +15,7 @@ describe("get()", () => {
   it("get value after setting the value", () => {
     const env = new Environment();
     const varName = "foo";
-    const varValue = {} as Evaluated;
+    const varValue = {} as Value;
 
     env.set(varName, varValue);
 
@@ -33,7 +33,7 @@ describe("get()", () => {
 describe("linked environment", () => {
   it("set super environment and get via sub environment", () => {
     const varNameInSuper = "foo";
-    const varValueInSuper = {} as Evaluated;
+    const varValueInSuper = {} as Value;
 
     const superEnv = new Environment();
     superEnv.set(varNameInSuper, varValueInSuper);

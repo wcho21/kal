@@ -1,40 +1,38 @@
 import Lexer from "../lexer";
 import Parser from "../parser";
-import type { EvaluatedPrimitive, EvaluatedFunction, EvaluatedEmpty } from "./evaluated";
-import Evaluator from "./";
+import Evaluator, * as Eval from "./";
 import Environment from "./environment";
 
 const evaluateInput = (input: string) => {
   const lexer = new Lexer(input);
   const parser = new Parser(lexer);
-  const program = parser.parseProgram();
+  const parsed = parser.parseSource();
 
   const evaluator = new Evaluator();
-  const environment = new Environment();
-  const evaluated = evaluator.evaluate(program, environment);
-
+  const env = new Environment();
+  const evaluated = evaluator.evaluate(parsed, env);
   return evaluated;
 };
 
 const testEvaluatingPrimitive = ({ input, expected }: { input: string, expected: any }): void => {
-  const evaluated = evaluateInput(input) as EvaluatedPrimitive;
+  const evaluated = evaluateInput(input) as any;
 
   expect(evaluated.value).toBe(expected);
 };
 
+const testEvaluatingEmpty = ({ input }: { input: string }): void => {
+  const evaluated = evaluateInput(input) as any;
+
+  expect(evaluated.value).toBe(null);
+};
+
 const testEvaluatingFunction = ({ input, expectedParamsLength }: { input: string, expectedParamsLength: number }): void => {
-  const evaluated = evaluateInput(input) as EvaluatedFunction;
+  const evaluated = evaluateInput(input) as any;
 
   expect(evaluated).toHaveProperty("parameters");
   expect(evaluated.parameters.length).toBe(expectedParamsLength);
   expect(evaluated).toHaveProperty("body");
   expect(evaluated).toHaveProperty("environment");
-};
-
-const testEvaluatingEmpty = ({ input }: { input: string }): void => {
-  const evaluated = evaluateInput(input) as EvaluatedEmpty;
-
-  expect(evaluated.type).toBe("empty");
 };
 
 describe("evaluate()", () => {
@@ -357,5 +355,44 @@ describe("evaluate()", () => {
     ];
 
     it.each(cases)("evaluate $name", testEvaluatingPrimitive);
+  });
+
+  describe("errors", () => {
+    const cases = [
+      {
+        name: "top level return error",
+        input: "결과 11",
+        expected: Eval.TopLevelReturnError,
+        range: { begin: { row: 0, col: 0 }, end: { row: 0, col: 4 } },
+      },
+      {
+        name: "bad predicate error",
+        input: "만약 11 {\n  22\n}",
+        expected: Eval.BadPredicateError,
+        range: { begin: { row: 0, col: 3 }, end: { row: 0, col: 4 } },
+        received: "11",
+      },
+      {
+        name: "bad identifier error",
+        input: "사과",
+        expected: Eval.BadIdentifierError,
+        range: { begin: { row: 0, col: 0 }, end: { row: 0, col: 1 } },
+        received: "사과",
+      },
+    ];
+
+    it.each(cases)("$name", ({ input, expected, range, received }) => {
+      expect(() => evaluateInput(input)).toThrow(expected);
+      try {
+        evaluateInput(input);
+      } catch (err) {
+        const e = err as typeof expected;
+
+        expect(e).toMatchObject({ range });
+        if (received !== undefined) {
+          expect(e).toMatchObject({ received });
+        }
+      }
+    });
   });
 });
