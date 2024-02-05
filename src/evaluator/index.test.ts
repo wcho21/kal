@@ -3,12 +3,15 @@ import Parser from "../parser";
 import Evaluator, * as Eval from "./";
 import Environment from "./environment";
 
-const evaluateInput = (input: string) => {
+const evaluateInput = (input: string, onStdout?: (toWrite: string) => void) => {
   const lexer = new Lexer(input);
   const parser = new Parser(lexer);
   const parsed = parser.parseSource();
 
   const evaluator = new Evaluator();
+  if (onStdout !== undefined) {
+    evaluator.onStdout(onStdout);
+  }
   const env = new Environment();
   const evaluated = evaluator.evaluate(parsed, env);
   return evaluated;
@@ -33,6 +36,14 @@ const testEvaluatingFunction = ({ input, expectedParamsLength }: { input: string
   expect(evaluated.parameters.length).toBe(expectedParamsLength);
   expect(evaluated).toHaveProperty("body");
   expect(evaluated).toHaveProperty("environment");
+};
+
+const testEvaluatingStdout = ({ input, expected }: { input: string, expected: any }): void => {
+  const stdouts: string[] = [];
+
+  evaluateInput(input, toWrite => stdouts.push(toWrite));
+
+  expect(stdouts).toEqual(expected);
 };
 
 describe("evaluate()", () => {
@@ -355,6 +366,47 @@ describe("evaluate()", () => {
     ];
 
     it.each(cases)("evaluate $name", testEvaluatingPrimitive);
+  });
+
+  describe("builtin function calls", () => {
+    describe("길이()", () => {
+      const cases = [
+        {
+          name: "empty string",
+          input: "길이('')",
+          expected: 0,
+        },
+        {
+          name: "nonempty string",
+          input: "길이('사과')",
+          expected: 2,
+        },
+      ];
+
+      it.each(cases)("evaluate $name", testEvaluatingPrimitive);
+    });
+
+    describe("쓰기()", () => {
+      const cases = [
+        {
+          name: "single string",
+          input: "쓰기('사과')",
+          expected: ["사과"],
+        },
+        {
+          name: "multiple string",
+          input: "쓰기('사과', '포도', '바나나')",
+          expected: ["사과 포도 바나나"],
+        },
+        {
+          name: "multiple calls",
+          input: "쓰기('사과') 쓰기('포도')",
+          expected: ["사과", "포도"],
+        },
+      ];
+
+      it.each(cases)("evaluate $name", testEvaluatingStdout);
+    });
   });
 
   describe("errors", () => {

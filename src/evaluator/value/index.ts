@@ -10,11 +10,12 @@ export interface ValueBase<T extends string = string> {
 
 export type Value = PrimitiveValue
   | EmptyValue
+  | BuiltinFunctionValue;
 
 export type PrimitiveValue = NumberValue
   | StringValue
   | BooleanValue
-  | FunctionValue
+  | FunctionValue;
 
 export interface NumberValue extends ValueBase<"number"> {
   readonly value: number,
@@ -32,6 +33,9 @@ export interface FunctionValue extends ValueBase<"function"> {
 }
 export interface EmptyValue extends ValueBase<"empty"> {
   readonly value: null,
+}
+export interface BuiltinFunctionValue extends ValueBase<"builtin function"> {
+  readonly body: (args: any, onStdout?: (toWrite: string) => void) => Value,
 }
 
 export interface ReturnValue {
@@ -54,7 +58,7 @@ export const createBooleanValue: CreateValue<"boolean", BooleanValue> = createVa
 export const createStringValue: CreateValue<"string", StringValue> = createValueCreator<"string", StringValue>("string");
 export const createEmptyValue: CreateValue<"empty", EmptyValue> = createValueCreator<"empty", EmptyValue>("empty");
 export const createFunctionValue: CreateValue<"function", FunctionValue> = createValueCreator<"function", FunctionValue>("function");
-
+export const createBuiltinFunctionValue: CreateValue<"builtin function", BuiltinFunctionValue> = createValueCreator<"builtin function", BuiltinFunctionValue>("builtin function");
 export const createReturnValue = (value: Value): ReturnValue => ({
   type: "return",
   value,
