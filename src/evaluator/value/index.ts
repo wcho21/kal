@@ -35,7 +35,7 @@ export interface EmptyValue extends ValueBase<"empty"> {
   readonly value: null,
 }
 export interface BuiltinFunctionValue extends ValueBase<"builtin function"> {
-  readonly body: (args: any) => Value,
+  readonly body: (args: any, onStdout?: (toWrite: string) => void) => Value,
 }
 
 export interface ReturnValue {
