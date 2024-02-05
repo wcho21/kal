@@ -15,8 +15,9 @@ _KALANG: Korean Programming Language_.
 한국어 프로그래밍 언어.
 
 - < 0.03 MB.
-- 자바스크립트로 작성되어 브라우저에서 바로 동작합니다.
-- 한국어 키워드로 구성된 간단한 문법을 갖습니다.
+- 250 개 이상의 테스트 케이스.
+- 브라우저에서 바로 동작하는 자바스크립트 구현체.
+- 한국어 키워드로 구성된 간단한 문법.
 
 _KALANG_ 을 [플레이그라운드][playground]에서 체험해보세요.
 
@@ -36,10 +37,15 @@ _KALANG_ 인터프리터를 브라우저에 로드하거나 직접 빌드하는 
 
 이후, _KALANG_ 코드는 다음과 같이 `kal.execute(code-to-execute)`로 실행합니다.
 
-```HTML
-<script>
-  kal.execute("5+5"); // === 10
-</script>
+```javascript
+kal.execute("5+5"); // === 10
+```
+
+표준 출력을 위해 이벤트 핸들러를 등록할 수 있습니다.
+```javascript
+const stdouts = [];
+
+kal.execute("쓰기('사과')", stdout => stdouts.push(stdout)); // stdout === ["사과"]
 ```
 
 
@@ -93,6 +99,27 @@ _KALANG_ 인터프리터를 브라우저에 로드하거나 직접 빌드하는 
 
 
 
+### 내장 함수
+
+`쓰기()`:
+```
+쓰기('사과')
+쓰기('포도', '바나나')
+```
+결과는 다음과 같습니다.
+```
+사과
+포도 바나나
+```
+
+`길이()`:
+```
+길이('사과')
+```
+결과는 `2`입니다.
+
+
+
 ### 타입들
 
 _숫자 타입_: 아무 부동소수점 숫자
@@ -120,15 +147,9 @@ _불리언 타입_: `참`, `거짓`
 
 빌드 과정은 [Node.js][node]를 기반으로 합니다.
 
-_KALANG_ 인터프리터를 다음 커맨드로 [`pnpm`]을 이용해 빌드합니다.
+[`pnpm`][pnpm]을 이용해, _KALANG_ 인터프리터를 `pnpm install && pnpm build`로 빌드할 수 있습니다.
 
-```
-pnpm install && pnpm build && pnpm bundle`
-```
+빌드 결과는 `/dist/index.min.js` 디렉토리에 위치합니다.
 
-
-
-결과는 `/bundle/index.js` 디렉토리에 위치합니다.
-
-[pnpm]: https://pnpm.io/
 [node]: https://nodejs.org/
+[pnpm]: https://pnpm.io/
