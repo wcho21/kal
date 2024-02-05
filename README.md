@@ -13,7 +13,8 @@
 _KALANG: Korean Programming Language_.
 
 - < 0.03 MB.
-- Written in JavaScript. Natively runs on web browsers.
+- Tested with >250 cases
+- Written in JavaScript, natively runs on web browsers.
 - Minimal syntax with Korean keywords.
 
 Try _KALANG_ at [Playground][playground].
@@ -34,10 +35,15 @@ Load the interpreter script in HTML as follows:
 
 After that, you can execute _KALANG_ code with `kal.execute(code-to-execute)` as follows:
 
-```HTML
-<script>
-  kal.execute("5+5"); // === 10
-</script>
+```javascript
+kal.execute("5+5"); // === 10
+```
+
+You can attach an event handler for standard output writing as follows:
+```javascript
+const stdouts = [];
+
+kal.execute("쓰기('사과')", stdout => stdouts.push(stdout)); // stdout === ["사과"]
 ```
 
 
@@ -91,6 +97,27 @@ which yields `43`.
 
 
 
+### Builtin functions
+
+`쓰기()`:
+```
+쓰기('사과')
+쓰기('포도', '바나나')
+```
+which yields
+```
+사과
+포도 바나나
+```
+
+`길이()`:
+```
+길이('사과')
+```
+which yields `2`.
+
+
+
 ### Types
 
 _Number type_: any floating-point numbers
@@ -116,9 +143,9 @@ _Boolean type_: `참`, `거짓`
 
 Note that building process is based on [Node.js][node].
 
-With [`pnpm`][pnpm], you can build a _KALANG_ interpreter by running `pnpm install && pnpm build && pnpm bundle`.
+With [`pnpm`][pnpm], you can build a _KALANG_ interpreter by running `pnpm install && pnpm build`.
 
-The output will be in the directory `/bundle/index.js`.
+The output will be in the directory `/dist/index.min.js`.
 
-[pnpm]: https://pnpm.io/
 [node]: https://nodejs.org/
+[pnpm]: https://pnpm.io/
