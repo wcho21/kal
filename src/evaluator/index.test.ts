@@ -357,6 +357,23 @@ describe("evaluate()", () => {
     it.each(cases)("evaluate $name", testEvaluatingPrimitive);
   });
 
+  describe("builtin function calls", () => {
+    const cases = [
+      {
+        name: "length function for empty string",
+        input: "길이('')",
+        expected: 0,
+      },
+      {
+        name: "length function for nonempty string",
+        input: "길이('사과')",
+        expected: 2,
+      },
+    ];
+
+    it.each(cases)("evaluate $name", testEvaluatingPrimitive);
+  });
+
   describe("errors", () => {
     const cases = [
       {
