@@ -1,6 +1,7 @@
 import type * as Node from "../parser";
 import type * as Value from "./value";
 import * as value from "./value";
+import builtin, { type BuiltinFunction } from "./builtin";
 import Environment from "./environment";
 import type { Range } from "../util/position";
 
@@ -173,14 +174,19 @@ export default class Evaluator {
   }
 
   private evaluateIdentifier(node: Node.IdentifierNode, env: Environment): Value.Value {
-    const varName = node.value;
-    const value = env.get(varName);
+    const name = node.value;
+    const envValue = env.get(name);
 
-    if (value === null) {
-      throw new BadIdentifierError(node.range, varName);
+    if (envValue !== null) {
+      return envValue;
     }
 
-    return value;
+    const builtinValue = builtin.get(name);
+    if (builtinValue !== null) {
+      return this.createBuiltinFunctionValue(builtinValue, node.range);
+    }
+
+    throw new BadIdentifierError(node.range, name);
   }
 
   private evaluateAssignment(node: Node.AssignmentNode, env: Environment): Value.Value {
@@ -202,14 +208,20 @@ export default class Evaluator {
 
   private evaluateCall(node: Node.CallNode, env: Environment): Value.Value {
     const func = this.evaluateExpression(node.func, env);
-    if (func.type !== "function") {
-      throw new Error(`expected function but received ${func.type}`);
+
+    if (func.type === "function") {
+      const callArguments = this.evaluateCallArguments(node.args, env);
+
+      const value = this.evaluateFunctionCall(func, callArguments);
+      return value;
+    }
+    if (func.type === "builtin function") {
+      const callArguments = this.evaluateCallArguments(node.args, env);
+
+      return this.evaluateBuiltinFunctionCall(func, callArguments);
     }
 
-    const callArguments = this.evaluateCallArguments(node.args, env);
-
-    const value = this.evaluateFunctionCall(func, callArguments);
-    return value;
+    throw new Error(`expected function but received ${func.type}`);
   }
 
   private evaluateCallArguments(args: Node.ExpressionNode[], env: Environment): Value.Value[] {
@@ -227,6 +239,10 @@ export default class Evaluator {
 
     const returnValue = blockValue.value;
     return returnValue;
+  }
+
+  private evaluateBuiltinFunctionCall(func: Value.BuiltinFunctionValue, callArguments: Value.Value[]): Value.Value {
+    return func.body(callArguments);
   }
 
   private getBooleanComparisonInfixOperationValue(left: boolean, right: boolean, operator: ComparisonOperator): boolean {
@@ -336,6 +352,10 @@ export default class Evaluator {
 
   private createFunctionValue(parameters: Node.FunctionNode["parameters"], body: Node.FunctionNode["body"], environment: Environment, range: Range): Value.FunctionValue {
     return value.createFunctionValue({ parameters, body, environment }, "(함수)", range);
+  }
+
+  private createBuiltinFunctionValue(func: BuiltinFunction, range: Range): Value.BuiltinFunctionValue {
+    return value.createBuiltinFunctionValue({ body: func }, "(내장 함수)", range);
   }
 
   // util predicate functions
