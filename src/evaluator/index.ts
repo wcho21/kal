@@ -26,8 +26,14 @@ export class BadIdentifierError extends EvalError {};
 type ComparisonOperator = "==" | "!=" | ">" | "<" | ">=" | "<=";
 
 export default class Evaluator {
+  private callbackOnStdout?: (toWrite: string) => void;
+
   evaluate(node: Node.ProgramNode, env: Environment): Value.Value {
     return this.evaluateProgram(node, env);
+  }
+
+  onStdout(callback: (toWrite: string) => void): void {
+    this.callbackOnStdout = callback;
   }
 
   private evaluateProgram(node: Node.ProgramNode, env: Environment): Value.Value {
@@ -242,7 +248,8 @@ export default class Evaluator {
   }
 
   private evaluateBuiltinFunctionCall(func: Value.BuiltinFunctionValue, callArguments: Value.Value[]): Value.Value {
-    return func.body(callArguments);
+    const callbackOnStdout = this.callbackOnStdout === undefined ? undefined : this.callbackOnStdout.bind(this);
+    return func.body(callArguments, callbackOnStdout);
   }
 
   private getBooleanComparisonInfixOperationValue(left: boolean, right: boolean, operator: ComparisonOperator): boolean {
