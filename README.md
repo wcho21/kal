@@ -13,8 +13,8 @@
 _KALANG: Korean Programming Language_.
 
 - < 0.03 MB.
-- Tested with >250 cases
-- Written in JavaScript, natively runs on web browsers.
+- Tested with >250 cases.
+- JavaScript-implemented, which runs natively on web browsers.
 - Minimal syntax with Korean keywords.
 
 Try _KALANG_ at [Playground][playground].
