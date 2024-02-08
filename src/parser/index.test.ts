@@ -596,6 +596,40 @@ describe("parseSource()", () => {
             ],
           },
         },
+        {
+          name: "call curried function",
+          input: "사과(1)(2)",
+          expected: {
+            type: "program",
+            statements: [
+              {
+                type: "expression statement",
+                expression: {
+                  type: "call",
+                  func: {
+                    type: "call",
+                    func: {
+                      type: "identifier",
+                      value: "사과",
+                    },
+                    args: [
+                      {
+                        type: "number",
+                        value: 1,
+                      },
+                    ],
+                  },
+                  args: [
+                    {
+                      type: "number",
+                      value: 2,
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        },
       ];
 
       it.each(cases)("$name", testSuccess);
