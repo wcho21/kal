@@ -64,3 +64,15 @@ it("execute builtin function 쓰기()", () => {
 
   expect(stdouts).toEqual(["사과", "포도 바나나"]);
 });
+
+it("execute function", () => {
+  expect(execute("사과 = 함수(포도) { 결과 포도+1 } 사과(42)")).toBe("43");
+});
+
+it("execute closure", () => {
+  expect(execute("사과 = 함수(포도) { 결과 함수(바나나) { 결과 포도 + 바나나 } } 수박 = 사과(42) 수박(99)")).toBe("141");
+});
+
+it("execute curried function", () => {
+  expect(execute("사과 = 함수(포도) { 결과 함수(바나나) { 결과 포도 + 바나나 } } 사과(42)(99)")).toBe("141");
+});

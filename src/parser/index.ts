@@ -184,7 +184,7 @@ export default class Parser {
     const { type, value } = this.reader.read();
 
     if (type === "group delimiter" && value === "(") {
-      if (left.type !== "function" && left.type !== "identifier") {
+      if (left.type !== "function" && left.type !== "identifier" && left.type !== "call") {
         return null;
       }
 
@@ -202,7 +202,7 @@ export default class Parser {
     return null;
   }
 
-  private parseCall(left: Node.FunctionNode | Node.IdentifierNode): Node.CallNode {
+  private parseCall(left: Node.FunctionNode | Node.IdentifierNode | Node.CallNode): Node.CallNode {
     this.advanceOrThrow("group delimiter", "(", BadGroupDelimiterError);
 
     const secondToken = this.reader.read();

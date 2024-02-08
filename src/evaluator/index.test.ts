@@ -363,6 +363,11 @@ describe("evaluate()", () => {
         input: "더하기 = 함수(숫자1) { 결과 함수(숫자2) { 결과 숫자1+숫자2 } }  하나더하기 = 더하기(1)  하나더하기(4)",
         expected: 5,
       },
+      {
+        name: "curried function call",
+        input: "더하기 = 함수(숫자1) { 결과 함수(숫자2) { 결과 숫자1+숫자2 } }  더하기(4)(7)",
+        expected: 11,
+      },
     ];
 
     it.each(cases)("evaluate $name", testEvaluatingPrimitive);
