@@ -547,6 +547,75 @@ describe("getSourceToken()", () => {
           },
         ]
       },
+      {
+        input: "사과(1)(2)",
+        expectedTokens: [
+          {
+            type: "identifier",
+            value: "사과",
+            range: {
+              begin: { row: 0, col: 0 },
+              end: { row: 0, col: 1 },
+            },
+          },
+          {
+            type: "group delimiter",
+            value: "(",
+            range: {
+              begin: { row: 0, col: 2 },
+              end: { row: 0, col: 2 },
+            },
+          },
+          {
+            type: "number literal",
+            value: "1",
+            range: {
+              begin: { row: 0, col: 3 },
+              end: { row: 0, col: 3 },
+            },
+          },
+          {
+            type: "group delimiter",
+            value: ")",
+            range: {
+              begin: { row: 0, col: 4 },
+              end: { row: 0, col: 4 },
+            },
+          },
+          {
+            type: "group delimiter",
+            value: "(",
+            range: {
+              begin: { row: 0, col: 5 },
+              end: { row: 0, col: 5 },
+            },
+          },
+          {
+            type: "number literal",
+            value: "2",
+            range: {
+              begin: { row: 0, col: 6 },
+              end: { row: 0, col: 6 },
+            },
+          },
+          {
+            type: "group delimiter",
+            value: ")",
+            range: {
+              begin: { row: 0, col: 7 },
+              end: { row: 0, col: 7 },
+            },
+          },
+          {
+            type: "end",
+            value: "$end",
+            range: {
+              begin: { row: 0, col: 8 },
+              end: { row: 0, col: 8 },
+            },
+          },
+        ]
+      },
     ];
 
     it.each(cases)("get tokens from input '$input'", ({ input, expectedTokens }) => {

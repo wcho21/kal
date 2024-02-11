@@ -41,7 +41,7 @@ export interface FunctionNode extends SyntaxNodeBase<"function"> {
   body: BlockNode,
 };
 export interface CallNode extends SyntaxNodeBase<"call"> {
-  func: IdentifierNode | FunctionNode,
+  func: IdentifierNode | FunctionNode | CallNode,
   args: ExpressionNode[],
 };
 export interface AssignmentNode extends SyntaxNodeBase<"assignment"> {
