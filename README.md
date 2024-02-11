@@ -81,7 +81,7 @@ Defining and calling function:
 ```
 which yields `52`.
 
-Closure:
+Closure and currying:
 ```
 더하기 = 함수(숫자1) {
     결과 함수(숫자2) {
@@ -92,8 +92,10 @@ Closure:
 하나더하기 = 더하기(1)
 
 하나더하기(42)
+
+더하기(1)(42)
 ```
-which yields `43`.
+which yields `43` twice.
 
 
 
