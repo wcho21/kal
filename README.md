@@ -13,8 +13,8 @@
 _KALANG: Korean Programming Language_.
 
 - < 0.03 MB.
-- Tested with >250 cases
-- Written in JavaScript, natively runs on web browsers.
+- Tested with >250 cases.
+- JavaScript-implemented, which runs natively on web browsers.
 - Minimal syntax with Korean keywords.
 
 Try _KALANG_ at [Playground][playground].
@@ -81,7 +81,7 @@ Defining and calling function:
 ```
 which yields `52`.
 
-Closure:
+Closure and currying:
 ```
 더하기 = 함수(숫자1) {
     결과 함수(숫자2) {
@@ -92,8 +92,10 @@ Closure:
 하나더하기 = 더하기(1)
 
 하나더하기(42)
+
+더하기(1)(42)
 ```
-which yields `43`.
+which yields `43` twice.
 
 
 
