@@ -29,7 +29,7 @@ export class BadFunctionKeywordError extends ParserError {};
 export class BadIdentifierError extends ParserError {};
 export class BadSeparatorError extends ParserError {};
 
-import Lexer from "../lexer";
+import type Lexer from "../lexer";
 import SourceTokenReader from "./source-token-reader";
 
 type PrefixOperator = "+" | "-" | "!";

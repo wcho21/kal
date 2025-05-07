@@ -1,4 +1,4 @@
-import Lexer from "../../lexer";
+import type Lexer from "../../lexer";
 import type { SourceToken } from "../../lexer";
 
 export default class SourceTokenReader {

@@ -1,6 +1,6 @@
 import { copyRange, type Range } from "../../util/position";
 import type { FunctionNode } from "../../parser";
-import Environment from "../environment";
+import type Environment from "../environment";
 
 export interface ValueBase<T extends string = string> {
   readonly type: T,
@@ -35,7 +35,7 @@ export interface EmptyValue extends ValueBase<"empty"> {
   readonly value: null,
 }
 export interface BuiltinFunctionValue extends ValueBase<"builtin function"> {
-  readonly body: (args: any, onStdout?: (toWrite: string) => void) => Value,
+  readonly body: (args: Value[], onStdout?: (toWrite: string) => void) => Value,
 }
 
 export interface ReturnValue {

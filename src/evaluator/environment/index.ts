@@ -7,11 +7,11 @@ export interface EnvironmentType {
 
 export default class Environment implements EnvironmentType {
   private readonly superEnvironment: Environment | null;
-  private readonly table: Map<string, any>;
+  private readonly table: Map<string, Value>;
 
   constructor(superEnvironment: Environment | null = null) {
     this.superEnvironment = superEnvironment;
-    this.table = new Map<string, any>;
+    this.table = new Map<string, Value>;
   }
 
   get(name: string): Value | null {

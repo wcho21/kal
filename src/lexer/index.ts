@@ -17,7 +17,10 @@ import {
 import type {
   SourceToken,
   OperatorToken,
+  IdentifierToken,
+  KeywordToken,
   NumberLiteralToken,
+  BooleanLiteralToken,
   StringLiteralToken,
   IllegalStringLiteralToken,
 } from "./source-token";
@@ -251,7 +254,7 @@ export default class Lexer {
     return token;
   }
 
-  private lexLetters(): any {
+  private lexLetters(): BooleanLiteralToken | IdentifierToken | KeywordToken {
     const letterChars = this.readLetterChars();
 
     const value = letterChars.map(char => char.value).join("");

@@ -1,15 +1,12 @@
 import Lexer from "../lexer";
 import Parser from "./";
 import {
-  ParserError,
+  type ParserError,
   BadExpressionError,
 } from "./";
-import type {
-  ProgramNode,
-} from "./syntax-node";
 
-type SuccessTestCase<E extends {} = any> = { name: string, input: string, expected: E };
-type FailureTestCase<E extends typeof ParserError = typeof ParserError> = { name: string, input: string, expected: E };
+type SuccessTestCase = { name: string, input: string, expected: object };
+type FailureTestCase = { name: string, input: string, expected: typeof ParserError };
 
 describe("parseSource()", () => {
   const createParser = (input: string) => {
@@ -19,7 +16,7 @@ describe("parseSource()", () => {
     return parser;
   };
 
-  const testSuccess = ({ input, expected }: { input: string, expected: ProgramNode }) => {
+  const testSuccess = ({ input, expected }: { input: string, expected: object }) => {
     const parser = createParser(input);
 
     const node = parser.parseSource();
@@ -35,7 +32,7 @@ describe("parseSource()", () => {
 
   describe("creating nodes", () => {
     describe("literal expressions", () => {
-      const cases: SuccessTestCase[] = [
+      const cases = [
         {
           name: "a number literal",
           input: "42",

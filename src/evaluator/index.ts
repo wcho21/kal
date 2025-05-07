@@ -5,7 +5,7 @@ import builtin, { type BuiltinFunction } from "./builtin";
 import Environment from "./environment";
 import type { Range } from "../util/position";
 
-export class EvalError extends Error {
+export class EvaluatorError extends Error {
   public range: Range;
   public received?: string;
 
@@ -16,12 +16,12 @@ export class EvalError extends Error {
   }
 }
 
-export class TopLevelReturnError extends EvalError {};
-export class BadPredicateError extends EvalError {};
-export class BadAssignmentLeftError extends EvalError {};
-export class BadPrefixExpressionError extends EvalError {};
-export class BadInfixExpressionError extends EvalError {};
-export class BadIdentifierError extends EvalError {};
+export class TopLevelReturnError extends EvaluatorError {};
+export class BadPredicateError extends EvaluatorError {};
+export class BadAssignmentLeftError extends EvaluatorError {};
+export class BadPrefixExpressionError extends EvaluatorError {};
+export class BadInfixExpressionError extends EvaluatorError {};
+export class BadIdentifierError extends EvaluatorError {};
 
 type ComparisonOperator = "==" | "!=" | ">" | "<" | ">=" | "<=";
 
@@ -142,7 +142,7 @@ export default class Evaluator {
   private evaluatePrefixExpression(node: Node.PrefixNode, env: Environment): Value.Value {
     const right = this.evaluateExpression(node.right, env);
 
-    if ((node.prefix === "+" || node.prefix === "-") && right.type == "number") {
+    if ((node.prefix === "+" || node.prefix === "-") && right.type === "number") {
       return this.evaluatePrefixNumberExpression(node.prefix, right);
     }
     if (node.prefix === "!" && right.type === "boolean") {

@@ -2,8 +2,9 @@ import Lexer from "../lexer";
 import Parser from "../parser";
 import Evaluator, * as Eval from "./";
 import Environment from "./environment";
+import type { FunctionValue, EmptyValue, StringValue, BooleanValue, Value } from "./value";
 
-const evaluateInput = (input: string, onStdout?: (toWrite: string) => void) => {
+const evaluateInput = (input: string, onStdout?: (toWrite: string) => void): Value => {
   const lexer = new Lexer(input);
   const parser = new Parser(lexer);
   const parsed = parser.parseSource();
@@ -17,20 +18,20 @@ const evaluateInput = (input: string, onStdout?: (toWrite: string) => void) => {
   return evaluated;
 };
 
-const testEvaluatingPrimitive = ({ input, expected }: { input: string, expected: any }): void => {
-  const evaluated = evaluateInput(input) as any;
+const testEvaluatingPrimitive = ({ input, expected }: { input: string, expected: number | boolean | string }) => {
+  const evaluated = evaluateInput(input) as StringValue | BooleanValue;
 
   expect(evaluated.value).toBe(expected);
 };
 
 const testEvaluatingEmpty = ({ input }: { input: string }): void => {
-  const evaluated = evaluateInput(input) as any;
+  const evaluated = evaluateInput(input) as EmptyValue;
 
   expect(evaluated.value).toBe(null);
 };
 
 const testEvaluatingFunction = ({ input, expectedParamsLength }: { input: string, expectedParamsLength: number }): void => {
-  const evaluated = evaluateInput(input) as any;
+  const evaluated = evaluateInput(input) as FunctionValue;
 
   expect(evaluated).toHaveProperty("parameters");
   expect(evaluated.parameters.length).toBe(expectedParamsLength);
@@ -38,7 +39,7 @@ const testEvaluatingFunction = ({ input, expectedParamsLength }: { input: string
   expect(evaluated).toHaveProperty("environment");
 };
 
-const testEvaluatingStdout = ({ input, expected }: { input: string, expected: any }): void => {
+const testEvaluatingStdout = ({ input, expected }: { input: string, expected: object }): void => {
   const stdouts: string[] = [];
 
   evaluateInput(input, toWrite => stdouts.push(toWrite));

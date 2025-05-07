@@ -1,9 +1,9 @@
 import type * as Value from "../value";
 import * as value from "../value";
 
-export type BuiltinFunction = (args: any[], onStdout?: (toWrite: string) => void) => Value.Value;
+export type BuiltinFunction = (args: Value.Value[], onStdout?: (toWrite: string) => void) => Value.Value;
 
-const len: BuiltinFunction = (args) => {
+const len: BuiltinFunction = (args: Value.Value[]) => {
   const arg = args[0];
   if (arg.type === "string") {
     const length = arg.value.length;
