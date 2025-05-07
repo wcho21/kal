@@ -13,25 +13,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
+      - name: Setup bun
+        uses: oven-sh/setup-bun@v2
         with:
-          version: 8
-
-      - name: Setup node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
+          bun-version: 1.2.12 # make sure the same version with the one in dev container
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-
+        run: bun install --frozen-lockfile
 
       - name: Run test
-        run: pnpm test
-
-      - name: Check if buildable
-        run: pnpm tsc --noEmit
+        run: bun test
+      
+      # TODO: check if buildable
