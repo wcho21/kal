@@ -6,7 +6,5 @@ RUN apt-get update && apt-get --yes install git vim gnupg2 curl unzip && apt-get
 
 SHELL ["/bin/bash", "-c"]
 
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash;
-ENV NVM_DIR=/root/.nvm
-ARG NODE_VERSION=22.15.0
-RUN bash -c "source $NVM_DIR/nvm.sh && nvm install $NODE_VERSION"
+ARG BUN_VERSION=1.2.12
+RUN curl -fsSL https://bun.sh/install | bash -s "bun-v${BUN_VERSION}"
