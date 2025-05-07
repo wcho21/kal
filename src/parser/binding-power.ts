@@ -1,6 +1,6 @@
 export type BindingPower = number;
 
-export type BindingPowerEntry = { left: BindingPower, right: BindingPower };
+export type BindingPowerEntry = { left: BindingPower; right: BindingPower };
 export type BindingPowers = { [key: string]: BindingPowerEntry };
 
 export const bindingPowers: BindingPowers = {

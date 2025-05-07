@@ -1,6 +1,6 @@
+import Evaluator, { Environment } from "./evaluator";
 import Lexer from "./lexer";
 import Parser from "./parser";
-import Evaluator, { Environment } from "./evaluator";
 
 export const execute = (input: string, callbackOnStdout?: (toWrite: string) => void): string => {
   const lexer = new Lexer(input);

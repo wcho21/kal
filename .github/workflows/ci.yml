@@ -6,7 +6,7 @@ on:
     branches: [master, dev]
 
 jobs:
-  test:
+  ci:
     runs-on: ubuntu-24.04
 
     steps:
@@ -23,5 +23,11 @@ jobs:
 
       - name: Run test
         run: bun test
+
+      - name: Check format
+        run: bun run format:check
+      
+      - name: Check type
+        run: bun run typecheck
       
       # TODO: check if buildable

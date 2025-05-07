@@ -1,27 +1,30 @@
 import CharBuffer, { type SourceChar } from "./char-buffer";
 
+import type { Position } from "../util/position";
 import {
-  createOperatorToken,
-  createGroupDelimiterToken,
   createBlockDelimiterToken,
-  createSeparatorToken,
-  createIllegalToken,
-  createIllegalStringLiteralToken,
-  createNumberLiteralToken,
   createBooleanLiteralToken,
-  createStringLiteralToken,
-  createKeywordToken,
-  createIdentifierToken,
   createEndToken,
+  createGroupDelimiterToken,
+  createIdentifierToken,
+  createIllegalStringLiteralToken,
+  createIllegalToken,
+  createKeywordToken,
+  createNumberLiteralToken,
+  createOperatorToken,
+  createSeparatorToken,
+  createStringLiteralToken,
 } from "./source-token";
 import type {
-  SourceToken,
-  OperatorToken,
-  NumberLiteralToken,
-  StringLiteralToken,
+  BooleanLiteralToken,
+  IdentifierToken,
   IllegalStringLiteralToken,
+  KeywordToken,
+  NumberLiteralToken,
+  OperatorToken,
+  SourceToken,
+  StringLiteralToken,
 } from "./source-token";
-import type { Position } from "../util/position";
 import { isDigit, isLetter, isWhitespace } from "./util";
 
 export default class Lexer {
@@ -39,108 +42,97 @@ export default class Lexer {
       case "+":
       case "-":
       case "*":
-      case "/":
-        {
-          const { position } = this.charBuffer.popChar();
-          const value = char.value;
+      case "/": {
+        const { position } = this.charBuffer.popChar();
+        const value = char.value;
 
-          const token = createOperatorToken(value, position, position);
-          return token;
-        }
+        const token = createOperatorToken(value, position, position);
+        return token;
+      }
 
       case "(":
-      case ")":
-        {
-          const { position } = this.charBuffer.popChar();
-          const value = char.value;
+      case ")": {
+        const { position } = this.charBuffer.popChar();
+        const value = char.value;
 
-          const token = createGroupDelimiterToken(value, position, position);
-          return token;
-        }
+        const token = createGroupDelimiterToken(value, position, position);
+        return token;
+      }
 
       case "{":
-      case "}":
-        {
-          const { position } = this.charBuffer.popChar();
-          const value = char.value;
+      case "}": {
+        const { position } = this.charBuffer.popChar();
+        const value = char.value;
 
-          const token = createBlockDelimiterToken(value, position, position);
+        const token = createBlockDelimiterToken(value, position, position);
+        return token;
+      }
+
+      case ",": {
+        const { position } = this.charBuffer.popChar();
+        const value = char.value;
+
+        const token = createSeparatorToken(value, position, position);
+        return token;
+      }
+
+      case "!": {
+        const { position: pos } = this.charBuffer.popChar();
+
+        const token = this.lexCharsStartingWithBang(pos);
+        return token;
+      }
+
+      case "=": {
+        const { position: pos } = this.charBuffer.popChar();
+
+        const token = this.lexCharsStartingWithEqual(pos);
+        return token;
+      }
+
+      case ">": {
+        const { position: pos } = this.charBuffer.popChar();
+
+        const token = this.lexCharsStartingWithGreaterThan(pos);
+        return token;
+      }
+
+      case "<": {
+        const { position: pos } = this.charBuffer.popChar();
+
+        const token = this.lexCharsStartingWithLessThan(pos);
+        return token;
+      }
+
+      case "'": {
+        const { position: pos } = this.charBuffer.popChar();
+
+        const token = this.lexCharsStartingWithSingleQuote(pos);
+        return token;
+      }
+
+      case CharBuffer.END_OF_INPUT: {
+        const { position: pos } = this.charBuffer.popChar();
+
+        const token = createEndToken("$end", pos, pos);
+        return token;
+      }
+
+      default: {
+        if (isDigit(char.value)) {
+          const token = this.lexNumberLiteral();
           return token;
         }
 
-      case ",":
-        {
-          const { position } = this.charBuffer.popChar();
-          const value = char.value;
-
-          const token = createSeparatorToken(value, position, position);
+        if (isLetter(char.value)) {
+          const token = this.lexLetters();
           return token;
         }
 
-      case "!":
-        {
-          const { position: pos } = this.charBuffer.popChar();
-
-          const token = this.lexCharsStartingWithBang(pos);
-          return token;
-        }
-
-      case "=":
-        {
-          const { position: pos } = this.charBuffer.popChar();
-
-          const token = this.lexCharsStartingWithEqual(pos);
-          return token;
-        }
-
-      case ">":
-        {
-          const { position: pos } = this.charBuffer.popChar();
-
-          const token = this.lexCharsStartingWithGreaterThan(pos);
-          return token;
-        }
-
-      case "<":
-        {
-          const { position: pos } = this.charBuffer.popChar();
-
-          const token = this.lexCharsStartingWithLessThan(pos);
-          return token;
-        }
-
-      case "'":
-        {
-          const { position: pos } = this.charBuffer.popChar();
-
-          const token = this.lexCharsStartingWithSingleQuote(pos);
-          return token;
-        }
-
-      case CharBuffer.END_OF_INPUT:
-        {
-          const { position: pos } = this.charBuffer.popChar();
-
-          const token = createEndToken("$end", pos, pos);
-          return token;
-        }
-
-      default:
-        {
-          if (isDigit(char.value)) {
-            const token = this.lexNumberLiteral();
-            return token;
-          }
-
-          if (isLetter(char.value)) {
-            const token = this.lexLetters();
-            return token;
-          }
-
-          const { position } = this.charBuffer.popChar();
-          const token = createIllegalToken(char.value, position, position);
-          return token;
-        }
+        const { position } = this.charBuffer.popChar();
+        const token = createIllegalToken(char.value, position, position);
+        return token;
+      }
     }
   }
 
@@ -159,11 +151,10 @@ export default class Lexer {
   private lexCharsStartingWithBang(bangPos: Position): OperatorToken {
     const peek = this.charBuffer.peekChar();
     switch (peek.value) {
-      case "=":
-        {
-          const { position: posEnd } = this.charBuffer.popChar();
-          return createOperatorToken("!=", bangPos, posEnd);
-        }
+      case "=": {
+        const { position: posEnd } = this.charBuffer.popChar();
+        return createOperatorToken("!=", bangPos, posEnd);
+      }
 
       default:
         return createOperatorToken("!", bangPos, bangPos);
@@ -174,11 +165,10 @@ export default class Lexer {
   private lexCharsStartingWithEqual(equalPos: Position): OperatorToken {
     const peek = this.charBuffer.peekChar();
     switch (peek.value) {
-      case "=":
-        {
-          const { position: posEnd } = this.charBuffer.popChar();
-          return createOperatorToken("==", equalPos, posEnd);
-        }
+      case "=": {
+        const { position: posEnd } = this.charBuffer.popChar();
+        return createOperatorToken("==", equalPos, posEnd);
+      }
 
       default:
         return createOperatorToken("=", equalPos, equalPos);
@@ -189,14 +179,13 @@ export default class Lexer {
   private lexCharsStartingWithGreaterThan(greaterThanPos: Position): OperatorToken {
     const peek = this.charBuffer.peekChar();
     switch (peek.value) {
-      case "=":
-        {
-          const { position: posEnd } = this.charBuffer.popChar();
-          return createOperatorToken(">=", greaterThanPos, posEnd);
-        }
+      case "=": {
+        const { position: posEnd } = this.charBuffer.popChar();
+        return createOperatorToken(">=", greaterThanPos, posEnd);
+      }
 
       default:
-          return createOperatorToken(">", greaterThanPos, greaterThanPos);
+        return createOperatorToken(">", greaterThanPos, greaterThanPos);
     }
   }
 
@@ -204,11 +193,10 @@ export default class Lexer {
   private lexCharsStartingWithLessThan(lessThanPos: Position): OperatorToken {
     const peek = this.charBuffer.peekChar();
     switch (peek.value) {
-      case "=":
-        {
-          const { position: posEnd } = this.charBuffer.popChar();
-          return createOperatorToken("<=", lessThanPos, posEnd);
-        }
+      case "=": {
+        const { position: posEnd } = this.charBuffer.popChar();
+        return createOperatorToken("<=", lessThanPos, posEnd);
+      }
 
       default:
         return createOperatorToken("<", lessThanPos, lessThanPos);
@@ -245,42 +233,39 @@ export default class Lexer {
 
     const value = numberChars.map(char => char.value).join("");
     const posBegin = numberChars[0].position;
-    const posEnd = numberChars[numberChars.length-1].position;
+    const posEnd = numberChars[numberChars.length - 1].position;
 
     const token = createNumberLiteralToken(value, posBegin, posEnd);
     return token;
   }
 
-  private lexLetters(): any {
+  private lexLetters(): BooleanLiteralToken | IdentifierToken | KeywordToken {
     const letterChars = this.readLetterChars();
 
     const value = letterChars.map(char => char.value).join("");
     const posBegin = letterChars[0].position;
-    const posEnd = letterChars[letterChars.length-1].position;
+    const posEnd = letterChars[letterChars.length - 1].position;
 
     // order is important; match keywords first, then identifier
     switch (value) {
       case "참":
-      case "거짓":
-        {
-          const token = createBooleanLiteralToken(value, posBegin, posEnd);
-          return token;
-        }
+      case "거짓": {
+        const token = createBooleanLiteralToken(value, posBegin, posEnd);
+        return token;
+      }
 
       case "만약":
       case "아니면":
       case "함수":
-      case "결과":
-        {
-          const token = createKeywordToken(value, posBegin, posEnd);
-          return token;
-        }
+      case "결과": {
+        const token = createKeywordToken(value, posBegin, posEnd);
+        return token;
+      }
 
-      default:
-        {
-          const token = createIdentifierToken(value, posBegin, posEnd);
-          return token;
-        }
+      default: {
+        const token = createIdentifierToken(value, posBegin, posEnd);
+        return token;
+      }
     }
   }
 

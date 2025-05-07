@@ -1,9 +1,5 @@
-import {
-  createNumberLiteralToken,
-  createBooleanLiteralToken,
-  createStringLiteralToken,
-} from "./";
 import { fakePos } from "../testing/fixtures";
+import { createBooleanLiteralToken, createNumberLiteralToken, createStringLiteralToken } from "./";
 
 describe("create token with begin and end position", () => {
   const cases = [

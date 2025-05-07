@@ -2,8 +2,9 @@ import Lexer from "../lexer";
 import Parser from "../parser";
 import Evaluator, * as Eval from "./";
 import Environment from "./environment";
+import type { BooleanValue, EmptyValue, FunctionValue, StringValue, Value } from "./value";
 
-const evaluateInput = (input: string, onStdout?: (toWrite: string) => void) => {
+const evaluateInput = (input: string, onStdout?: (toWrite: string) => void): Value => {
   const lexer = new Lexer(input);
   const parser = new Parser(lexer);
   const parsed = parser.parseSource();
@@ -17,20 +18,23 @@ const evaluateInput = (input: string, onStdout?: (toWrite: string) => void) => {
   return evaluated;
 };
 
-const testEvaluatingPrimitive = ({ input, expected }: { input: string, expected: any }): void => {
-  const evaluated = evaluateInput(input) as any;
+const testEvaluatingPrimitive = ({ input, expected }: { input: string; expected: number | boolean | string }) => {
+  const evaluated = evaluateInput(input) as StringValue | BooleanValue;
 
   expect(evaluated.value).toBe(expected);
 };
 
 const testEvaluatingEmpty = ({ input }: { input: string }): void => {
-  const evaluated = evaluateInput(input) as any;
+  const evaluated = evaluateInput(input) as EmptyValue;
 
   expect(evaluated.value).toBe(null);
 };
 
-const testEvaluatingFunction = ({ input, expectedParamsLength }: { input: string, expectedParamsLength: number }): void => {
-  const evaluated = evaluateInput(input) as any;
+const testEvaluatingFunction = ({
+  input,
+  expectedParamsLength,
+}: { input: string; expectedParamsLength: number }): void => {
+  const evaluated = evaluateInput(input) as FunctionValue;
 
   expect(evaluated).toHaveProperty("parameters");
   expect(evaluated.parameters.length).toBe(expectedParamsLength);
@@ -38,7 +42,7 @@ const testEvaluatingFunction = ({ input, expectedParamsLength }: { input: string
   expect(evaluated).toHaveProperty("environment");
 };
 
-const testEvaluatingStdout = ({ input, expected }: { input: string, expected: any }): void => {
+const testEvaluatingStdout = ({ input, expected }: { input: string; expected: object }): void => {
   const stdouts: string[] = [];
 
   evaluateInput(input, toWrite => stdouts.push(toWrite));
@@ -202,32 +206,32 @@ describe("evaluate()", () => {
       {
         name: "simple if statement with boolean literal predicate",
         input: "만약 참 { 3 }",
-        expected: 3
+        expected: 3,
       },
       {
         name: "simple if statement with boolean expression predicate",
         input: "만약 1 != 2 { 4 }",
-        expected: 4
+        expected: 4,
       },
       {
         name: "simple if statement with variable comparison predicate",
         input: "사과 = 3  바나나 = 4  만약 사과 < 바나나 { 5 }",
-        expected: 5
+        expected: 5,
       },
       {
         name: "simple if-else statement with true boolean literal predicate",
         input: "만약 참 { 6 } 아니면 { 7 }",
-        expected: 6
+        expected: 6,
       },
       {
         name: "simple if-else statement with false boolean literal predicate",
         input: "만약 거짓 { 6 } 아니면 { 7 }",
-        expected: 7
+        expected: 7,
       },
       {
         name: "simple if-else statement with boolean expression predicate",
         input: "만약 1 == 2 { 34 } 아니면 { 56 }",
-        expected: 56
+        expected: 56,
       },
     ];
 
@@ -290,27 +294,27 @@ describe("evaluate()", () => {
       {
         name: "integer variable with number literal",
         input: "foo = 42  foo",
-        expected: 42
+        expected: 42,
       },
       {
         name: "integer variable with arithmetic expression",
         input: "foo = 42 * (8 / 4) + (1 - (2 - 1))  foo",
-        expected: 84
+        expected: 84,
       },
       {
         name: "two integer variables with number literal",
         input: "foo = 42  bar = foo + 1  bar",
-        expected: 43
+        expected: 43,
       },
       {
         name: "arithmetic expression with variables",
         input: "foo = 42  bar = 43  baz = 44  qux = (bar * (baz - foo))",
-        expected: 86
+        expected: 86,
       },
       {
         name: "Korean integer variable with number literal",
         input: "변수 = 42  변수",
-        expected: 42
+        expected: 42,
       },
     ];
 

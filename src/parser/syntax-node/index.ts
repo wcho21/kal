@@ -1,6 +1,6 @@
+import type { ExpressionNode } from "./expression";
 import type { GroupNode } from "./group";
 import type { StatementNode } from "./statement";
-import type { ExpressionNode } from "./expression";
 
 export type SyntaxNode = GroupNode | StatementNode | ExpressionNode;
 

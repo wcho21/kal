@@ -1,7 +1,5 @@
-import {
-  createOperatorToken,
-} from "./";
 import { fakePos } from "../testing/fixtures";
+import { createOperatorToken } from "./";
 
 describe("create token with begin and end position", () => {
   const cases = [

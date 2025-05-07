@@ -28,7 +28,8 @@ it("execute 참 == 2 > 1", () => {
   expect(execute("참 == 2 > 1")).toBe("참");
 });
 
-it("execute 거짓 == 1 != 1", () => { // note that comparison is left associative
+it("execute 거짓 == 1 != 1", () => {
+  // note that comparison is left associative
   expect(execute("거짓 == 1 != 1")).toBe("참");
 });
 
@@ -70,7 +71,9 @@ it("execute function", () => {
 });
 
 it("execute closure", () => {
-  expect(execute("사과 = 함수(포도) { 결과 함수(바나나) { 결과 포도 + 바나나 } } 수박 = 사과(42) 수박(99)")).toBe("141");
+  expect(execute("사과 = 함수(포도) { 결과 함수(바나나) { 결과 포도 + 바나나 } } 수박 = 사과(42) 수박(99)")).toBe(
+    "141",
+  );
 });
 
 it("execute curried function", () => {

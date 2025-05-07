@@ -20,4 +20,4 @@ export const isWhitespace = (char: string): boolean => {
   }
 
   return /^(\r\n|[ \t\r\n])$/.test(char);
-}
+};

@@ -1,15 +1,7 @@
-import {
-  createBranchNode,
-  createReturnNode,
-  createExpressionStatementNode,
-} from "./";
-import type {
-  ExpressionNode,
-} from "../expression";
-import type {
-  BlockNode,
-} from "../group";
+import type { ExpressionNode } from "../expression";
+import type { BlockNode } from "../group";
 import { fakePos } from "../testing/fixtures";
+import { createBranchNode, createExpressionStatementNode, createReturnNode } from "./";
 
 const cases = [
   {
@@ -24,7 +16,11 @@ const cases = [
   },
   {
     name: "branch with alternative",
-    node: createBranchNode({ predicate: {} as ExpressionNode, consequence: {} as BlockNode, alternative: {} as BlockNode }, fakePos, fakePos),
+    node: createBranchNode(
+      { predicate: {} as ExpressionNode, consequence: {} as BlockNode, alternative: {} as BlockNode },
+      fakePos,
+      fakePos,
+    ),
     expected: {
       type: "branch",
       predicate: {},

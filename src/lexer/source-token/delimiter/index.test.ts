@@ -1,9 +1,5 @@
-import {
-  createGroupDelimiterToken,
-  createBlockDelimiterToken,
-  createSeparatorToken,
-} from "./";
 import { fakePos } from "../testing/fixtures";
+import { createBlockDelimiterToken, createGroupDelimiterToken, createSeparatorToken } from "./";
 
 describe("create token with begin and end position", () => {
   const cases = [

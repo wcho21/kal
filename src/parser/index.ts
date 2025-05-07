@@ -1,8 +1,8 @@
+import { type BindingPowerEntry, bindingPowers, getInfixBindingPower } from "./binding-power";
 import type * as Node from "./syntax-node";
 import * as node from "./syntax-node";
-import { getInfixBindingPower, bindingPowers, type BindingPowerEntry } from "./binding-power";
 
-import { copyRange, type Range } from "../util/position";
+import { type Range, copyRange } from "../util/position";
 
 export class ParserError extends Error {
   public received: string;
@@ -15,21 +15,21 @@ export class ParserError extends Error {
     this.expected = expected;
     this.range = range;
   }
-};
+}
 
-export class BadNumberLiteralError extends ParserError {};
-export class BadBooleanLiteralError extends ParserError {};
-export class BadPrefixError extends ParserError {};
-export class BadInfixError extends ParserError {};
-export class BadExpressionError extends ParserError {};
-export class BadGroupDelimiterError extends ParserError {};
-export class BadBlockDelimiterError extends ParserError {};
-export class BadAssignmentError extends ParserError {};
-export class BadFunctionKeywordError extends ParserError {};
-export class BadIdentifierError extends ParserError {};
-export class BadSeparatorError extends ParserError {};
+export class BadNumberLiteralError extends ParserError {}
+export class BadBooleanLiteralError extends ParserError {}
+export class BadPrefixError extends ParserError {}
+export class BadInfixError extends ParserError {}
+export class BadExpressionError extends ParserError {}
+export class BadGroupDelimiterError extends ParserError {}
+export class BadBlockDelimiterError extends ParserError {}
+export class BadAssignmentError extends ParserError {}
+export class BadFunctionKeywordError extends ParserError {}
+export class BadIdentifierError extends ParserError {}
+export class BadSeparatorError extends ParserError {}
 
-import Lexer from "../lexer";
+import type Lexer from "../lexer";
 import SourceTokenReader from "./source-token-reader";
 
 type PrefixOperator = "+" | "-" | "!";
@@ -54,7 +54,7 @@ export default class Parser {
 
     const firstPos = { row: 0, col: 0 };
     const posBegin = statements.length > 0 ? statements[0].range.begin : firstPos;
-    const posEnd = statements.length > 0 ? statements[statements.length-1].range.end : firstPos;
+    const posEnd = statements.length > 0 ? statements[statements.length - 1].range.end : firstPos;
 
     const program = node.createProgramNode({ statements }, posBegin, posEnd);
 
@@ -395,6 +395,6 @@ export default class Parser {
   private isInfixOperator(operator: string): operator is InfixOperator {
     return Parser.INFIX_OPERATORS.some(infix => infix === operator);
   }
-};
+}
 
 export type * from "./syntax-node";

@@ -1,21 +1,16 @@
-import {
-  createIdentifierNode,
-  createNumberNode,
-  createStringNode,
-  createPrefixNode,
-  createInfixNode,
-  createFunctionNode,
-  createCallNode,
-  createAssignmentNode,
-} from "./";
-import type {
-  IdentifierNode,
-  ExpressionNode,
-} from "./";
-import type {
-  BlockNode,
-} from "../group";
+import type { BlockNode } from "../group";
 import { fakePos } from "../testing/fixtures";
+import {
+  createAssignmentNode,
+  createCallNode,
+  createFunctionNode,
+  createIdentifierNode,
+  createInfixNode,
+  createNumberNode,
+  createPrefixNode,
+  createStringNode,
+} from "./";
+import type { ExpressionNode, IdentifierNode } from "./";
 
 const cases = [
   {

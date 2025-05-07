@@ -1,9 +1,9 @@
 import type * as Value from "../value";
 import * as value from "../value";
 
-export type BuiltinFunction = (args: any[], onStdout?: (toWrite: string) => void) => Value.Value;
+export type BuiltinFunction = (args: Value.Value[], onStdout?: (toWrite: string) => void) => Value.Value;
 
-const len: BuiltinFunction = (args) => {
+const len: BuiltinFunction = (args: Value.Value[]) => {
   const arg = args[0];
   if (arg.type === "string") {
     const length = arg.value.length;
@@ -23,7 +23,7 @@ const write: BuiltinFunction = (args, onStdout) => {
     onStdout(str);
   }
 
-  const range = { begin: args[0].range.begin, end: args[args.length-1].range.end };
+  const range = { begin: args[0].range.begin, end: args[args.length - 1].range.end };
   return value.createEmptyValue({ value: null }, "(없음)", range);
 };
 
@@ -37,6 +37,6 @@ const builtins = {
       default:
         return null;
     }
-  }
+  },
 };
 export default builtins;

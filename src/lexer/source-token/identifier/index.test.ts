@@ -1,8 +1,5 @@
-import {
-  createIdentifierToken,
-  createKeywordToken,
-} from "./";
 import { fakePos } from "../testing/fixtures";
+import { createIdentifierToken, createKeywordToken } from "./";
 
 describe("create token with begin and end position", () => {
   const cases = [
