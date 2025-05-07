@@ -595,6 +595,122 @@ export const functionExpressionCases = [
   },
 ];
 
+export const listExpressionCases = [
+  {
+    name: "empty list",
+    input: "[]",
+    expected: {
+      type: "program",
+      statements: [
+        {
+          type: "expression statement",
+          expression: {
+            type: "list",
+            elements: [],
+          },
+        },
+      ],
+    },
+  },
+  {
+    name: "single element list",
+    input: "[42]",
+    expected: {
+      type: "program",
+      statements: [
+        {
+          type: "expression statement",
+          expression: {
+            type: "list",
+            elements: [
+              {
+                type: "number",
+                value: 42,
+              },
+            ],
+          },
+        },
+      ],
+    },
+  },
+  {
+    name: "multiple element list",
+    input: "['foo', bar, 함수() {}]",
+    expected: {
+      type: "program",
+      statements: [
+        {
+          type: "expression statement",
+          expression: {
+            type: "list",
+            elements: [
+              {
+                type: "string",
+                value: "foo",
+              },
+              {
+                type: "identifier",
+                value: "bar",
+              },
+              {
+                type: "function",
+                parameters: [],
+                body: {
+                  type: "block",
+                  statements: [],
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  },
+  {
+    name: "nested list",
+    input: "[1, [2, [3, 4]]]",
+    expected: {
+      type: "program",
+      statements: [
+        {
+          type: "expression statement",
+          expression: {
+            type: "list",
+            elements: [
+              {
+                type: "number",
+                value: 1,
+              },
+              {
+                type: "list",
+                elements: [
+                  {
+                    type: "number",
+                    value: 2,
+                  },
+                  {
+                    type: "list",
+                    elements: [
+                      {
+                        type: "number",
+                        value: 3,
+                      },
+                      {
+                        type: "number",
+                        value: 4,
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        },
+      ],
+    },
+  },
+];
+
 export const returnStatementCases = [
   {
     name: "return number literal",

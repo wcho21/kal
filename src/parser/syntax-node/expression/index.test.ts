@@ -6,6 +6,7 @@ import {
   createFunctionNode,
   createIdentifierNode,
   createInfixNode,
+  createListNode,
   createNumberNode,
   createPrefixNode,
   createStringNode,
@@ -88,6 +89,15 @@ const cases = [
       type: "assignment",
       left: {},
       right: {},
+      range: { begin: fakePos, end: fakePos },
+    },
+  },
+  {
+    name: "list",
+    node: createListNode({ elements: [] }, fakePos, fakePos),
+    expected: {
+      type: "list",
+      elements: [],
       range: { begin: fakePos, end: fakePos },
     },
   },

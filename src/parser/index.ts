@@ -24,10 +24,12 @@ export class BadInfixError extends ParserError {}
 export class BadExpressionError extends ParserError {}
 export class BadGroupDelimiterError extends ParserError {}
 export class BadBlockDelimiterError extends ParserError {}
+export class BadListDelimiterError extends ParserError {}
 export class BadAssignmentError extends ParserError {}
 export class BadFunctionKeywordError extends ParserError {}
 export class BadIdentifierError extends ParserError {}
 export class BadSeparatorError extends ParserError {}
+export class BadListSeparatorError extends ParserError {}
 
 import type Lexer from "../lexer";
 import SourceTokenReader from "./source-token-reader";
@@ -174,6 +176,9 @@ export default class Parser {
     }
     if (type === "group delimiter" && value === "(") {
       return this.parseGroupedExpression();
+    }
+    if (type === "list delimiter" && value === "[") {
+      return this.parseListExpression();
     }
 
     throw new BadExpressionError(type, "expression", range);
@@ -373,10 +378,44 @@ export default class Parser {
     this.advanceOrThrow("group delimiter", ")", BadGroupDelimiterError);
 
     // range change due to group delimiters
+    // TODO: just use two positions from delimiters
     const offset = { begin: { row: 0, col: -1 }, end: { row: 0, col: 1 } };
     const range = copyRange(expression.range.begin, expression.range.end, offset);
 
     return { ...expression, range };
+  }
+
+  private parseListExpression(): Node.ListNode {
+    const { begin } = this.reader.read().range;
+    this.advanceOrThrow("list delimiter", "[", BadListDelimiterError);
+
+    const elements: Node.ExpressionNode[] = [];
+
+    // return if empty list
+    const maybeListEnd = this.reader.read();
+    if (maybeListEnd.type === "list delimiter" && maybeListEnd.value === "]") {
+      const { end } = this.reader.read().range;
+      this.advanceOrThrow("list delimiter", "]", BadListDelimiterError);
+
+      const range = { begin, end };
+      return node.createListNode({ elements }, range);
+    }
+
+    while (true) {
+      const element = this.parseExpression(bindingPowers.lowest);
+      elements.push(element);
+
+      const separatorOrListEnd = this.reader.read();
+      if (separatorOrListEnd.type === "list delimiter" && separatorOrListEnd.value === "]") {
+        const { end } = this.reader.read().range;
+        this.advanceOrThrow("list delimiter", "]", BadListDelimiterError);
+
+        const range = { begin, end };
+        return node.createListNode({ elements }, range);
+      }
+
+      this.advanceOrThrow("separator", ",", BadListSeparatorError);
+    }
   }
 
   private advanceOrThrow(type: string, value: string, ErrorClass: typeof ParserError): void {

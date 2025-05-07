@@ -10,6 +10,7 @@ import {
   groupedCases,
   infixCases,
   leftAssocCases,
+  listExpressionCases,
   literalCases,
   literalExpressionCases,
   multipleOperatorsAssocCases,
@@ -90,6 +91,10 @@ describe("parseSource()", () => {
 
     describe("function expressions", () => {
       it.each(functionExpressionCases)("$name", testSuccess);
+    });
+
+    describe("list expressions", () => {
+      it.each(listExpressionCases)("$name", testSuccess);
     });
 
     describe("return statement", () => {
