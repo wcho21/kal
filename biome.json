@@ -1,0 +1,14 @@
+{
+  "files": {
+    "include": ["src/**/*.ts"]
+  },
+  "formatter": {
+    "indentStyle": "space",
+    "lineWidth": 120
+  },
+  "javascript": {
+    "formatter": {
+      "arrowParentheses": "asNeeded"
+    }
+  }
+}
