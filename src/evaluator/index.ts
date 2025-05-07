@@ -1,9 +1,9 @@
 import type * as Node from "../parser";
-import type * as Value from "./value";
-import * as value from "./value";
+import type { Range } from "../util/position";
 import builtin, { type BuiltinFunction } from "./builtin";
 import Environment from "./environment";
-import type { Range } from "../util/position";
+import type * as Value from "./value";
+import * as value from "./value";
 
 export class EvaluatorError extends Error {
   public range: Range;
@@ -16,12 +16,12 @@ export class EvaluatorError extends Error {
   }
 }
 
-export class TopLevelReturnError extends EvaluatorError {};
-export class BadPredicateError extends EvaluatorError {};
-export class BadAssignmentLeftError extends EvaluatorError {};
-export class BadPrefixExpressionError extends EvaluatorError {};
-export class BadInfixExpressionError extends EvaluatorError {};
-export class BadIdentifierError extends EvaluatorError {};
+export class TopLevelReturnError extends EvaluatorError {}
+export class BadPredicateError extends EvaluatorError {}
+export class BadAssignmentLeftError extends EvaluatorError {}
+export class BadPrefixExpressionError extends EvaluatorError {}
+export class BadInfixExpressionError extends EvaluatorError {}
+export class BadIdentifierError extends EvaluatorError {}
 
 type ComparisonOperator = "==" | "!=" | ">" | "<" | ">=" | "<=";
 
@@ -252,7 +252,11 @@ export default class Evaluator {
     return func.body(callArguments, callbackOnStdout);
   }
 
-  private getBooleanComparisonInfixOperationValue(left: boolean, right: boolean, operator: ComparisonOperator): boolean {
+  private getBooleanComparisonInfixOperationValue(
+    left: boolean,
+    right: boolean,
+    operator: ComparisonOperator,
+  ): boolean {
     return this.getComparisonInfixOperationValue<boolean>(left, right, operator);
   }
 
@@ -327,7 +331,11 @@ export default class Evaluator {
     return _never;
   }
 
-  private createExtendedEnvironment(oldEnv: Environment, identifiers: Node.IdentifierNode[], values: Value.Value[]): Environment {
+  private createExtendedEnvironment(
+    oldEnv: Environment,
+    identifiers: Node.IdentifierNode[],
+    values: Value.Value[],
+  ): Environment {
     const newEnv = new Environment(oldEnv);
 
     for (let i = 0; i < identifiers.length; ++i) {
@@ -357,7 +365,12 @@ export default class Evaluator {
     return value.createEmptyValue({ value: null }, "(없음)", range);
   }
 
-  private createFunctionValue(parameters: Node.FunctionNode["parameters"], body: Node.FunctionNode["body"], environment: Environment, range: Range): Value.FunctionValue {
+  private createFunctionValue(
+    parameters: Node.FunctionNode["parameters"],
+    body: Node.FunctionNode["body"],
+    environment: Environment,
+    range: Range,
+  ): Value.FunctionValue {
     return value.createFunctionValue({ parameters, body, environment }, "(함수)", range);
   }
 

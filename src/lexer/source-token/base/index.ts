@@ -1,15 +1,15 @@
 import type { Position, Range } from "../../../util/position";
 
 export interface SourceTokenBase<T extends string = string, V = unknown> {
-  readonly type: T,
-  readonly value: V,
-  readonly range: Range,
-};
+  readonly type: T;
+  readonly value: V;
+  readonly range: Range;
+}
 
 /** returns overloaded token creator function */
 export function createTokenCreator<T extends SourceTokenBase>(type: T["type"]) {
   // explicitly specify the return type since the overloaded function cannot infer it
-  type Token = { type: T["type"], value: T["value"], range: Range };
+  type Token = { type: T["type"]; value: T["value"]; range: Range };
 
   function createToken(value: T["value"], range: Range): Token;
   function createToken(value: T["value"], pos1: Position, pos2: Position): Token;
@@ -19,11 +19,11 @@ export function createTokenCreator<T extends SourceTokenBase>(type: T["type"]) {
       return { type, value, range };
     }
 
-    return { type, value, range: arg1 as { begin: Position, end: Position } };
-  };
+    return { type, value, range: arg1 as { begin: Position; end: Position } };
+  }
 
   return createToken;
-};
+}
 
 declare function createToken<T extends SourceTokenBase>(value: T["value"], range: Range): T;
 declare function createToken<T extends SourceTokenBase>(value: T["value"], pos1: Position, pos2: Position): T;

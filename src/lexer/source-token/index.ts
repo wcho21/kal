@@ -1,10 +1,11 @@
-import type { OperatorToken } from "./operator";
+import type { BlockDelimiterToken, GroupDelimiterToken, SeparatorToken } from "./delimiter";
 import type { IdentifierToken, KeywordToken } from "./identifier";
-import type { NumberLiteralToken, BooleanLiteralToken, StringLiteralToken } from "./literal";
-import type { GroupDelimiterToken, BlockDelimiterToken, SeparatorToken } from "./delimiter";
-import type { IllegalToken, IllegalStringLiteralToken, EndToken } from "./special";
+import type { BooleanLiteralToken, NumberLiteralToken, StringLiteralToken } from "./literal";
+import type { OperatorToken } from "./operator";
+import type { EndToken, IllegalStringLiteralToken, IllegalToken } from "./special";
 
-export type SourceToken = OperatorToken
+export type SourceToken =
+  | OperatorToken
   | IdentifierToken
   | KeywordToken
   | NumberLiteralToken
@@ -15,7 +16,7 @@ export type SourceToken = OperatorToken
   | SeparatorToken
   | IllegalToken
   | IllegalStringLiteralToken
-  | EndToken
+  | EndToken;
 
 export * from "./operator";
 export type * from "./operator";

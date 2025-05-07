@@ -1,5 +1,5 @@
-import type { SourceTokenBase, CreateToken } from "./../base";
 import { createTokenCreator } from "../base";
+import type { CreateToken, SourceTokenBase } from "./../base";
 
 export type KeywordValue = BranchKeywordValue | FunctionKeywordValue | ReturnKeywordValue;
 export type BranchKeywordValue = "만약" | "아니면";

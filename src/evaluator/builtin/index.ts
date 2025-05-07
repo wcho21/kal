@@ -23,7 +23,7 @@ const write: BuiltinFunction = (args, onStdout) => {
     onStdout(str);
   }
 
-  const range = { begin: args[0].range.begin, end: args[args.length-1].range.end };
+  const range = { begin: args[0].range.begin, end: args[args.length - 1].range.end };
   return value.createEmptyValue({ value: null }, "(없음)", range);
 };
 
@@ -37,6 +37,6 @@ const builtins = {
       default:
         return null;
     }
-  }
+  },
 };
 export default builtins;

@@ -1,9 +1,5 @@
-import {
-  createIllegalToken,
-  createIllegalStringLiteralToken,
-  createEndToken,
-} from "./";
 import { fakePos } from "../testing/fixtures";
+import { createEndToken, createIllegalStringLiteralToken, createIllegalToken } from "./";
 
 describe("create token with begin and end position", () => {
   const cases = [

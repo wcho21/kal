@@ -1,12 +1,9 @@
 import Lexer from "../lexer";
 import Parser from "./";
-import {
-  type ParserError,
-  BadExpressionError,
-} from "./";
+import { BadExpressionError, type ParserError } from "./";
 
-type SuccessTestCase = { name: string, input: string, expected: object };
-type FailureTestCase = { name: string, input: string, expected: typeof ParserError };
+type SuccessTestCase = { name: string; input: string; expected: object };
+type FailureTestCase = { name: string; input: string; expected: typeof ParserError };
 
 describe("parseSource()", () => {
   const createParser = (input: string) => {
@@ -16,7 +13,7 @@ describe("parseSource()", () => {
     return parser;
   };
 
-  const testSuccess = ({ input, expected }: { input: string, expected: object }) => {
+  const testSuccess = ({ input, expected }: { input: string; expected: object }) => {
     const parser = createParser(input);
 
     const node = parser.parseSource();
@@ -24,7 +21,7 @@ describe("parseSource()", () => {
     expect(node).toMatchObject(expected);
   };
 
-  const testFailure = ({ input, expected }: { input: string, expected: typeof ParserError }) => {
+  const testFailure = ({ input, expected }: { input: string; expected: typeof ParserError }) => {
     const parser = createParser(input);
 
     expect(() => parser.parseSource()).toThrow(expected);
@@ -44,7 +41,7 @@ describe("parseSource()", () => {
                 expression: {
                   type: "number",
                   value: 42,
-                }
+                },
               },
             ],
           },
@@ -60,7 +57,7 @@ describe("parseSource()", () => {
                 expression: {
                   type: "boolean",
                   value: true,
-                }
+                },
               },
             ],
           },
@@ -92,7 +89,7 @@ describe("parseSource()", () => {
                 expression: {
                   type: "identifier",
                   value: "foo",
-                }
+                },
               },
             ],
           },
@@ -120,7 +117,7 @@ describe("parseSource()", () => {
                       type: "number",
                       value: 42,
                     },
-                  }
+                  },
                 },
               ],
             },
@@ -140,7 +137,7 @@ describe("parseSource()", () => {
                       type: "number",
                       value: 42,
                     },
-                  }
+                  },
                 },
               ],
             },
@@ -245,11 +242,11 @@ describe("parseSource()", () => {
                           infix: "*",
                           left: {
                             type: "number",
-                            value: 22
+                            value: 22,
                           },
                           right: {
                             type: "number",
-                            value: 33
+                            value: 33,
                           },
                         },
                         right: {
@@ -303,7 +300,6 @@ describe("parseSource()", () => {
 
         it.each(cases)("$name", testSuccess);
       });
-
     });
 
     describe("logical expressions", () => {
@@ -968,8 +964,8 @@ describe("parseSource()", () => {
             expected: {
               type: "program",
               range: {
-                begin: { row: 0, col: 0, },
-                end: { row: 2, col: 0, },
+                begin: { row: 0, col: 0 },
+                end: { row: 2, col: 0 },
               },
               statements: [
                 {
@@ -977,14 +973,14 @@ describe("parseSource()", () => {
                   expression: {
                     type: "function",
                     range: {
-                      begin: { row: 0, col: 0, },
-                      end: { row: 2, col: 0, },
+                      begin: { row: 0, col: 0 },
+                      end: { row: 2, col: 0 },
                     },
                     body: {
                       type: "block",
                       range: {
-                        begin: { row: 0, col: 8, },
-                        end: { row: 2, col: 0, },
+                        begin: { row: 0, col: 8 },
+                        end: { row: 2, col: 0 },
                       },
                     },
                   },
@@ -997,16 +993,15 @@ describe("parseSource()", () => {
             input: "foo(bar, baz)",
             expected: {
               type: "program",
-              range: {
-              },
+              range: {},
               statements: [
                 {
                   type: "expression statement",
                   expression: {
                     type: "call",
                     range: {
-                      begin: { row: 0, col: 0, },
-                      end: { row: 0, col: 12, },
+                      begin: { row: 0, col: 0 },
+                      end: { row: 0, col: 12 },
                     },
                   },
                 },
@@ -1025,31 +1020,29 @@ describe("parseSource()", () => {
             input: "만약 foo {\n  11\n} 아니면 {\n  22\n}",
             expected: {
               type: "program",
-              range: {
-              },
+              range: {},
               statements: [
                 {
                   type: "branch",
-                  range: {
-                  },
+                  range: {},
                   predicate: {
                     range: {
-                      begin: { row: 0, col: 3, },
-                      end: { row: 0, col: 5, },
+                      begin: { row: 0, col: 3 },
+                      end: { row: 0, col: 5 },
                     },
                   },
                   consequence: {
                     type: "block",
                     range: {
-                      begin: { row: 0, col: 7, },
-                      end: { row: 2, col: 0, },
+                      begin: { row: 0, col: 7 },
+                      end: { row: 2, col: 0 },
                     },
                   },
                   alternative: {
                     type: "block",
                     range: {
-                      begin: { row: 2, col: 6, },
-                      end: { row: 4, col: 0, },
+                      begin: { row: 2, col: 6 },
+                      end: { row: 4, col: 0 },
                     },
                   },
                 },
@@ -1069,7 +1062,7 @@ describe("parseSource()", () => {
         name: "not parsable expression start",
         input: "*3",
         expected: BadExpressionError,
-      }
+      },
     ];
 
     it.each(cases)("$name", testFailure);

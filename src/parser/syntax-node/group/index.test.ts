@@ -1,8 +1,5 @@
-import {
-  createProgramNode,
-  createBlockNode,
-} from "./";
 import { fakePos } from "../testing/fixtures";
+import { createBlockNode, createProgramNode } from "./";
 
 const cases = [
   {

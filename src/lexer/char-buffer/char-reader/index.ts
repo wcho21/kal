@@ -92,12 +92,12 @@ export default class CharReader {
     }
 
     // return if the last character
-    if (this.index+1 === this.chars.length) {
+    if (this.index + 1 === this.chars.length) {
       return char;
     }
 
     // return if single-character new line
-    const nextChar = this.chars[this.index+1];
+    const nextChar = this.chars[this.index + 1];
     if (nextChar !== "\r" && nextChar !== "\n") {
       return char;
     }

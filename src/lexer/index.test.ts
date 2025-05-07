@@ -1,11 +1,9 @@
 import Lexer from "./";
-import type {
-  SourceToken,
-} from "./source-token";
+import type { SourceToken } from "./source-token";
 
 describe("getSourceToken()", () => {
   describe("single token", () => {
-    const testLex = ({ input, expected }: { input: string, expected: SourceToken }) => {
+    const testLex = ({ input, expected }: { input: string; expected: SourceToken }) => {
       const lexer = new Lexer(input);
 
       const token = lexer.getSourceToken();
@@ -14,7 +12,7 @@ describe("getSourceToken()", () => {
     };
 
     describe("operators", () => {
-      const cases: { input: string, expected: SourceToken }[] = [
+      const cases: { input: string; expected: SourceToken }[] = [
         {
           input: "+",
           expected: {
@@ -153,7 +151,7 @@ describe("getSourceToken()", () => {
     });
 
     describe("delimiters", () => {
-      const cases: { input: string, expected: SourceToken }[] = [
+      const cases: { input: string; expected: SourceToken }[] = [
         {
           input: "(",
           expected: {
@@ -215,7 +213,7 @@ describe("getSourceToken()", () => {
     });
 
     describe("number literals", () => {
-      const cases: { input: string, expected: SourceToken }[] = [
+      const cases: { input: string; expected: SourceToken }[] = [
         {
           input: "0",
           expected: {
@@ -266,7 +264,7 @@ describe("getSourceToken()", () => {
     });
 
     describe("boolean literals", () => {
-      const cases: { input: string, expected: SourceToken }[] = [
+      const cases: { input: string; expected: SourceToken }[] = [
         {
           input: "참",
           expected: {
@@ -295,7 +293,7 @@ describe("getSourceToken()", () => {
     });
 
     describe("string literals", () => {
-      const cases: { input: string, expected: SourceToken }[] = [
+      const cases: { input: string; expected: SourceToken }[] = [
         {
           input: "'foo bar 123 !@# 참'",
           expected: {
@@ -324,7 +322,7 @@ describe("getSourceToken()", () => {
     });
 
     describe("keywords", () => {
-      const cases: { input: string, expected: SourceToken }[] = [
+      const cases: { input: string; expected: SourceToken }[] = [
         {
           input: "만약",
           expected: {
@@ -375,7 +373,7 @@ describe("getSourceToken()", () => {
     });
 
     describe("identifiers", () => {
-      const cases: { input: string, expected: SourceToken }[] = [
+      const cases: { input: string; expected: SourceToken }[] = [
         {
           input: "Foo이름123_",
           expected: {
@@ -415,7 +413,7 @@ describe("getSourceToken()", () => {
     });
 
     describe("special", () => {
-      const cases: { input: string, expected: SourceToken }[] = [
+      const cases: { input: string; expected: SourceToken }[] = [
         {
           input: "$",
           expected: {
@@ -456,7 +454,7 @@ describe("getSourceToken()", () => {
   });
 
   describe("multiple tokens", () => {
-    const cases: { input: string, expectedTokens: SourceToken[] }[] = [
+    const cases: { input: string; expectedTokens: SourceToken[] }[] = [
       {
         input: "12 + 34",
         expectedTokens: [
@@ -492,7 +490,7 @@ describe("getSourceToken()", () => {
               end: { row: 0, col: 7 },
             },
           },
-        ]
+        ],
       },
       {
         input: "만약 참 {\n  12\r\n}",
@@ -545,7 +543,7 @@ describe("getSourceToken()", () => {
               end: { row: 2, col: 1 },
             },
           },
-        ]
+        ],
       },
       {
         input: "사과(1)(2)",
@@ -614,7 +612,7 @@ describe("getSourceToken()", () => {
               end: { row: 0, col: 8 },
             },
           },
-        ]
+        ],
       },
     ];
 

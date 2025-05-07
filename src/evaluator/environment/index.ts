@@ -11,7 +11,7 @@ export default class Environment implements EnvironmentType {
 
   constructor(superEnvironment: Environment | null = null) {
     this.superEnvironment = superEnvironment;
-    this.table = new Map<string, Value>;
+    this.table = new Map<string, Value>();
   }
 
   get(name: string): Value | null {
