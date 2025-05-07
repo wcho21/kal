@@ -1,4 +1,4 @@
-import type { BlockDelimiterToken, GroupDelimiterToken, SeparatorToken } from "./delimiter";
+import type { BlockDelimiterToken, GroupDelimiterToken, ListDelimiterToken, SeparatorToken } from "./delimiter";
 import type { IdentifierToken, KeywordToken } from "./identifier";
 import type { BooleanLiteralToken, NumberLiteralToken, StringLiteralToken } from "./literal";
 import type { OperatorToken } from "./operator";
@@ -13,6 +13,7 @@ export type SourceToken =
   | StringLiteralToken
   | GroupDelimiterToken
   | BlockDelimiterToken
+  | ListDelimiterToken
   | SeparatorToken
   | IllegalToken
   | IllegalStringLiteralToken
