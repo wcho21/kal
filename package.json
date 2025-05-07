@@ -1,20 +1,13 @@
 {
   "scripts": {
-    "build": "tsc && webpack && rm -rf tsc-out",
     "test": "jest",
     "test:watch": "jest --watchAll"
   },
-  "browserslist": [
-    "> 1%",
-    "not dead"
-  ],
   "devDependencies": {
     "@types/jest": "29.5.14",
     "@types/node": "22.15.14",
     "jest": "29.7.0",
     "ts-jest": "29.3.2",
-    "typescript": "5.8.3",
-    "webpack": "^5.89.0",
-    "webpack-cli": "^5.1.4"
+    "typescript": "5.8.3"
   }
 }
