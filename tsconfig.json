@@ -10,9 +10,7 @@
     "outDir": "tsc-out"
   },
   "include": [
-    "src/**/*"
-  ],
-  "exclude": [
+    "src/**/*.ts",
     "src/**/*.test.ts"
   ]
 }
