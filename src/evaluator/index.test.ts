@@ -1,3 +1,4 @@
+import { describe, expect, it } from "bun:test";
 import Lexer from "../lexer";
 import Parser from "../parser";
 import Evaluator from "./";
@@ -57,7 +58,7 @@ const evaluateInput = (input: string, onStdout?: (toWrite: string) => void): Val
 };
 
 const testEvaluatingPrimitive = ({ input, expected }: { input: string; expected: number | boolean | string }) => {
-  const evaluated = evaluateInput(input) as StringValue | BooleanValue;
+  const evaluated = evaluateInput(input) as NumberValue | BooleanValue | StringValue;
 
   expect(evaluated.value).toBe(expected);
 };
@@ -103,7 +104,7 @@ const testEvaluatingList = ({ input, expected }: { input: string; expected: List
   }
 };
 
-const testEvaluatingStdout = ({ input, expected }: { input: string; expected: object }): void => {
+const testEvaluatingStdout = ({ input, expected }: { input: string; expected: string[] }): void => {
   const stdouts: string[] = [];
 
   evaluateInput(input, toWrite => stdouts.push(toWrite));

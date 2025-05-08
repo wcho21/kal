@@ -1,9 +1,11 @@
+import { describe, expect, it } from "bun:test";
 import Lexer from "./";
 import {
   booleanLiteralCases,
   identifierCases,
   keywordCases,
   multipleTokenCases,
+  noTokenCases,
   numberLiteralCases,
   singleDelimiterCases,
   singleOperatorCases,
@@ -53,6 +55,17 @@ describe("getSourceToken()", () => {
     describe("special", () => {
       it.each(specialCases)("lex special '$input'", testLex);
     });
+  });
+
+  describe("no tokens", () => {
+    const testLex = ({ input, expected }: { input: string; expected: SourceToken }) => {
+      const lexer = new Lexer(input);
+
+      const token = lexer.getSourceToken();
+
+      expect(token).toEqual(expected);
+    };
+    it.each(noTokenCases)("#%# no tokens from input '$input'", testLex);
   });
 
   describe("multiple tokens", () => {

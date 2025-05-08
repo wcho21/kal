@@ -1,3 +1,4 @@
+import { describe, expect, it } from "bun:test";
 import Lexer from "../lexer";
 import Parser from "./";
 import type { ParserError } from "./";

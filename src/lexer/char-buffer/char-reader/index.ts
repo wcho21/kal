@@ -96,14 +96,14 @@ export default class CharReader {
       return char;
     }
 
-    // return if single-character new line
+    // return if CR LF
     const nextChar = this.chars[this.index + 1];
-    if (nextChar !== "\r" && nextChar !== "\n") {
-      return char;
+    if (char === "\r" && nextChar === "\n") {
+      return char + nextChar;
     }
 
-    // return two-character new line
-    return char + nextChar;
+    // return if CR or LF
+    return char;
   }
 }
 

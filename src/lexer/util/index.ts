@@ -15,9 +15,14 @@ export const isDigit = (char: string): boolean => {
 };
 
 export const isWhitespace = (char: string): boolean => {
+  if (char === "\r\n") {
+    return true;
+  }
   if (char.length > 2) {
     return false;
   }
-
-  return /^(\r\n|[ \t\r\n])$/.test(char);
+  if (char === " " || char === "\t" || char === "\r" || char === "\n") {
+    return true;
+  }
+  return false;
 };

@@ -1,8 +1,13 @@
+import { describe, expect, it } from "bun:test";
 import { fakePos } from "../testing/fixtures";
+import type { IdentifierToken, KeywordToken } from "./";
 import { createIdentifierToken, createKeywordToken } from "./";
 
+type Token = IdentifierToken | KeywordToken;
+type Case = { name: string; token: Token; expected: Token };
+
 describe("create token with begin and end position", () => {
-  const cases = [
+  const cases: Case[] = [
     {
       name: "identifier",
       token: createIdentifierToken("foo", fakePos, fakePos),
@@ -35,7 +40,7 @@ describe("create token with begin and end position", () => {
 });
 
 describe("create token with range", () => {
-  const cases = [
+  const cases: Case[] = [
     {
       name: "identifier",
       token: createIdentifierToken("foo", { begin: fakePos, end: fakePos }),

@@ -1,4 +1,6 @@
+import { describe, expect, it } from "bun:test";
 import { fakePos } from "../testing/fixtures";
+import type { BlockDelimiterToken, GroupDelimiterToken, ListDelimiterToken, SeparatorToken } from "./";
 import {
   createBlockDelimiterToken,
   createGroupDelimiterToken,
@@ -6,8 +8,11 @@ import {
   createSeparatorToken,
 } from "./";
 
+type Token = BlockDelimiterToken | GroupDelimiterToken | ListDelimiterToken | SeparatorToken;
+type Case = { name: string; token: Token; expected: Token };
+
 describe("create token with begin and end position", () => {
-  const cases = [
+  const cases: Case[] = [
     {
       name: "group delimiter",
       token: createGroupDelimiterToken("(", fakePos, fakePos),
@@ -64,7 +69,7 @@ describe("create token with begin and end position", () => {
 });
 
 describe("create token with range", () => {
-  const cases = [
+  const cases: Case[] = [
     {
       name: "group delimiter",
       token: createGroupDelimiterToken("(", { begin: fakePos, end: fakePos }),

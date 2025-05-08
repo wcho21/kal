@@ -1,5 +1,10 @@
+import { describe, expect, it } from "bun:test";
 import Lexer from "../../lexer";
+import type { SourceToken } from "../../lexer/source-token";
 import SourceTokenReader from "./";
+
+type Token = SourceToken;
+type Case = { name: string; token: Token; expected: Token };
 
 const createReader = (input: string) => {
   const lexer = new Lexer(input);
@@ -11,7 +16,7 @@ describe("read()", () => {
   it("read a token", () => {
     const input = "42";
     const reader = createReader(input);
-    const expected = {
+    const expected: Token = {
       type: "number literal",
       value: "42",
       range: {
@@ -26,7 +31,7 @@ describe("read()", () => {
   it("read the end token if nothing to read", () => {
     const input = "";
     const reader = createReader(input);
-    const expected = {
+    const expected: Token = {
       type: "end",
       value: "$end",
       range: {
@@ -43,7 +48,7 @@ describe("advance()", () => {
   it("advance to next token", () => {
     const input = "42 99";
     const reader = createReader(input);
-    const expected = {
+    const expected: Token = {
       type: "number literal",
       value: "99",
       range: {
