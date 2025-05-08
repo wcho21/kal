@@ -1,5 +1,6 @@
 import type * as Value from "../value";
 import * as value from "../value";
+import { getListRepresentation } from "../util";
 
 export type BuiltinFunction = (args: Value.Value[], onStdout?: (toWrite: string) => void) => Value.Value;
 
@@ -57,7 +58,7 @@ const insertIntoList = (list: Value.ListValue, toInsert: Value.Value[]): Value.L
 
   // keep original as is
   const inserted = Array.from(list.elements).concat(toInsert as Value.ListableValue[]);
-  const representation = `[${inserted.map(value => value.representation).join(", ")}]`;
+  const representation = getListRepresentation(inserted);
   return value.createListValue({ elements: inserted }, representation, list.range);
 };
 
@@ -81,7 +82,7 @@ const removeFromList = (list: Value.ListValue): Value.ListValue => {
   }
 
   const removed = list.elements.slice(0, -1);
-  const representation = `[${removed.map(value => value.representation).join(", ")}]`;
+  const representation = getListRepresentation(removed);
   return value.createListValue({ elements: removed }, representation, list.range);
 };
 

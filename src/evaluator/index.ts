@@ -4,6 +4,7 @@ import builtin, { type BuiltinFunction } from "./builtin";
 import Environment from "./environment";
 import type * as Value from "./value";
 import * as value from "./value";
+import { getListRepresentation } from "./util";
 
 export class EvaluatorError extends Error {
   public range: Range;
@@ -367,7 +368,7 @@ export default class Evaluator {
 
   private createListValue(elements: Node.ExpressionNode[], range: Range, env: Environment): Value.ListValue {
     const evaluated = this.evaluateListElements(elements, env);
-    const representation = this.getListRepresentation(evaluated);
+    const representation = getListRepresentation(evaluated);
 
     return value.createListValue({ elements: evaluated }, representation, range);
   }
@@ -388,10 +389,6 @@ export default class Evaluator {
 
       return e;
     });
-  }
-
-  private getListRepresentation(elements: Value.ListableValue[]): string {
-    return `[${elements.map(value => value.representation).join(", ")}]`;
   }
 
   private createEmptyValue(range: Range): Value.EmptyValue {
