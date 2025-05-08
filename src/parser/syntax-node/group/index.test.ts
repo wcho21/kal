@@ -1,7 +1,12 @@
+import { expect, it } from "bun:test";
 import { fakePos } from "../testing/fixtures";
 import { createBlockNode, createProgramNode } from "./";
+import type { BlockNode, ProgramNode } from "./";
 
-const cases = [
+type Node = BlockNode | ProgramNode;
+type Case = { name: string; node: Node; expected: Node };
+
+const cases: Case[] = [
   {
     name: "program",
     node: createProgramNode({ statements: [] }, fakePos, fakePos),

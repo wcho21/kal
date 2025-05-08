@@ -1,12 +1,14 @@
 {
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
+    "@types/bun": "1.2.12",
     "typescript": "5.8.3"
   },
   "scripts": {
     "format": "biome check --write",
     "format:check": "biome check",
     "typecheck": "tsc --noEmit",
+    "typecheck:watch": "tsc --noEmit --watch",
     "build": "./bin/build.js"
   }
 }

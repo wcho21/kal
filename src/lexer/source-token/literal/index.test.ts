@@ -1,8 +1,13 @@
+import { describe, expect, it } from "bun:test";
 import { fakePos } from "../testing/fixtures";
 import { createBooleanLiteralToken, createNumberLiteralToken, createStringLiteralToken } from "./";
+import type { BooleanLiteralToken, NumberLiteralToken, StringLiteralToken } from "./";
+
+type Token = BooleanLiteralToken | NumberLiteralToken | StringLiteralToken;
+type Case = { name: string; token: Token; expected: Token };
 
 describe("create token with begin and end position", () => {
-  const cases = [
+  const cases: Case[] = [
     {
       name: "number literal",
       token: createNumberLiteralToken("0", fakePos, fakePos),
@@ -47,7 +52,7 @@ describe("create token with begin and end position", () => {
 });
 
 describe("create token with range", () => {
-  const cases = [
+  const cases: Case[] = [
     {
       name: "number literal",
       token: createNumberLiteralToken("0", { begin: fakePos, end: fakePos }),

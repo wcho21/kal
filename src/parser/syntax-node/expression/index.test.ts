@@ -1,3 +1,4 @@
+import { expect, it } from "bun:test";
 import type { BlockNode } from "../group";
 import { fakePos } from "../testing/fixtures";
 import {
@@ -11,9 +12,33 @@ import {
   createPrefixNode,
   createStringNode,
 } from "./";
-import type { ExpressionNode, IdentifierNode } from "./";
+import type {
+  AssignmentNode,
+  CallNode,
+  ExpressionNode,
+  FunctionNode,
+  IdentifierNode,
+  InfixNode,
+  ListNode,
+  NumberNode,
+  PrefixNode,
+  StringNode,
+} from "./";
 
-const cases = [
+type Node =
+  | AssignmentNode
+  | CallNode
+  | ExpressionNode
+  | FunctionNode
+  | IdentifierNode
+  | InfixNode
+  | ListNode
+  | NumberNode
+  | PrefixNode
+  | StringNode;
+type Case = { name: string; node: Node; expected: Node };
+
+const cases: Case[] = [
   {
     name: "identifier",
     node: createIdentifierNode({ value: "foo" }, fakePos, fakePos),
@@ -47,7 +72,7 @@ const cases = [
     expected: {
       type: "prefix",
       prefix: "+",
-      right: {},
+      right: {} as ExpressionNode,
       range: { begin: fakePos, end: fakePos },
     },
   },
@@ -57,8 +82,8 @@ const cases = [
     expected: {
       type: "infix",
       infix: "+",
-      left: {},
-      right: {},
+      left: {} as ExpressionNode,
+      right: {} as ExpressionNode,
       range: { begin: fakePos, end: fakePos },
     },
   },
@@ -68,7 +93,7 @@ const cases = [
     expected: {
       type: "function",
       parameters: [],
-      body: {},
+      body: {} as FunctionNode["body"],
       range: { begin: fakePos, end: fakePos },
     },
   },
@@ -77,8 +102,8 @@ const cases = [
     node: createCallNode({ func: {} as IdentifierNode, args: [] as ExpressionNode[] }, fakePos, fakePos),
     expected: {
       type: "call",
-      func: {},
-      args: [],
+      func: {} as CallNode["func"],
+      args: [] as CallNode["args"],
       range: { begin: fakePos, end: fakePos },
     },
   },
@@ -87,8 +112,8 @@ const cases = [
     node: createAssignmentNode({ left: {} as IdentifierNode, right: {} as ExpressionNode }, fakePos, fakePos),
     expected: {
       type: "assignment",
-      left: {},
-      right: {},
+      left: {} as IdentifierNode,
+      right: {} as ExpressionNode,
       range: { begin: fakePos, end: fakePos },
     },
   },
@@ -106,7 +131,7 @@ const cases = [
     node: createListNode({ elements: [{} as ExpressionNode, {} as ExpressionNode] }, fakePos, fakePos),
     expected: {
       type: "list",
-      elements: [{}, {}],
+      elements: [{} as ExpressionNode, {} as ExpressionNode],
       range: { begin: fakePos, end: fakePos },
     },
   },
