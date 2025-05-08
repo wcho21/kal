@@ -4,6 +4,10 @@ import * as value from "../value";
 export type BuiltinFunction = (args: Value.Value[], onStdout?: (toWrite: string) => void) => Value.Value;
 
 const len: BuiltinFunction = (args: Value.Value[]) => {
+  if (args.length !== 1) {
+    throw new Error();
+  }
+
   const target = args[0];
 
   if (target.type === "string") {
