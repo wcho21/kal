@@ -20,27 +20,22 @@ You can load a ***Kal*** interpreter in browsers, and build manually (see below)
 
 ## 🗡️ Installation
 
-Load the interpreter script in HTML as follows:
+Load and use the interpreter in HTML as follows:
 
 ```HTML
-<script src="https://cdn.jsdelivr.net/gh/wcho21/kal@latest/dist/index.min.js"></script>
-```
-
-After that, you can execute ***Kal*** code with `kal.execute(code-to-execute)` as follows:
-
-```javascript
-kal.execute("5+5"); // === 10
+<script type="module">
+  import { execute } from "https://cdn.jsdelivr.net/gh/wcho21/kal@0.3.1/dist/index.min.js";
+  execute("5+5") === "10"; // true
+</script>
 ```
 
 You can attach an handler on standard output event as follows:
 
 ```javascript
-const stdouts = [];
+const outputs = [];
 
-kal.execute("쓰기('사과')", stdout => stdouts.push(stdout)); // stdout === ["사과"]
+execute("쓰기('사과')", stdout => outputs.push(stdout)); // outouts === ["사과"]
 ```
-
-
 
 ## 🗡️ Examples
 
