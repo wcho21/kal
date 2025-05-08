@@ -166,11 +166,9 @@ which yields `2`.
 
 ## 🗡️ Building
 
-Note that building process is based on [Node.js][node].
+Building process is based on [Bun][bun]
 
-With [`pnpm`][pnpm], you can build a _KALANG_ interpreter by running `pnpm install && pnpm build`.
-
+You can build a ***Kal*** interpreter by executing `bun run build`.
 The output will be in the directory `/dist/index.min.js`.
 
-[node]: https://nodejs.org/
-[pnpm]: https://pnpm.io/
+[bun]: https://bun.sh
