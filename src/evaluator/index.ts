@@ -22,6 +22,7 @@ export class BadAssignmentLeftError extends EvaluatorError {}
 export class BadPrefixExpressionError extends EvaluatorError {}
 export class BadInfixExpressionError extends EvaluatorError {}
 export class BadIdentifierError extends EvaluatorError {}
+export class BadListElementTypeError extends EvaluatorError {}
 
 type ComparisonOperator = "==" | "!=" | ">" | "<" | ">=" | "<=";
 
@@ -115,6 +116,9 @@ export default class Evaluator {
     }
     if (node.type === "string") {
       return this.createStringValue(node.value, node.range);
+    }
+    if (node.type === "list") {
+      return this.createListValue(node.elements, node.range, env);
     }
     if (node.type === "prefix") {
       return this.evaluatePrefixExpression(node, env);
@@ -359,6 +363,22 @@ export default class Evaluator {
 
   private createStringValue(val: string, range: Range): Value.StringValue {
     return value.createStringValue({ value: val }, val, range);
+  }
+
+  private createListValue(elements: Node.ExpressionNode[], range: Range, env: Environment): Value.ListValue {
+    const evaluated: Value.PrimitiveValue[] = [];
+
+    for (const node of elements) {
+      const e = this.evaluateExpression(node, env);
+
+      if (e.type !== "number" && e.type !== "string" && e.type !== "boolean" && e.type !== "function") {
+        throw new BadListElementTypeError(node.range);
+      }
+
+      evaluated.push(e);
+    }
+
+    return value.createListValue({ elements: evaluated }, "list", range);
   }
 
   private createEmptyValue(range: Range): Value.EmptyValue {

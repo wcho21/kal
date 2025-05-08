@@ -1,4 +1,5 @@
 import * as Eval from "./";
+import type * as Value from "./value";
 
 export const singleNumberCases = [
   { input: "5", expected: 5 },
@@ -100,6 +101,28 @@ export const stringComparisonCases = [
 export const logicalNotToBooleanExpressionCases = [
   { input: "!(1 == 1)", expected: false },
   { input: "!!(1 == 1)", expected: true },
+];
+
+export const listCases = [
+  { input: "[]", expected: [] },
+  { input: "[1]", expected: [{ type: "number", value: 1 } as Value.NumberValue] },
+  {
+    input: "[42, 참, 'foo', 함수() {}]",
+    expected: [
+      { type: "number", value: 42 } as Value.NumberValue,
+      { type: "boolean", value: true } as Value.BooleanValue,
+      { type: "string", value: "foo" } as Value.StringValue,
+      { type: "function" } as Value.FunctionValue,
+    ],
+  },
+  {
+    input: "[42 + 1, !거짓, 길이('foo')]",
+    expected: [
+      { type: "number", value: 43 } as Value.NumberValue,
+      { type: "boolean", value: true } as Value.BooleanValue,
+      { type: "number", value: 3 } as Value.NumberValue,
+    ],
+  },
 ];
 
 export const branchStatementsYieldingSomethingCases = [

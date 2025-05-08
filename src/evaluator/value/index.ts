@@ -8,7 +8,7 @@ export interface ValueBase<T extends string = string> {
   readonly range: Range;
 }
 
-export type Value = PrimitiveValue | EmptyValue | BuiltinFunctionValue;
+export type Value = PrimitiveValue | EmptyValue | BuiltinFunctionValue | ListValue;
 
 export type PrimitiveValue = NumberValue | StringValue | BooleanValue | FunctionValue;
 
@@ -26,6 +26,11 @@ export interface FunctionValue extends ValueBase<"function"> {
   readonly body: FunctionNode["body"];
   readonly environment: Environment;
 }
+
+export interface ListValue extends ValueBase<"list"> {
+  readonly elements: PrimitiveValue[];
+}
+
 export interface EmptyValue extends ValueBase<"empty"> {
   readonly value: null;
 }
@@ -66,6 +71,7 @@ export const createFunctionValue: CreateValue<"function", FunctionValue> = creat
   "function",
   FunctionValue
 >("function");
+export const createListValue: CreateValue<"list", ListValue> = createValueCreator<"list", ListValue>("list");
 export const createBuiltinFunctionValue: CreateValue<"builtin function", BuiltinFunctionValue> = createValueCreator<
   "builtin function",
   BuiltinFunctionValue

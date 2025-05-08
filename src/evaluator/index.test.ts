@@ -15,6 +15,7 @@ import {
   functionExpressionCases,
   groupedArithmeticExpressionCases,
   leftAssocArithmeticOperationCases,
+  listCases,
   logicalNotExpressionCases,
   logicalNotToBooleanExpressionCases,
   nestedBranchStatementsYieldingNothingCases,
@@ -27,7 +28,16 @@ import {
   stringComparisonCases,
   variableStatementsCases,
 } from "./index.test.case";
-import type { BooleanValue, EmptyValue, FunctionValue, StringValue, Value } from "./value";
+import type {
+  BooleanValue,
+  EmptyValue,
+  FunctionValue,
+  ListValue,
+  NumberValue,
+  PrimitiveValue,
+  StringValue,
+  Value,
+} from "./value";
 
 const evaluateInput = (input: string, onStdout?: (toWrite: string) => void): Value => {
   const lexer = new Lexer(input);
@@ -65,6 +75,26 @@ const testEvaluatingFunction = ({
   expect(evaluated.parameters.length).toBe(expectedParamsLength);
   expect(evaluated).toHaveProperty("body");
   expect(evaluated).toHaveProperty("environment");
+};
+
+const testEvaluatingList = ({ input, expected }: { input: string; expected: PrimitiveValue[] }): void => {
+  const evaluated = evaluateInput(input) as ListValue;
+
+  expect(evaluated.elements.length).toBe(expected.length);
+
+  for (let i = 0; i < evaluated.elements.length; ++i) {
+    const elem = evaluated.elements[i];
+    const expectedElem = expected[i];
+
+    if (elem.type === "number" || elem.type === "string" || elem.type === "boolean") {
+      const expectedValue = (expectedElem as NumberValue).value;
+      expect(elem.value).toBe(expectedValue);
+    } else if (elem.type === "function") {
+      expect(elem.type).toBe("function");
+    } else {
+      throw new Error("must be unreachable");
+    }
+  }
 };
 
 const testEvaluatingStdout = ({ input, expected }: { input: string; expected: object }): void => {
@@ -122,6 +152,10 @@ describe("evaluate()", () => {
 
   describe("logical not operation to boolean expression", () => {
     it.each(logicalNotToBooleanExpressionCases)("evaluate $input", testEvaluatingPrimitive);
+  });
+
+  describe("list", () => {
+    it.each(listCases)("evaluate $input", testEvaluatingList);
   });
 
   describe("branch statements yielding something", () => {
