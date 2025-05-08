@@ -280,6 +280,16 @@ export const builtinFunctionLengthCallCases = [
     input: "길이('사과')",
     expected: 2,
   },
+  {
+    name: "empty list",
+    input: "길이([])",
+    expected: 0,
+  },
+  {
+    name: "nonempty list",
+    input: "길이([1, 2, 3])",
+    expected: 3,
+  },
 ];
 
 export const builtinFunctionWriteCallCases = [

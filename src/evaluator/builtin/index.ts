@@ -5,10 +5,17 @@ export type BuiltinFunction = (args: Value.Value[], onStdout?: (toWrite: string)
 
 const len: BuiltinFunction = (args: Value.Value[]) => {
   const arg = args[0];
+
   if (arg.type === "string") {
     const length = arg.value.length;
     return value.createNumberValue({ value: length }, String(length), arg.range);
   }
+  if (arg.type === "list") {
+    const length = arg.elements.length;
+    return value.createNumberValue({ value: length }, String(length), arg.range);
+  }
+
+  // TODO: handle exceptional cases such as more than two args
 
   throw new Error();
 };

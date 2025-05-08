@@ -65,8 +65,12 @@ it("execute assignment and calculation", () => {
   expect(execute("변수1 = 4  변수2 = 9  ((변수1 - 변수2) * 변수1)")).toBe("-20");
 });
 
-it("execute builtin function 길이()", () => {
+it("execute builtin function 길이('사과')", () => {
   expect(execute("길이('사과')")).toBe("2");
+});
+
+it("execute builtin function 길이([1, 2, 3])", () => {
+  expect(execute("길이([1, 2, 3])")).toBe("3");
 });
 
 it("execute builtin function 쓰기()", () => {
