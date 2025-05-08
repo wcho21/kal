@@ -1,27 +1,20 @@
-[![English](https://img.shields.io/badge/Lang-en-green)][readme-en]
-[![Korean](https://img.shields.io/badge/Lang-ko-blue)][readme-ko]
+# 🗡️ Kal
 
-[readme-en]: ./
-[readme-ko]: ./docs/README.ko.md
+<img src="./docs/images/kal-logo.png" alt="Kal logo" width="192px" height="192px" />
 
-
-
-# 🗡️ KALANG
-
-<img src="./docs/images/kal-logo.png" alt="KALANG logo" width="192px" height="192px" />
-
-_KALANG: Korean Programming Language_.
+***Kal***: _Korean Algorithmic Language_.
 
 - < 0.03 MB.
-- Tested with >250 cases.
-- JavaScript-implemented, which runs natively on web browsers.
+- Tested with ~ 300 cases.
+- JavaScript-bundled, which runs natively on web browsers.
 - Minimal syntax with Korean keywords.
+- No dependencies (made from scratch).
 
-Try _KALANG_ at [Playground][playground].
-
-You can load a _KALANG_ interpreter in browsers, or build manually (see below).
+Try ***Kal*** at [Playground][playground].
 
 [playground]: https://kal-playground.rooi.dev/
+
+You can load a ***Kal*** interpreter in browsers, and build manually (see below).
 
 
 
@@ -33,13 +26,14 @@ Load the interpreter script in HTML as follows:
 <script src="https://cdn.jsdelivr.net/gh/wcho21/kal@latest/dist/index.min.js"></script>
 ```
 
-After that, you can execute _KALANG_ code with `kal.execute(code-to-execute)` as follows:
+After that, you can execute ***Kal*** code with `kal.execute(code-to-execute)` as follows:
 
 ```javascript
 kal.execute("5+5"); // === 10
 ```
 
-You can attach an event handler for standard output writing as follows:
+You can attach an handler on standard output event as follows:
+
 ```javascript
 const stdouts = [];
 
@@ -50,19 +44,16 @@ kal.execute("쓰기('사과')", stdout => stdouts.push(stdout)); // stdout === [
 
 ## 🗡️ Examples
 
-### Statements and expressions
+### Statements and Expressions
 
-Variable assignment:
+**Variable assignment**:
+
 ```
 사과 = 42
 ```
 
-Comparison:
-```
-사과 < 99
-```
+**Conditional statement**:
 
-Conditional statement:
 ```
 만약 사과 < 99 {
     사과 = 99
@@ -71,7 +62,8 @@ Conditional statement:
 }
 ```
 
-Defining and calling function:
+**Defining and calling a function**:
+
 ```
 더하기 = 함수(숫자1, 숫자2) {
     결과 숫자1 + 숫자2
@@ -79,9 +71,11 @@ Defining and calling function:
 
 더하기(42, 10)
 ```
+
 which yields `52`.
 
-Closure and currying:
+**Closure and currying**:
+
 ```
 더하기 = 함수(숫자1) {
     결과 함수(숫자2) {
@@ -95,48 +89,77 @@ Closure and currying:
 
 더하기(1)(42)
 ```
+
 which yields `43` twice.
-
-
 
 ### Builtin functions
 
-`쓰기()`:
+**`쓰기()`**:
+
 ```
-쓰기('사과')
-쓰기('포도', '바나나')
-```
-which yields
-```
-사과
-포도 바나나
+쓰기('안녕')
 ```
 
-`길이()`:
+which yields `안녕`.
+
+**`넣기()`**:
+
+```
+넣기(['사과'], '포도')
+```
+
+which yields `['사과', '포도]`.
+
+**`빼기()`**:
+
+```
+빼기(['사과', '포도'])
+```
+
+which yields `['사과']`.
+
+**`찾기()`**:
+
+```
+찾기(['사과', '포도', '바나나'], 2)
+```
+
+which yields `바나나`.
+
+**`길이()`**:
+
 ```
 길이('사과')
 ```
+
 which yields `2`.
-
-
 
 ### Types
 
-_Number type_: any floating-point numbers
+**Number**: any floating-point numbers
+
 ```
 사과 = 42
 포도 = -9.5
 ```
 
-_String type_: characters surrounded with single quotes
+**String**: characters surrounded with single quotes
+
 ```
 사과 = '맛있음'
 ```
 
-_Boolean type_: `참`, `거짓`
+**Boolean**: `참`, `거짓`
+
 ```
 사과 = 참
 포도 = 거짓
+```
+
+**List**: comma-separated elements surrounded with square brackets
+
+```
+['사과', '포도', '바나나']
 ```
 
 
