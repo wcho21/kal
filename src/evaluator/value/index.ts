@@ -9,8 +9,8 @@ export interface ValueBase<T extends string = string> {
 }
 
 export type Value = PrimitiveValue | EmptyValue | BuiltinFunctionValue | ListValue;
-
 export type PrimitiveValue = NumberValue | StringValue | BooleanValue | FunctionValue;
+export type ListableValue = PrimitiveValue | ListValue;
 
 export interface NumberValue extends ValueBase<"number"> {
   readonly value: number;
@@ -28,7 +28,7 @@ export interface FunctionValue extends ValueBase<"function"> {
 }
 
 export interface ListValue extends ValueBase<"list"> {
-  readonly elements: PrimitiveValue[];
+  readonly elements: ListableValue[];
 }
 
 export interface EmptyValue extends ValueBase<"empty"> {

@@ -372,11 +372,17 @@ export default class Evaluator {
     return value.createListValue({ elements: evaluated }, representation, range);
   }
 
-  private evaluateListElements(elements: Node.ExpressionNode[], env: Environment): Value.PrimitiveValue[] {
+  private evaluateListElements(elements: Node.ExpressionNode[], env: Environment): Value.ListableValue[] {
     return elements.map(node => {
       const e = this.evaluateExpression(node, env);
 
-      if (e.type !== "number" && e.type !== "string" && e.type !== "boolean" && e.type !== "function") {
+      if (
+        e.type !== "number" &&
+        e.type !== "string" &&
+        e.type !== "boolean" &&
+        e.type !== "function" &&
+        e.type !== "list"
+      ) {
         throw new BadListElementTypeError(node.range);
       }
 
@@ -384,7 +390,7 @@ export default class Evaluator {
     });
   }
 
-  private getListRepresentation(elements: Value.PrimitiveValue[]): string {
+  private getListRepresentation(elements: Value.ListableValue[]): string {
     return `[${elements.map(value => value.representation).join(", ")}]`;
   }
 

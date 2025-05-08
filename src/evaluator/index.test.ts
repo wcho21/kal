@@ -33,8 +33,8 @@ import type {
   EmptyValue,
   FunctionValue,
   ListValue,
+  ListableValue,
   NumberValue,
-  PrimitiveValue,
   StringValue,
   Value,
 } from "./value";
@@ -77,7 +77,7 @@ const testEvaluatingFunction = ({
   expect(evaluated).toHaveProperty("environment");
 };
 
-const testEvaluatingList = ({ input, expected }: { input: string; expected: PrimitiveValue[] }): void => {
+const testEvaluatingList = ({ input, expected }: { input: string; expected: ListableValue[] }): void => {
   const evaluated = evaluateInput(input) as ListValue;
 
   expect(evaluated.elements.length).toBe(expected.length);
@@ -91,7 +91,10 @@ const testEvaluatingList = ({ input, expected }: { input: string; expected: Prim
       expect(elem.value).toBe(expectedValue);
     } else if (elem.type === "function") {
       expect(elem.type).toBe("function");
+    } else if (elem.type === "list") {
+      expect(elem.type).toBe("list");
     } else {
+      const _never: never = elem;
       throw new Error("must be unreachable");
     }
   }

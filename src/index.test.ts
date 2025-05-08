@@ -93,6 +93,12 @@ describe("execute builtin function 쓰기()", () => {
 
     expect(stdouts).toEqual(["[42, 참, foo]"]);
   });
+
+  it("nested list", () => {
+    execute("쓰기([ [[]], [1, [2]] ])", onStdout);
+
+    expect(stdouts).toEqual(["[[[]], [1, [2]]]"]);
+  });
 });
 
 it("execute function", () => {

@@ -290,6 +290,16 @@ export const builtinFunctionLengthCallCases = [
     input: "길이([1, 2, 3])",
     expected: 3,
   },
+  {
+    name: "nested-in-single-level list",
+    input: "길이([[1, 2, 3]])",
+    expected: 1,
+  },
+  {
+    name: "nested-in-multiple-level list",
+    input: "길이([[[]], [1], [2, [3]]])",
+    expected: 3,
+  },
 ];
 
 export const builtinFunctionWriteCallCases = [
