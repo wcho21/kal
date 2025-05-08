@@ -93,11 +93,20 @@ const cases = [
     },
   },
   {
-    name: "list",
+    name: "list (empty)",
     node: createListNode({ elements: [] }, fakePos, fakePos),
     expected: {
       type: "list",
       elements: [],
+      range: { begin: fakePos, end: fakePos },
+    },
+  },
+  {
+    name: "list (non-empty)",
+    node: createListNode({ elements: [{} as ExpressionNode, {} as ExpressionNode] }, fakePos, fakePos),
+    expected: {
+      type: "list",
+      elements: [{}, {}],
       range: { begin: fakePos, end: fakePos },
     },
   },
