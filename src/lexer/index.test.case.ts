@@ -431,6 +431,75 @@ export const specialCases: { input: string; expected: SourceToken }[] = [
   },
 ];
 
+export const noTokenCases: { input: string; expected: SourceToken }[] = [
+  {
+    input: "",
+    expected: {
+      type: "end",
+      value: "$end",
+      range: {
+        begin: { row: 0, col: 0 },
+        end: { row: 0, col: 0 },
+      },
+    },
+  },
+  {
+    input: "   ",
+    expected: {
+      type: "end",
+      value: "$end",
+      range: {
+        begin: { row: 0, col: 3 },
+        end: { row: 0, col: 3 },
+      },
+    },
+  },
+  {
+    input: "\n\n\n",
+    expected: {
+      type: "end",
+      value: "$end",
+      range: {
+        begin: { row: 3, col: 0 },
+        end: { row: 3, col: 0 },
+      },
+    },
+  },
+  {
+    input: "\r\r\r",
+    expected: {
+      type: "end",
+      value: "$end",
+      range: {
+        begin: { row: 3, col: 0 },
+        end: { row: 3, col: 0 },
+      },
+    },
+  },
+  {
+    input: "\r\n\r\n\r\n",
+    expected: {
+      type: "end",
+      value: "$end",
+      range: {
+        begin: { row: 3, col: 0 },
+        end: { row: 3, col: 0 },
+      },
+    },
+  },
+  {
+    input: "   \n\n\n\r\r\r\r\n\r\n\r\n",
+    expected: {
+      type: "end",
+      value: "$end",
+      range: {
+        begin: { row: 9, col: 0 },
+        end: { row: 9, col: 0 },
+      },
+    },
+  },
+];
+
 export const multipleTokenCases: { input: string; expected: SourceToken[] }[] = [
   {
     input: "12 + 34",

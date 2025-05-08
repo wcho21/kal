@@ -72,4 +72,32 @@ describe("advance()", () => {
     const char2 = reader.readChar();
     expect(char2).toEqual(expected2);
   });
+
+  it("read a couple of LF new lines", () => {
+    const reader = new Reader("a\n\nb", "\0");
+    const expected1 = { value: "\n", position: { row: 0, col: 1 } };
+    const expected2 = { value: "\n", position: { row: 1, col: 0 } };
+
+    reader.advance();
+    const char1 = reader.readChar();
+    expect(char1).toEqual(expected1);
+
+    reader.advance();
+    const char2 = reader.readChar();
+    expect(char2).toEqual(expected2);
+  });
+
+  it("read a couple of CR LF new lines", () => {
+    const reader = new Reader("a\r\n\r\nb", "\0");
+    const expected1 = { value: "\r\n", position: { row: 0, col: 1 } };
+    const expected2 = { value: "\r\n", position: { row: 1, col: 0 } };
+
+    reader.advance();
+    const char1 = reader.readChar();
+    expect(char1).toEqual(expected1);
+
+    reader.advance();
+    const char2 = reader.readChar();
+    expect(char2).toEqual(expected2);
+  });
 });
