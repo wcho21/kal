@@ -1,6 +1,6 @@
+import { getListRepresentation, isListableValue } from "../util";
 import type * as Value from "../value";
 import * as value from "../value";
-import { getListRepresentation, isListableValue } from "../util";
 
 export type BuiltinFunction = (args: Value.Value[], onStdout?: (toWrite: string) => void) => Value.Value;
 
@@ -71,7 +71,8 @@ const remove: BuiltinFunction = (args: Value.Value[]) => {
 
 const removeFromList = (list: Value.ListValue): Value.ListValue => {
   const popped = list.elements.at(-1);
-  if (popped === undefined) { // empty list
+  // throw if empty list
+  if (popped === undefined) {
     throw new Error("cannot remove element from empty list");
   }
 

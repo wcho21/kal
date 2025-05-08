@@ -2,9 +2,9 @@ import type * as Node from "../parser";
 import type { Range } from "../util/position";
 import builtin, { type BuiltinFunction } from "./builtin";
 import Environment from "./environment";
+import { getListRepresentation, isListableValue } from "./util";
 import type * as Value from "./value";
 import * as value from "./value";
-import { getListRepresentation, isListableValue } from "./util";
 
 export class EvaluatorError extends Error {
   public range: Range;
