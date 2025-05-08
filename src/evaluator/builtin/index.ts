@@ -1,6 +1,6 @@
 import type * as Value from "../value";
 import * as value from "../value";
-import { getListRepresentation } from "../util";
+import { getListRepresentation, isListableValue } from "../util";
 
 export type BuiltinFunction = (args: Value.Value[], onStdout?: (toWrite: string) => void) => Value.Value;
 
@@ -45,13 +45,7 @@ const insertIntoList = (list: Value.ListValue, toInsert: Value.Value[]): Value.L
   }
 
   for (const value of toInsert) {
-    if (
-      value.type !== "number" &&
-      value.type !== "string" &&
-      value.type !== "boolean" &&
-      value.type !== "function" &&
-      value.type !== "list"
-    ) {
+    if (!isListableValue(value)) {
       throw new Error("element is not listable");
     }
   }

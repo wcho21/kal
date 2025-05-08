@@ -4,7 +4,7 @@ import builtin, { type BuiltinFunction } from "./builtin";
 import Environment from "./environment";
 import type * as Value from "./value";
 import * as value from "./value";
-import { getListRepresentation } from "./util";
+import { getListRepresentation, isListableValue } from "./util";
 
 export class EvaluatorError extends Error {
   public range: Range;
@@ -377,13 +377,7 @@ export default class Evaluator {
     return elements.map(node => {
       const e = this.evaluateExpression(node, env);
 
-      if (
-        e.type !== "number" &&
-        e.type !== "string" &&
-        e.type !== "boolean" &&
-        e.type !== "function" &&
-        e.type !== "list"
-      ) {
+      if (!isListableValue(e)) {
         throw new BadListElementTypeError(node.range);
       }
 
