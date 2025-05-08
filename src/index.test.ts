@@ -74,13 +74,25 @@ describe("execute builtin function 길이()", () => {
   });
 });
 
-it("execute builtin function 쓰기()", () => {
-  const stdouts: string[] = [];
+describe("execute builtin function 쓰기()", () => {
+  let stdouts: string[] = [];
   const onStdout = (toWrite: string) => stdouts.push(toWrite);
 
-  execute("쓰기('사과') 쓰기('포도', '바나나')", onStdout);
+  beforeEach(() => {
+    stdouts = [];
+  });
 
-  expect(stdouts).toEqual(["사과", "포도 바나나"]);
+  it("string", () => {
+    execute("쓰기('사과') 쓰기('포도', '바나나')", onStdout);
+
+    expect(stdouts).toEqual(["사과", "포도 바나나"]);
+  });
+
+  it("list", () => {
+    execute("쓰기([42, 참, 'foo'])", onStdout);
+
+    expect(stdouts).toEqual(["[42, 참, foo]"]);
+  });
 });
 
 it("execute function", () => {
