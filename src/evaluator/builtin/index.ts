@@ -24,6 +24,43 @@ const len: BuiltinFunction = (args: Value.Value[]) => {
   throw new Error();
 };
 
+const insert: BuiltinFunction = (args: Value.Value[]) => {
+  if (args.length === 0) {
+    throw new Error("must be called with arguments");
+  }
+
+  const [target, ...remArgs] = args;
+
+  if (target.type === "list") {
+    return insertIntoList(target, remArgs);
+  }
+
+  throw new Error(`expected 'list', but received '${target.type}'`);
+};
+
+const insertIntoList = (list: Value.ListValue, toInsert: Value.Value[]): Value.ListValue => {
+  if (toInsert.length === 0) {
+    throw new Error("nothing to insert");
+  }
+
+  for (const value of toInsert) {
+    if (
+      value.type !== "number" &&
+      value.type !== "string" &&
+      value.type !== "boolean" &&
+      value.type !== "function" &&
+      value.type !== "list"
+    ) {
+      throw new Error("element is not listable");
+    }
+  }
+
+  // keep original as is
+  const inserted = Array.from(list.elements).concat(toInsert as Value.ListableValue[]);
+  const representation = `[${inserted.map(value => value.representation).join(", ")}]`;
+  return value.createListValue({ elements: inserted }, representation, list.range);
+};
+
 const write: BuiltinFunction = (args, onStdout) => {
   if (args.length === 0) {
     throw new Error();
@@ -43,6 +80,8 @@ const builtins = {
     switch (identifier) {
       case "길이":
         return len;
+      case "넣기":
+        return insert;
       case "쓰기":
         return write;
       default:

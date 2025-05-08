@@ -7,6 +7,7 @@ import {
   booleanComparisonCases,
   branchStatementsYieldingNothingCases,
   branchStatementsYieldingSomethingCases,
+  builtinFunctionInsertCallCases,
   builtinFunctionLengthCallCases,
   builtinFunctionWriteCallCases,
   callExpressionCases,
@@ -196,6 +197,10 @@ describe("evaluate()", () => {
   describe("builtin function calls", () => {
     describe("길이()", () => {
       it.each(builtinFunctionLengthCallCases)("evaluate $name", testEvaluatingPrimitive);
+    });
+
+    describe("넣기()", () => {
+      it.each(builtinFunctionInsertCallCases)("evaluate $name", testEvaluatingList);
     });
 
     describe("쓰기()", () => {

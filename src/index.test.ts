@@ -74,6 +74,15 @@ describe("execute builtin function 길이()", () => {
   });
 });
 
+describe("execute builtin function 넣기()", () => {
+  it("list", () => {
+    expect(execute("넣기([1], 2, 3)")).toBe("[1, 2, 3]");
+  });
+  it("original list not changing on insert", () => {
+    expect(execute("원본 = [1] 넣기(원본, 2, 3) 원본")).toBe("[1]");
+  });
+});
+
 describe("execute builtin function 쓰기()", () => {
   let stdouts: string[] = [];
   const onStdout = (toWrite: string) => stdouts.push(toWrite);

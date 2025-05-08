@@ -302,6 +302,24 @@ export const builtinFunctionLengthCallCases = [
   },
 ];
 
+export const builtinFunctionInsertCallCases = [
+  {
+    name: "insert single value into empty list",
+    input: "넣기([], 4)",
+    expected: [{ type: "number", value: 4 } as Value.NumberValue],
+  },
+  {
+    name: "insert multiple value into non-empty list",
+    input: "넣기([42], 4, 참, 'foo')",
+    expected: [
+      { type: "number", value: 42 } as Value.NumberValue,
+      { type: "number", value: 4 } as Value.NumberValue,
+      { type: "boolean", value: true } as Value.BooleanValue,
+      { type: "string", value: "foo" } as Value.StringValue,
+    ],
+  },
+];
+
 export const builtinFunctionWriteCallCases = [
   {
     name: "single string",
