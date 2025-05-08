@@ -142,3 +142,29 @@ it("execute closure", () => {
 it("execute curried function", () => {
   expect(execute("사과 = 함수(포도) { 결과 함수(바나나) { 결과 포도 + 바나나 } } 사과(42)(99)")).toBe("141");
 });
+
+describe("sample program", () => {
+  it("empty", () => {
+    expect(execute("")).toBe("(없음)");
+  });
+
+  it("whitespaces only", () => {
+    expect(execute(" \t \r\r\r \n\n\n \r\n\r\n")).toBe("(없음)");
+  });
+
+  it("factorial calculation", () => {
+    const source = `
+      팩토리얼 = 함수(숫자) {
+        만약 (숫자 <= 1) {
+          결과 1
+        }
+
+        결과 숫자 * 팩토리얼(숫자 - 1)
+      }
+
+      팩토리얼(3)
+    `;
+
+    expect(execute(source)).toBe("6");
+  });
+});
