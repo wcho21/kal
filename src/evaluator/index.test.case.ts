@@ -328,6 +328,19 @@ export const builtinFunctionRemoveCallCases = [
   },
 ];
 
+export const builtinFunctionFindCallCases = [
+  {
+    name: "find value in list",
+    input: "찾기([4, 42], 1)",
+    expected: 42,
+  },
+  {
+    name: "find value in list with negative index",
+    input: "찾기([4, 42], -2)",
+    expected: 4,
+  },
+];
+
 export const builtinFunctionWriteCallCases = [
   {
     name: "single string",

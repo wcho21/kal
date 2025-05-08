@@ -83,6 +83,15 @@ describe("execute builtin function 넣기()", () => {
   });
 });
 
+describe("execute builtin function 찾기()", () => {
+  it("list", () => {
+    expect(execute("찾기([4, 42], 1)")).toBe("42");
+  });
+  it("list, with negative index", () => {
+    expect(execute("찾기([4, 42], -1)")).toBe("42");
+  });
+});
+
 describe("execute builtin function 빼기()", () => {
   it("list", () => {
     expect(execute("빼기([4, 42])")).toBe("[4]");

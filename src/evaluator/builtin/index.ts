@@ -85,6 +85,40 @@ const removeFromList = (list: Value.ListValue): Value.ListValue => {
   return value.createListValue({ elements: removed }, representation, list.range);
 };
 
+const find: BuiltinFunction = (args: Value.Value[]) => {
+  if (args.length === 0) {
+    throw new Error("must be called with arguments");
+  }
+  const [target, ...remArgs] = args;
+
+  if (target.type === "list") {
+    return findInList(target, remArgs);
+  }
+
+  throw new Error(`expected 'list', but received '${target.type}'`);
+};
+
+const findInList = (list: Value.ListValue, remArgs: Value.Value[]): Value.ListableValue => {
+  if (list.elements.length === 0) {
+    throw new Error("cannot find element in empty list");
+  }
+  if (remArgs.length !== 1) {
+    throw new Error("must be one index");
+  }
+  const indexArg = remArgs[0];
+  if (indexArg.type !== "number") {
+    throw new Error("must be number index");
+  }
+
+  const index = indexArg.value;
+  const found = list.elements.at(index);
+  if (found === undefined) {
+    throw new Error("must be valid index within the range");
+  }
+
+  return found;
+};
+
 const write: BuiltinFunction = (args, onStdout) => {
   if (args.length === 0) {
     throw new Error();
@@ -108,6 +142,8 @@ const builtins = {
         return insert;
       case "빼기":
         return remove;
+      case "찾기":
+        return find;
       case "쓰기":
         return write;
       default:

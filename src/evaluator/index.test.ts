@@ -10,6 +10,7 @@ import {
   builtinFunctionInsertCallCases,
   builtinFunctionLengthCallCases,
   builtinFunctionRemoveCallCases,
+  builtinFunctionFindCallCases,
   builtinFunctionWriteCallCases,
   callExpressionCases,
   complexStatementsWithFunctionAndCallCases,
@@ -206,6 +207,10 @@ describe("evaluate()", () => {
 
     describe("빼기()", () => {
       it.each(builtinFunctionRemoveCallCases)("evaluate $name", testEvaluatingList);
+    });
+
+    describe("찾기()", () => {
+      it.each(builtinFunctionFindCallCases)("evaluate $name", testEvaluatingPrimitive);
     });
 
     describe("쓰기()", () => {
