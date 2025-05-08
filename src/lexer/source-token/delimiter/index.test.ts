@@ -1,5 +1,10 @@
 import { fakePos } from "../testing/fixtures";
-import { createBlockDelimiterToken, createGroupDelimiterToken, createSeparatorToken } from "./";
+import {
+  createBlockDelimiterToken,
+  createGroupDelimiterToken,
+  createListDelimiterToken,
+  createSeparatorToken,
+} from "./";
 
 describe("create token with begin and end position", () => {
   const cases = [
@@ -21,6 +26,18 @@ describe("create token with begin and end position", () => {
       expected: {
         type: "block delimiter",
         value: "{",
+        range: {
+          begin: fakePos,
+          end: fakePos,
+        },
+      },
+    },
+    {
+      name: "list delimiter",
+      token: createListDelimiterToken("[", fakePos, fakePos),
+      expected: {
+        type: "list delimiter",
+        value: "[",
         range: {
           begin: fakePos,
           end: fakePos,
@@ -66,6 +83,18 @@ describe("create token with range", () => {
       expected: {
         type: "block delimiter",
         value: "{",
+        range: {
+          begin: fakePos,
+          end: fakePos,
+        },
+      },
+    },
+    {
+      name: "list delimiter",
+      token: createListDelimiterToken("[", { begin: fakePos, end: fakePos }),
+      expected: {
+        type: "list delimiter",
+        value: "[",
         range: {
           begin: fakePos,
           end: fakePos,

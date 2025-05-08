@@ -14,7 +14,8 @@ export type ExpressionNode =
   | InfixNode
   | FunctionNode
   | CallNode
-  | AssignmentNode;
+  | AssignmentNode
+  | ListNode;
 
 export interface IdentifierNode extends SyntaxNodeBase<"identifier"> {
   value: string;
@@ -49,6 +50,9 @@ export interface AssignmentNode extends SyntaxNodeBase<"assignment"> {
   left: ExpressionNode;
   right: ExpressionNode;
 }
+export interface ListNode extends SyntaxNodeBase<"list"> {
+  elements: ExpressionNode[];
+}
 
 export const createIdentifierNode: CreateNode<"identifier", IdentifierNode> = createNodeCreator<
   "identifier",
@@ -69,3 +73,4 @@ export const createAssignmentNode: CreateNode<"assignment", AssignmentNode> = cr
   "assignment",
   AssignmentNode
 >("assignment");
+export const createListNode: CreateNode<"list", ListNode> = createNodeCreator<"list", ListNode>("list");

@@ -10,6 +10,7 @@ import {
   createIllegalStringLiteralToken,
   createIllegalToken,
   createKeywordToken,
+  createListDelimiterToken,
   createNumberLiteralToken,
   createOperatorToken,
   createSeparatorToken,
@@ -65,6 +66,15 @@ export default class Lexer {
         const value = char.value;
 
         const token = createBlockDelimiterToken(value, position, position);
+        return token;
+      }
+
+      case "[":
+      case "]": {
+        const { position } = this.charBuffer.popChar();
+        const value = char.value;
+
+        const token = createListDelimiterToken(value, position, position);
         return token;
       }
 

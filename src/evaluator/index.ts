@@ -2,6 +2,7 @@ import type * as Node from "../parser";
 import type { Range } from "../util/position";
 import builtin, { type BuiltinFunction } from "./builtin";
 import Environment from "./environment";
+import { getListRepresentation, isListableValue } from "./util";
 import type * as Value from "./value";
 import * as value from "./value";
 
@@ -22,6 +23,7 @@ export class BadAssignmentLeftError extends EvaluatorError {}
 export class BadPrefixExpressionError extends EvaluatorError {}
 export class BadInfixExpressionError extends EvaluatorError {}
 export class BadIdentifierError extends EvaluatorError {}
+export class BadListElementTypeError extends EvaluatorError {}
 
 type ComparisonOperator = "==" | "!=" | ">" | "<" | ">=" | "<=";
 
@@ -115,6 +117,9 @@ export default class Evaluator {
     }
     if (node.type === "string") {
       return this.createStringValue(node.value, node.range);
+    }
+    if (node.type === "list") {
+      return this.createListValue(node.elements, node.range, env);
     }
     if (node.type === "prefix") {
       return this.evaluatePrefixExpression(node, env);
@@ -359,6 +364,25 @@ export default class Evaluator {
 
   private createStringValue(val: string, range: Range): Value.StringValue {
     return value.createStringValue({ value: val }, val, range);
+  }
+
+  private createListValue(elements: Node.ExpressionNode[], range: Range, env: Environment): Value.ListValue {
+    const evaluated = this.evaluateListElements(elements, env);
+    const representation = getListRepresentation(evaluated);
+
+    return value.createListValue({ elements: evaluated }, representation, range);
+  }
+
+  private evaluateListElements(elements: Node.ExpressionNode[], env: Environment): Value.ListableValue[] {
+    return elements.map(node => {
+      const e = this.evaluateExpression(node, env);
+
+      if (!isListableValue(e)) {
+        throw new BadListElementTypeError(node.range);
+      }
+
+      return e;
+    });
   }
 
   private createEmptyValue(range: Range): Value.EmptyValue {

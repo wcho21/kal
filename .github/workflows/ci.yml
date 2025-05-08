@@ -30,4 +30,5 @@ jobs:
       - name: Check type
         run: bun run typecheck
       
-      # TODO: check if buildable
+      - name: Check buildable
+        run: bun run build

@@ -10,6 +10,7 @@
   "scripts": {
     "format": "biome check --write",
     "format:check": "biome check",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build": "./bin/build.js"
   }
 }
