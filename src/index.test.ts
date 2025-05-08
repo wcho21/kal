@@ -28,6 +28,18 @@ it("execute 참 == 2 > 1", () => {
   expect(execute("참 == 2 > 1")).toBe("참");
 });
 
+it("execute []", () => {
+  expect(execute("[]")).toBe("[]");
+});
+
+it("execute [1, 참, 'foo']", () => {
+  expect(execute("[1, 참, 'foo']")).toBe("[1, 참, foo]");
+});
+
+it("execute [42+1, !참, 길이('foo')]", () => {
+  expect(execute("[42+1, !참, 길이('foo')]")).toBe("[43, 거짓, 3]");
+});
+
 it("execute 거짓 == 1 != 1", () => {
   // note that comparison is left associative
   expect(execute("거짓 == 1 != 1")).toBe("참");

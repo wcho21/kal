@@ -366,19 +366,26 @@ export default class Evaluator {
   }
 
   private createListValue(elements: Node.ExpressionNode[], range: Range, env: Environment): Value.ListValue {
-    const evaluated: Value.PrimitiveValue[] = [];
+    const evaluated = this.evaluateListElements(elements, env);
+    const representation = this.getListRepresentation(evaluated);
 
-    for (const node of elements) {
+    return value.createListValue({ elements: evaluated }, representation, range);
+  }
+
+  private evaluateListElements(elements: Node.ExpressionNode[], env: Environment): Value.PrimitiveValue[] {
+    return elements.map(node => {
       const e = this.evaluateExpression(node, env);
 
       if (e.type !== "number" && e.type !== "string" && e.type !== "boolean" && e.type !== "function") {
         throw new BadListElementTypeError(node.range);
       }
 
-      evaluated.push(e);
-    }
+      return e;
+    });
+  }
 
-    return value.createListValue({ elements: evaluated }, "list", range);
+  private getListRepresentation(elements: Value.PrimitiveValue[]): string {
+    return `[${elements.map(value => value.representation).join(", ")}]`;
   }
 
   private createEmptyValue(range: Range): Value.EmptyValue {
