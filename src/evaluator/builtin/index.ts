@@ -61,6 +61,30 @@ const insertIntoList = (list: Value.ListValue, toInsert: Value.Value[]): Value.L
   return value.createListValue({ elements: inserted }, representation, list.range);
 };
 
+const remove: BuiltinFunction = (args: Value.Value[]) => {
+  if (args.length !== 1) {
+    throw new Error("must be called with arguments");
+  }
+  const target = args[0];
+
+  if (target.type === "list") {
+    return removeFromList(target);
+  }
+
+  throw new Error(`expected 'list', but received '${target.type}'`);
+};
+
+const removeFromList = (list: Value.ListValue): Value.ListValue => {
+  const popped = list.elements.at(-1);
+  if (popped === undefined) { // empty list
+    throw new Error("cannot remove element from empty list");
+  }
+
+  const removed = list.elements.slice(0, -1);
+  const representation = `[${removed.map(value => value.representation).join(", ")}]`;
+  return value.createListValue({ elements: removed }, representation, list.range);
+};
+
 const write: BuiltinFunction = (args, onStdout) => {
   if (args.length === 0) {
     throw new Error();
@@ -82,6 +106,8 @@ const builtins = {
         return len;
       case "넣기":
         return insert;
+      case "빼기":
+        return remove;
       case "쓰기":
         return write;
       default:

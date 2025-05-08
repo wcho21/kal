@@ -83,6 +83,15 @@ describe("execute builtin function 넣기()", () => {
   });
 });
 
+describe("execute builtin function 빼기()", () => {
+  it("list", () => {
+    expect(execute("빼기([4, 42])")).toBe("[4]");
+  });
+  it("original list not changing on insert", () => {
+    expect(execute("원본 = [1, 2] 빼기(원본) 원본")).toBe("[1, 2]");
+  });
+});
+
 describe("execute builtin function 쓰기()", () => {
   let stdouts: string[] = [];
   const onStdout = (toWrite: string) => stdouts.push(toWrite);

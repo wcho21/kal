@@ -320,6 +320,14 @@ export const builtinFunctionInsertCallCases = [
   },
 ];
 
+export const builtinFunctionRemoveCallCases = [
+  {
+    name: "remove value into list",
+    input: "빼기([4, 42])",
+    expected: [{ type: "number", value: 4 } as Value.NumberValue],
+  },
+];
+
 export const builtinFunctionWriteCallCases = [
   {
     name: "single string",
