@@ -8,36 +8,20 @@ import {
   createIdentifierNode,
   createInfixNode,
   createListNode,
-  createTableNode,
   createNumberNode,
   createPrefixNode,
   createStringNode,
+  createTableNode,
 } from "./";
-import type {
-  AssignmentNode,
-  CallNode,
-  ExpressionNode,
-  FunctionNode,
-  IdentifierNode,
-  InfixNode,
-  ListNode,
-  NumberNode,
-  PrefixNode,
-  StringNode,
-} from "./";
+import type { AssignmentNode, CallNode, ExpressionNode, FunctionNode, IdentifierNode } from "./";
 
-type Node =
-  | AssignmentNode
-  | CallNode
-  | ExpressionNode
-  | FunctionNode
-  | IdentifierNode
-  | InfixNode
-  | ListNode
-  | NumberNode
-  | PrefixNode
-  | StringNode;
+type Node = AssignmentNode | ExpressionNode | CallNode;
 type Case = { name: string; node: Node; expected: Node };
+
+const fakeExprNode = {} as ExpressionNode;
+const fakeIdentifierNode = {} as IdentifierNode;
+const fakeIdentifierNodes = [] as IdentifierNode[];
+const fakeBlockNode = {} as BlockNode;
 
 const cases: Case[] = [
   {
@@ -69,52 +53,52 @@ const cases: Case[] = [
   },
   {
     name: "prefix",
-    node: createPrefixNode({ prefix: "+", right: {} as ExpressionNode }, fakePos1, fakePos2),
+    node: createPrefixNode({ prefix: "+", right: fakeExprNode }, fakePos1, fakePos2),
     expected: {
       type: "prefix",
       prefix: "+",
-      right: {} as ExpressionNode,
+      right: fakeExprNode,
       range: fakeRange,
     },
   },
   {
     name: "infix",
-    node: createInfixNode({ infix: "+", left: {} as ExpressionNode, right: {} as ExpressionNode }, fakePos1, fakePos2),
+    node: createInfixNode({ infix: "+", left: fakeExprNode, right: fakeExprNode }, fakePos1, fakePos2),
     expected: {
       type: "infix",
       infix: "+",
-      left: {} as ExpressionNode,
-      right: {} as ExpressionNode,
+      left: fakeExprNode,
+      right: fakeExprNode,
       range: fakeRange,
     },
   },
   {
     name: "function",
-    node: createFunctionNode({ parameters: [] as IdentifierNode[], body: {} as BlockNode }, fakePos1, fakePos2),
+    node: createFunctionNode({ parameters: fakeIdentifierNodes, body: fakeBlockNode }, fakePos1, fakePos2),
     expected: {
       type: "function",
-      parameters: [],
+      parameters: fakeIdentifierNodes,
       body: {} as FunctionNode["body"],
       range: fakeRange,
     },
   },
   {
     name: "call",
-    node: createCallNode({ func: {} as IdentifierNode, args: [] as ExpressionNode[] }, fakePos1, fakePos2),
+    node: createCallNode({ func: fakeIdentifierNode, args: fakeIdentifierNodes }, fakePos1, fakePos2),
     expected: {
       type: "call",
-      func: {} as CallNode["func"],
-      args: [] as CallNode["args"],
+      func: fakeIdentifierNode,
+      args: fakeIdentifierNodes,
       range: fakeRange,
     },
   },
   {
     name: "assignment",
-    node: createAssignmentNode({ left: {} as IdentifierNode, right: {} as ExpressionNode }, fakePos1, fakePos2),
+    node: createAssignmentNode({ left: fakeExprNode, right: fakeExprNode }, fakePos1, fakePos2),
     expected: {
       type: "assignment",
-      left: {} as IdentifierNode,
-      right: {} as ExpressionNode,
+      left: fakeExprNode,
+      right: fakeExprNode,
       range: fakeRange,
     },
   },
@@ -129,10 +113,10 @@ const cases: Case[] = [
   },
   {
     name: "list (non-empty)",
-    node: createListNode({ elements: [{} as ExpressionNode, {} as ExpressionNode] }, fakePos1, fakePos2),
+    node: createListNode({ elements: [fakeExprNode, fakeExprNode] }, fakePos1, fakePos2),
     expected: {
       type: "list",
-      elements: [{} as ExpressionNode, {} as ExpressionNode],
+      elements: [fakeExprNode, fakeExprNode],
       range: fakeRange,
     },
   },
@@ -147,10 +131,10 @@ const cases: Case[] = [
   },
   {
     name: "table (non-empty)",
-    node: createTableNode({ elements: [[{} as ExpressionNode, {} as ExpressionNode]] }, fakePos1, fakePos2),
+    node: createTableNode({ elements: [[fakeExprNode, fakeExprNode]] }, fakePos1, fakePos2),
     expected: {
       type: "table",
-      elements: [[{} as ExpressionNode, {} as ExpressionNode]],
+      elements: [[fakeExprNode, fakeExprNode]],
       range: fakeRange,
     },
   },
