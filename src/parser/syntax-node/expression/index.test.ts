@@ -8,6 +8,7 @@ import {
   createIdentifierNode,
   createInfixNode,
   createListNode,
+  createTableNode,
   createNumberNode,
   createPrefixNode,
   createStringNode,
@@ -132,6 +133,24 @@ const cases: Case[] = [
     expected: {
       type: "list",
       elements: [{} as ExpressionNode, {} as ExpressionNode],
+      range: fakeRange,
+    },
+  },
+  {
+    name: "table (empty)",
+    node: createTableNode({ elements: [] }, fakePos1, fakePos2),
+    expected: {
+      type: "table",
+      elements: [],
+      range: fakeRange,
+    },
+  },
+  {
+    name: "table (non-empty)",
+    node: createTableNode({ elements: [[{} as ExpressionNode, {} as ExpressionNode]] }, fakePos1, fakePos2),
+    expected: {
+      type: "table",
+      elements: [[{} as ExpressionNode, {} as ExpressionNode]],
       range: fakeRange,
     },
   },
