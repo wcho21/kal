@@ -141,7 +141,7 @@ export const listCases = [
   },
 ];
 
-export const tableCases: {input: string, expected: [Value.KeyableValue, Value.ListableValue][]}[] = [
+export const tableCases: { input: string; expected: [Value.KeyableValue, Value.ListableValue][] }[] = [
   { input: "[!]", expected: [] },
   {
     input: "[! 'foo': 1]",
