@@ -41,6 +41,22 @@ it("execute [42+1, !참, 길이('foo')]", () => {
   expect(execute("[42+1, !참, 길이('foo')]")).toBe("[43, 거짓, 3]");
 });
 
+it("execute [1, [[42], 99], []]", () => {
+  expect(execute("[1, [[42], 99], []]")).toBe("[1, [[42], 99], []]");
+});
+
+it("execute [1, [! 'foo': 42]]", () => {
+  expect(execute("[1, [! 'foo': 42]]")).toBe("[1, [!foo: 42]]");
+});
+
+it("execute [! 'foo': 42]", () => {
+  expect(execute("[! 'foo': 42]")).toBe("[!foo: 42]");
+});
+
+it("execute [! 'foo': [! 'bar': 42], 99: []]", () => {
+  expect(execute("[! 'foo': [! 'bar': 42 ], 99: []]")).toBe("[!foo: [!bar: 42], 99: []]");
+});
+
 it("execute 거짓 == 1 != 1", () => {
   // note that comparison is left associative
   expect(execute("거짓 == 1 != 1")).toBe("참");

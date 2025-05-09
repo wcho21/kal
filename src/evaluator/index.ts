@@ -2,7 +2,7 @@ import type * as Node from "../parser";
 import type { Range } from "../util/position";
 import builtin, { type BuiltinFunction } from "./builtin";
 import Environment from "./environment";
-import { getListRepresentation, isListableValue } from "./util";
+import { getListRepresentation, getTableRepresentation, isKeyableValue, isListableValue } from "./util";
 import type * as Value from "./value";
 import * as value from "./value";
 
@@ -24,6 +24,8 @@ export class BadPrefixExpressionError extends EvaluatorError {}
 export class BadInfixExpressionError extends EvaluatorError {}
 export class BadIdentifierError extends EvaluatorError {}
 export class BadListElementTypeError extends EvaluatorError {}
+export class BadTableKeyTypeError extends EvaluatorError {}
+export class BadTableValueTypeError extends EvaluatorError {}
 
 type ComparisonOperator = "==" | "!=" | ">" | "<" | ">=" | "<=";
 
@@ -120,6 +122,9 @@ export default class Evaluator {
     }
     if (node.type === "list") {
       return this.createListValue(node.elements, node.range, env);
+    }
+    if (node.type === "table") {
+      return this.createTableValue(node.elements, node.range, env);
     }
     if (node.type === "prefix") {
       return this.evaluatePrefixExpression(node, env);
@@ -376,13 +381,45 @@ export default class Evaluator {
   private evaluateListElements(elements: Node.ExpressionNode[], env: Environment): Value.ListableValue[] {
     return elements.map(node => {
       const e = this.evaluateExpression(node, env);
-
+      // TODO: can be parser-level error if elements restricted to be the "listable" type?
+      //       see also evaluateTableElements for the same problem
       if (!isListableValue(e)) {
         throw new BadListElementTypeError(node.range);
       }
 
       return e;
     });
+  }
+
+  private createTableValue(
+    elements: [Node.ExpressionNode, Node.ExpressionNode][],
+    range: Range,
+    env: Environment,
+  ): Value.TableValue {
+    const evaluated = this.evaluateTableElements(elements, env);
+    const representation = getTableRepresentation(evaluated);
+
+    return value.createTableValue({ elements: evaluated }, representation, range);
+  }
+
+  private evaluateTableElements(
+    elements: [Node.ExpressionNode, Node.ExpressionNode][],
+    env: Environment,
+  ): Map<Value.KeyableValue, Value.ListableValue> {
+    return new Map(
+      elements.map(([keyNode, valueNode]) => {
+        const k = this.evaluateExpression(keyNode, env);
+        if (!isKeyableValue(k)) {
+          throw new BadTableKeyTypeError(k.range);
+        }
+        const v = this.evaluateExpression(valueNode, env);
+        if (!isListableValue(v)) {
+          throw new BadTableKeyTypeError(v.range);
+        }
+
+        return [k, v];
+      }),
+    );
   }
 
   private createEmptyValue(range: Range): Value.EmptyValue {

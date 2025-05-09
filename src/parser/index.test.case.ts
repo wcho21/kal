@@ -711,6 +711,148 @@ export const listExpressionCases = [
   },
 ];
 
+export const tableExpressionCases = [
+  {
+    name: "empty table",
+    input: "[!]",
+    expected: {
+      type: "program",
+      statements: [
+        {
+          type: "expression statement",
+          expression: {
+            type: "table",
+            elements: [],
+          },
+        },
+      ],
+    },
+  },
+  {
+    name: "single element table",
+    input: "[! 'foo': 42]",
+    expected: {
+      type: "program",
+      statements: [
+        {
+          type: "expression statement",
+          expression: {
+            type: "table",
+            elements: [
+              [
+                {
+                  type: "string",
+                  value: "foo",
+                },
+                {
+                  type: "number",
+                  value: 42,
+                },
+              ],
+            ],
+          },
+        },
+      ],
+    },
+  },
+  {
+    name: "multiple element table",
+    input: "[! 'foo': 42, 'bar': 참]",
+    expected: {
+      type: "program",
+      statements: [
+        {
+          type: "expression statement",
+          expression: {
+            type: "table",
+            elements: [
+              [
+                {
+                  type: "string",
+                  value: "foo",
+                },
+                {
+                  type: "number",
+                  value: 42,
+                },
+              ],
+              [
+                {
+                  type: "string",
+                  value: "bar",
+                },
+                {
+                  type: "boolean",
+                  value: true,
+                },
+              ],
+            ],
+          },
+        },
+      ],
+    },
+  },
+  {
+    name: "nested table",
+    input: "[! 'foo': [! 'bar': [! 'baz': 42], 'qux': 참 ] ]",
+    expected: {
+      type: "program",
+      statements: [
+        {
+          type: "expression statement",
+          expression: {
+            type: "table",
+            elements: [
+              [
+                {
+                  type: "string",
+                  value: "foo",
+                },
+                {
+                  type: "table",
+                  elements: [
+                    [
+                      {
+                        type: "string",
+                        value: "bar",
+                      },
+                      {
+                        type: "table",
+                        elements: [
+                          [
+                            {
+                              type: "string",
+                              value: "baz",
+                            },
+                            {
+                              type: "number",
+                              value: 42,
+                            },
+                          ],
+                        ],
+                      },
+                    ],
+                    [
+                      {
+                        type: "string",
+                        value: "qux",
+                      },
+                      {
+                        type: "boolean",
+                        value: true,
+                      },
+                    ],
+                  ],
+                },
+              ],
+            ],
+          },
+        },
+      ],
+    },
+  },
+];
+
 export const returnStatementCases = [
   {
     name: "return number literal",

@@ -4,7 +4,7 @@ import type { CreateToken, SourceTokenBase } from "./../base";
 export type GroupDelimiterValue = "(" | ")";
 export type BlockDelimiterValue = "{" | "}";
 export type ListDelimiterValue = "[" | "]";
-export type SeparatorValue = ",";
+export type SeparatorValue = "," | ":";
 
 export type GroupDelimiterToken = SourceTokenBase<"group delimiter", GroupDelimiterValue>;
 export type BlockDelimiterToken = SourceTokenBase<"block delimiter", BlockDelimiterValue>;

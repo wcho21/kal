@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { fakePos } from "../testing/fixtures";
+import { fakePos1, fakePos2, fakeRange } from "../../../util/position/index.test.fixture";
 import type { BlockDelimiterToken, GroupDelimiterToken, ListDelimiterToken, SeparatorToken } from "./";
 import {
   createBlockDelimiterToken,
@@ -14,51 +14,75 @@ type Case = { name: string; token: Token; expected: Token };
 describe("create token with begin and end position", () => {
   const cases: Case[] = [
     {
-      name: "group delimiter",
-      token: createGroupDelimiterToken("(", fakePos, fakePos),
+      name: "group delimiter '('",
+      token: createGroupDelimiterToken("(", fakePos1, fakePos2),
       expected: {
         type: "group delimiter",
         value: "(",
-        range: {
-          begin: fakePos,
-          end: fakePos,
-        },
+        range: fakeRange,
       },
     },
     {
-      name: "block delimiter",
-      token: createBlockDelimiterToken("{", fakePos, fakePos),
+      name: "group delimiter ')'",
+      token: createGroupDelimiterToken(")", fakePos1, fakePos2),
+      expected: {
+        type: "group delimiter",
+        value: ")",
+        range: fakeRange,
+      },
+    },
+    {
+      name: "block delimiter '{'",
+      token: createBlockDelimiterToken("{", fakePos1, fakePos2),
       expected: {
         type: "block delimiter",
         value: "{",
-        range: {
-          begin: fakePos,
-          end: fakePos,
-        },
+        range: fakeRange,
       },
     },
     {
-      name: "list delimiter",
-      token: createListDelimiterToken("[", fakePos, fakePos),
+      name: "block delimiter '}'",
+      token: createBlockDelimiterToken("}", fakePos1, fakePos2),
+      expected: {
+        type: "block delimiter",
+        value: "}",
+        range: fakeRange,
+      },
+    },
+    {
+      name: "list delimiter '['",
+      token: createListDelimiterToken("[", fakePos1, fakePos2),
       expected: {
         type: "list delimiter",
         value: "[",
-        range: {
-          begin: fakePos,
-          end: fakePos,
-        },
+        range: fakeRange,
       },
     },
     {
-      name: "separator",
-      token: createSeparatorToken(",", fakePos, fakePos),
+      name: "list delimiter ']'",
+      token: createListDelimiterToken("]", fakePos1, fakePos2),
+      expected: {
+        type: "list delimiter",
+        value: "]",
+        range: fakeRange,
+      },
+    },
+    {
+      name: "separator ','",
+      token: createSeparatorToken(",", fakePos1, fakePos2),
       expected: {
         type: "separator",
         value: ",",
-        range: {
-          begin: fakePos,
-          end: fakePos,
-        },
+        range: fakeRange,
+      },
+    },
+    {
+      name: "separator ':'",
+      token: createSeparatorToken(":", fakePos1, fakePos2),
+      expected: {
+        type: "separator",
+        value: ":",
+        range: fakeRange,
       },
     },
   ];
@@ -71,51 +95,75 @@ describe("create token with begin and end position", () => {
 describe("create token with range", () => {
   const cases: Case[] = [
     {
-      name: "group delimiter",
-      token: createGroupDelimiterToken("(", { begin: fakePos, end: fakePos }),
+      name: "group delimiter '('",
+      token: createGroupDelimiterToken("(", fakeRange),
       expected: {
         type: "group delimiter",
         value: "(",
-        range: {
-          begin: fakePos,
-          end: fakePos,
-        },
+        range: fakeRange,
       },
     },
     {
-      name: "block delimiter",
-      token: createBlockDelimiterToken("{", { begin: fakePos, end: fakePos }),
+      name: "group delimiter ')'",
+      token: createGroupDelimiterToken(")", fakeRange),
+      expected: {
+        type: "group delimiter",
+        value: ")",
+        range: fakeRange,
+      },
+    },
+    {
+      name: "block delimiter '{'",
+      token: createBlockDelimiterToken("{", fakeRange),
       expected: {
         type: "block delimiter",
         value: "{",
-        range: {
-          begin: fakePos,
-          end: fakePos,
-        },
+        range: fakeRange,
       },
     },
     {
-      name: "list delimiter",
-      token: createListDelimiterToken("[", { begin: fakePos, end: fakePos }),
+      name: "block delimiter '}'",
+      token: createBlockDelimiterToken("}", fakeRange),
+      expected: {
+        type: "block delimiter",
+        value: "}",
+        range: fakeRange,
+      },
+    },
+    {
+      name: "list delimiter '['",
+      token: createListDelimiterToken("[", fakeRange),
       expected: {
         type: "list delimiter",
         value: "[",
-        range: {
-          begin: fakePos,
-          end: fakePos,
-        },
+        range: fakeRange,
       },
     },
     {
-      name: "separator",
-      token: createSeparatorToken(",", { begin: fakePos, end: fakePos }),
+      name: "list delimiter ']'",
+      token: createListDelimiterToken("]", fakeRange),
+      expected: {
+        type: "list delimiter",
+        value: "]",
+        range: fakeRange,
+      },
+    },
+    {
+      name: "separator ','",
+      token: createSeparatorToken(",", fakeRange),
       expected: {
         type: "separator",
         value: ",",
-        range: {
-          begin: fakePos,
-          end: fakePos,
-        },
+        range: fakeRange,
+      },
+    },
+    {
+      name: "separator ':'",
+      token: createSeparatorToken(":", fakeRange),
+      expected: {
+        type: "separator",
+        value: ":",
+        range: fakeRange,
       },
     },
   ];

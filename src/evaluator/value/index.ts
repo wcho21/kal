@@ -8,9 +8,10 @@ export interface ValueBase<T extends string = string> {
   readonly range: Range;
 }
 
-export type Value = PrimitiveValue | EmptyValue | BuiltinFunctionValue | ListValue;
+export type Value = PrimitiveValue | EmptyValue | BuiltinFunctionValue | ListValue | TableValue;
 export type PrimitiveValue = NumberValue | StringValue | BooleanValue | FunctionValue;
-export type ListableValue = PrimitiveValue | ListValue;
+export type ListableValue = PrimitiveValue | ListValue | TableValue;
+export type KeyableValue = NumberValue | StringValue | BooleanValue;
 
 export interface NumberValue extends ValueBase<"number"> {
   readonly value: number;
@@ -29,6 +30,10 @@ export interface FunctionValue extends ValueBase<"function"> {
 
 export interface ListValue extends ValueBase<"list"> {
   readonly elements: ListableValue[];
+}
+
+export interface TableValue extends ValueBase<"table"> {
+  readonly elements: Map<KeyableValue, ListableValue>;
 }
 
 export interface EmptyValue extends ValueBase<"empty"> {
@@ -72,6 +77,7 @@ export const createFunctionValue: CreateValue<"function", FunctionValue> = creat
   FunctionValue
 >("function");
 export const createListValue: CreateValue<"list", ListValue> = createValueCreator<"list", ListValue>("list");
+export const createTableValue: CreateValue<"table", TableValue> = createValueCreator<"table", TableValue>("table");
 export const createBuiltinFunctionValue: CreateValue<"builtin function", BuiltinFunctionValue> = createValueCreator<
   "builtin function",
   BuiltinFunctionValue

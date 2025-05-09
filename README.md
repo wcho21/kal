@@ -5,7 +5,7 @@
 ***Kal***: _Korean Algorithmic Language_.
 
 - < 0.03 MB.
-- Tested with ~ 300 cases.
+- Tested with > 300 cases.
 - JavaScript-bundled, which runs natively on web browsers.
 - Minimal syntax with Korean keywords.
 - No dependencies (made from scratch).
