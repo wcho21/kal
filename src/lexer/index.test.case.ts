@@ -170,6 +170,17 @@ export const singleDelimiterCases: { input: string; expected: SourceToken }[] = 
     },
   },
   {
+    input: "}",
+    expected: {
+      type: "block delimiter",
+      value: "}",
+      range: {
+        begin: { row: 0, col: 0 },
+        end: { row: 0, col: 0 },
+      },
+    },
+  },
+  {
     input: "[",
     expected: {
       type: "list delimiter",
@@ -185,17 +196,6 @@ export const singleDelimiterCases: { input: string; expected: SourceToken }[] = 
     expected: {
       type: "list delimiter",
       value: "]",
-      range: {
-        begin: { row: 0, col: 0 },
-        end: { row: 0, col: 0 },
-      },
-    },
-  },
-  {
-    input: "}",
-    expected: {
-      type: "block delimiter",
-      value: "}",
       range: {
         begin: { row: 0, col: 0 },
         end: { row: 0, col: 0 },
