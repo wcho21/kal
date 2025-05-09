@@ -30,16 +30,19 @@ import {
   singleNumberCases,
   singleStringCases,
   stringComparisonCases,
+  tableCases,
   variableStatementsCases,
 } from "./index.test.case";
 import type {
   BooleanValue,
   EmptyValue,
   FunctionValue,
+  KeyableValue,
   ListValue,
   ListableValue,
   NumberValue,
   StringValue,
+  TableValue,
   Value,
 } from "./value";
 
@@ -91,14 +94,46 @@ const testEvaluatingList = ({ input, expected }: { input: string; expected: List
     const expectedElem = expected[i];
 
     if (elem.type === "number" || elem.type === "string" || elem.type === "boolean") {
-      const expectedValue = (expectedElem as NumberValue).value;
+      const expectedValue = (expectedElem as NumberValue | StringValue | BooleanValue).value;
       expect(elem.value).toBe(expectedValue);
     } else if (elem.type === "function") {
       expect(elem.type).toBe("function");
     } else if (elem.type === "list") {
       expect(elem.type).toBe("list");
+    } else if (elem.type === "table") {
+      expect(elem.type).toBe("table");
     } else {
       const _never: never = elem;
+      throw new Error("must be unreachable");
+    }
+  }
+};
+
+const testEvaluatingTable = ({
+  input,
+  expected,
+}: { input: string; expected: [KeyableValue, ListableValue][] }): void => {
+  const evaluated = evaluateInput(input) as TableValue;
+  const elements = Array.from(evaluated.elements);
+
+  expect(elements.length).toBe(expected.length);
+
+  for (let i = 0; i < elements.length; ++i) {
+    const [key, value] = elements[i];
+    const [expectedKey, expectedValue] = expected[i];
+
+    expect(key.value).toBe(expectedKey.value);
+
+    if (value.type === "number" || value.type === "string" || value.type === "boolean") {
+      expect(value.value).toBe((expectedValue as NumberValue | StringValue | BooleanValue).value);
+    } else if (value.type === "function") {
+      expect(value.type).toBe("function");
+    } else if (value.type === "list") {
+      expect(value.type).toBe("list");
+    } else if (value.type === "table") {
+      expect(value.type).toBe("table");
+    } else {
+      const _never: never = value;
       throw new Error("must be unreachable");
     }
   }
@@ -163,6 +198,10 @@ describe("evaluate()", () => {
 
   describe("list", () => {
     it.each(listCases)("evaluate $input", testEvaluatingList);
+  });
+
+  describe("table", () => {
+    it.each(tableCases)("evaluate $input", testEvaluatingTable);
   });
 
   describe("branch statements yielding something", () => {

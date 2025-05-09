@@ -123,6 +123,100 @@ export const listCases = [
       { type: "number", value: 3 } as Value.NumberValue,
     ],
   },
+  {
+    input: "[42, [], [[99, 1]]]",
+    expected: [
+      { type: "number", value: 42 } as Value.NumberValue,
+      { type: "list", elements: [] as Value.Value[] } as Value.ListValue,
+      { type: "list", elements: [] as Value.Value[] } as Value.ListValue,
+    ],
+  },
+  {
+    input: "[42, [!], [! 'foo': 99]]",
+    expected: [
+      { type: "number", value: 42 } as Value.NumberValue,
+      { type: "table", elements: {} as Value.TableValue["elements"] } as Value.TableValue,
+      { type: "table", elements: {} as Value.TableValue["elements"] } as Value.TableValue,
+    ],
+  },
+];
+
+export const tableCases: {input: string, expected: [Value.KeyableValue, Value.ListableValue][]}[] = [
+  { input: "[!]", expected: [] },
+  {
+    input: "[! 'foo': 1]",
+    expected: [
+      [
+        {
+          type: "string",
+          value: "foo",
+        } as Value.StringValue,
+        {
+          type: "number",
+          value: 1,
+        } as Value.NumberValue,
+      ],
+    ],
+  },
+  {
+    input: "[! 'foo': 42, 참: 함수() {}, 99: -1]",
+    expected: [
+      [
+        {
+          type: "string",
+          value: "foo",
+        } as Value.StringValue,
+        {
+          type: "number",
+          value: 42,
+        } as Value.NumberValue,
+      ],
+      [
+        {
+          type: "boolean",
+          value: true,
+        } as Value.BooleanValue,
+        {
+          type: "function",
+        } as Value.FunctionValue,
+      ],
+      [
+        {
+          type: "number",
+          value: 99,
+        } as Value.NumberValue,
+        {
+          type: "number",
+          value: -1,
+        } as Value.NumberValue,
+      ],
+    ],
+  },
+  {
+    input: "[! 1+2: 42, !참: 'bar']",
+    expected: [
+      [
+        {
+          type: "number",
+          value: 3,
+        } as Value.NumberValue,
+        {
+          type: "number",
+          value: 42,
+        } as Value.NumberValue,
+      ],
+      [
+        {
+          type: "boolean",
+          value: false,
+        } as Value.BooleanValue,
+        {
+          type: "string",
+          value: "bar",
+        } as Value.StringValue,
+      ],
+    ],
+  },
 ];
 
 export const branchStatementsYieldingSomethingCases = [
