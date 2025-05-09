@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { fakePos1, fakePos2, fakeRange } from "../index.test.fixture";
+import { fakePos1, fakePos2, fakeRange } from "../../../util/position/index.test.fixture";
 import type { BlockDelimiterToken, GroupDelimiterToken, ListDelimiterToken, SeparatorToken } from "./";
 import {
   createBlockDelimiterToken,
