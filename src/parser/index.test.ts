@@ -20,6 +20,7 @@ import {
   singleExpressionCases,
   singleNumberCases,
   singleStatementCases,
+  tableExpressionCases,
   unaryCases,
 } from "./index.test.case";
 
@@ -96,6 +97,10 @@ describe("parseSource()", () => {
 
     describe("list expressions", () => {
       it.each(listExpressionCases)("$name", testSuccess);
+    });
+
+    describe("table expressions", () => {
+      it.each(tableExpressionCases)("$name", testSuccess);
     });
 
     describe("return statement", () => {

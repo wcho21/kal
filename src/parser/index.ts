@@ -2,7 +2,7 @@ import { type BindingPowerEntry, bindingPowers, getInfixBindingPower } from "./b
 import type * as Node from "./syntax-node";
 import * as node from "./syntax-node";
 
-import { type Range, type Position, copyRange } from "../util/position";
+import { type Position, type Range, copyRange } from "../util/position";
 
 export class ParserError extends Error {
   public received: string;
@@ -30,12 +30,14 @@ export class BadFunctionKeywordError extends ParserError {}
 export class BadIdentifierError extends ParserError {}
 export class BadSeparatorError extends ParserError {}
 export class BadListSeparatorError extends ParserError {}
+export class BadTableSeparatorError extends ParserError {}
 
 import type Lexer from "../lexer";
 import SourceTokenReader from "./source-token-reader";
 
 type PrefixOperator = "+" | "-" | "!";
 type InfixOperator = "+" | "-" | "*" | "/" | "!=" | "==" | ">" | "<" | ">=" | "<=";
+type TableElement = [Node.ExpressionNode, Node.ExpressionNode];
 
 export default class Parser {
   private static readonly PREFIX_OPERATORS = ["+", "-", "!"] as const;
@@ -391,14 +393,14 @@ export default class Parser {
 
     const notOrOther = this.reader.read();
     if (notOrOther.type === "operator" && notOrOther.value === "!") {
-      throw new Error("todo");
+      this.advanceOrThrow("operator", "!", BadListDelimiterError);
+      return this.parseTableExpression(begin);
     }
 
     return this.parseListExpression(begin);
   }
 
   private parseListExpression(begin: Position): Node.ListNode {
-
     const elements: Node.ExpressionNode[] = [];
 
     // return if empty list
@@ -422,6 +424,40 @@ export default class Parser {
 
         const range = { begin, end };
         return node.createListNode({ elements }, range);
+      }
+
+      this.advanceOrThrow("separator", ",", BadListSeparatorError);
+    }
+  }
+
+  private parseTableExpression(begin: Position): Node.TableNode {
+    const elements: TableElement[] = [];
+
+    const maybeTableEnd = this.reader.read();
+    if (maybeTableEnd.type === "list delimiter" && maybeTableEnd.value === "]") {
+      const { end } = this.reader.read().range;
+      this.advanceOrThrow("list delimiter", "]", BadListDelimiterError);
+
+      const range = { begin, end };
+      return node.createTableNode({ elements }, range);
+    }
+
+    while (true) {
+      const key = this.parseExpression(bindingPowers.lowest);
+      console.log(this.reader.read());
+      this.advanceOrThrow("separator", ":", BadTableSeparatorError);
+      const value = this.parseExpression(bindingPowers.lowest);
+
+      const pair: TableElement = [key, value];
+      elements.push(pair);
+
+      const separatorOrListEnd = this.reader.read();
+      if (separatorOrListEnd.type === "list delimiter" && separatorOrListEnd.value === "]") {
+        const { end } = this.reader.read().range;
+        this.advanceOrThrow("list delimiter", "]", BadListDelimiterError);
+
+        const range = { begin, end };
+        return node.createTableNode({ elements }, range);
       }
 
       this.advanceOrThrow("separator", ",", BadListSeparatorError);
