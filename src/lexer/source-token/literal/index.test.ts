@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { fakePos } from "../testing/fixtures";
+import { fakePos1, fakePos2, fakeRange } from "../index.test.fixture";
 import { createBooleanLiteralToken, createNumberLiteralToken, createStringLiteralToken } from "./";
 import type { BooleanLiteralToken, NumberLiteralToken, StringLiteralToken } from "./";
 
@@ -10,38 +10,29 @@ describe("create token with begin and end position", () => {
   const cases: Case[] = [
     {
       name: "number literal",
-      token: createNumberLiteralToken("0", fakePos, fakePos),
+      token: createNumberLiteralToken("0", fakePos1, fakePos2),
       expected: {
         type: "number literal",
         value: "0",
-        range: {
-          begin: fakePos,
-          end: fakePos,
-        },
+        range: fakeRange,
       },
     },
     {
       name: "boolean literal",
-      token: createBooleanLiteralToken("참", fakePos, fakePos),
+      token: createBooleanLiteralToken("참", fakePos1, fakePos2),
       expected: {
         type: "boolean literal",
         value: "참",
-        range: {
-          begin: fakePos,
-          end: fakePos,
-        },
+        range: fakeRange,
       },
     },
     {
       name: "string literal",
-      token: createStringLiteralToken("foo", fakePos, fakePos),
+      token: createStringLiteralToken("foo", fakePos1, fakePos2),
       expected: {
         type: "string literal",
         value: "foo",
-        range: {
-          begin: fakePos,
-          end: fakePos,
-        },
+        range: fakeRange,
       },
     },
   ];
@@ -55,38 +46,29 @@ describe("create token with range", () => {
   const cases: Case[] = [
     {
       name: "number literal",
-      token: createNumberLiteralToken("0", { begin: fakePos, end: fakePos }),
+      token: createNumberLiteralToken("0", fakeRange),
       expected: {
         type: "number literal",
         value: "0",
-        range: {
-          begin: fakePos,
-          end: fakePos,
-        },
+        range: fakeRange,
       },
     },
     {
       name: "boolean literal",
-      token: createBooleanLiteralToken("참", { begin: fakePos, end: fakePos }),
+      token: createBooleanLiteralToken("참", fakeRange),
       expected: {
         type: "boolean literal",
         value: "참",
-        range: {
-          begin: fakePos,
-          end: fakePos,
-        },
+        range: fakeRange,
       },
     },
     {
       name: "string literal",
-      token: createStringLiteralToken("foo", { begin: fakePos, end: fakePos }),
+      token: createStringLiteralToken("foo", fakeRange),
       expected: {
         type: "string literal",
         value: "foo",
-        range: {
-          begin: fakePos,
-          end: fakePos,
-        },
+        range: fakeRange,
       },
     },
   ];

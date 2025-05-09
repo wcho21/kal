@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { fakePos } from "../testing/fixtures";
+import { fakePos1, fakePos2, fakeRange } from "../index.test.fixture";
 import { createOperatorToken } from "./";
 import type { OperatorToken } from "./";
 
@@ -10,14 +10,11 @@ describe("create token with begin and end position", () => {
   const cases: Case[] = [
     {
       name: "operator",
-      token: createOperatorToken("+", fakePos, fakePos),
+      token: createOperatorToken("+", fakePos1, fakePos2),
       expected: {
         type: "operator",
         value: "+",
-        range: {
-          begin: fakePos,
-          end: fakePos,
-        },
+        range: fakeRange,
       },
     },
   ];
@@ -31,14 +28,11 @@ describe("create token with range", () => {
   const cases: Case[] = [
     {
       name: "operator",
-      token: createOperatorToken("+", { begin: fakePos, end: fakePos }),
+      token: createOperatorToken("+", fakeRange),
       expected: {
         type: "operator",
         value: "+",
-        range: {
-          begin: fakePos,
-          end: fakePos,
-        },
+        range: fakeRange,
       },
     },
   ];

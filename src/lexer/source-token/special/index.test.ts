@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { fakePos } from "../testing/fixtures";
+import { fakePos1, fakePos2, fakeRange } from "../index.test.fixture";
 import { createEndToken, createIllegalStringLiteralToken, createIllegalToken } from "./";
 import type { EndToken, IllegalStringLiteralToken, IllegalToken } from "./";
 
@@ -10,38 +10,29 @@ describe("create token with begin and end position", () => {
   const cases: Case[] = [
     {
       name: "illegal",
-      token: createIllegalToken("$", fakePos, fakePos),
+      token: createIllegalToken("$", fakePos1, fakePos2),
       expected: {
         type: "illegal",
         value: "$",
-        range: {
-          begin: fakePos,
-          end: fakePos,
-        },
+        range: fakeRange,
       },
     },
     {
       name: "illegal string",
-      token: createIllegalStringLiteralToken("foo", fakePos, fakePos),
+      token: createIllegalStringLiteralToken("foo", fakePos1, fakePos2),
       expected: {
         type: "illegal string",
         value: "foo",
-        range: {
-          begin: fakePos,
-          end: fakePos,
-        },
+        range: fakeRange,
       },
     },
     {
       name: "end",
-      token: createEndToken("$end", fakePos, fakePos),
+      token: createEndToken("$end", fakePos1, fakePos2),
       expected: {
         type: "end",
         value: "$end",
-        range: {
-          begin: fakePos,
-          end: fakePos,
-        },
+        range: fakeRange,
       },
     },
   ];
@@ -55,38 +46,29 @@ describe("create token with range", () => {
   const cases: Case[] = [
     {
       name: "illegal",
-      token: createIllegalToken("$end", { begin: fakePos, end: fakePos }),
+      token: createIllegalToken("$end", fakeRange),
       expected: {
         type: "illegal",
         value: "$end",
-        range: {
-          begin: fakePos,
-          end: fakePos,
-        },
+        range: fakeRange,
       },
     },
     {
       name: "illegal string",
-      token: createIllegalStringLiteralToken("foo", { begin: fakePos, end: fakePos }),
+      token: createIllegalStringLiteralToken("foo", fakeRange),
       expected: {
         type: "illegal string",
         value: "foo",
-        range: {
-          begin: fakePos,
-          end: fakePos,
-        },
+        range: fakeRange,
       },
     },
     {
       name: "end",
-      token: createEndToken("$end", { begin: fakePos, end: fakePos }),
+      token: createEndToken("$end", fakeRange),
       expected: {
         type: "end",
         value: "$end",
-        range: {
-          begin: fakePos,
-          end: fakePos,
-        },
+        range: fakeRange,
       },
     },
   ];

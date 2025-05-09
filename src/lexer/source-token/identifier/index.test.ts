@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { fakePos } from "../testing/fixtures";
+import { fakePos1, fakePos2, fakeRange } from "../index.test.fixture";
 import type { IdentifierToken, KeywordToken } from "./";
 import { createIdentifierToken, createKeywordToken } from "./";
 
@@ -10,26 +10,20 @@ describe("create token with begin and end position", () => {
   const cases: Case[] = [
     {
       name: "identifier",
-      token: createIdentifierToken("foo", fakePos, fakePos),
+      token: createIdentifierToken("foo", fakePos1, fakePos2),
       expected: {
         type: "identifier",
         value: "foo",
-        range: {
-          begin: fakePos,
-          end: fakePos,
-        },
+        range: fakeRange,
       },
     },
     {
       name: "keyword",
-      token: createKeywordToken("만약", fakePos, fakePos),
+      token: createKeywordToken("만약", fakePos1, fakePos2),
       expected: {
         type: "keyword",
         value: "만약",
-        range: {
-          begin: fakePos,
-          end: fakePos,
-        },
+        range: fakeRange,
       },
     },
   ];
@@ -43,26 +37,20 @@ describe("create token with range", () => {
   const cases: Case[] = [
     {
       name: "identifier",
-      token: createIdentifierToken("foo", { begin: fakePos, end: fakePos }),
+      token: createIdentifierToken("foo", fakeRange),
       expected: {
         type: "identifier",
         value: "foo",
-        range: {
-          begin: fakePos,
-          end: fakePos,
-        },
+        range: fakeRange,
       },
     },
     {
       name: "keyword",
-      token: createKeywordToken("만약", { begin: fakePos, end: fakePos }),
+      token: createKeywordToken("만약", fakeRange),
       expected: {
         type: "keyword",
         value: "만약",
-        range: {
-          begin: fakePos,
-          end: fakePos,
-        },
+        range: fakeRange,
       },
     },
   ];

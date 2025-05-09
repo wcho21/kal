@@ -1,4 +1,5 @@
 import { describe, expect, it } from "bun:test";
+import { fakePos1, fakePos2, fakeRange } from "../index.test.fixture";
 import type { BlockDelimiterToken, GroupDelimiterToken, ListDelimiterToken, SeparatorToken } from "./";
 import {
   createBlockDelimiterToken,
@@ -6,7 +7,6 @@ import {
   createListDelimiterToken,
   createSeparatorToken,
 } from "./";
-import { fakePos1, fakePos2, fakeRange } from "./index.test.fixture";
 
 type Token = BlockDelimiterToken | GroupDelimiterToken | ListDelimiterToken | SeparatorToken;
 type Case = { name: string; token: Token; expected: Token };

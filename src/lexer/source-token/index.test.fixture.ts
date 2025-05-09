@@ -1,4 +1,4 @@
-import type { Position, Range } from "../../../util/position";
+import type { Position, Range } from "../../util/position";
 
 // fake positions with random rows and cols
 export const fakePos1: Position = { row: 42, col: 99 };
