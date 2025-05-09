@@ -1,7 +1,7 @@
 import { expect, it } from "bun:test";
+import { fakePos1, fakePos2, fakeRange } from "../../../util/position/index.test.fixture";
 import type { ExpressionNode } from "../expression";
 import type { BlockNode } from "../group";
-import { fakePos } from "../testing/fixtures";
 import { createBranchNode, createExpressionStatementNode, createReturnNode } from "./";
 import type { BranchNode, ExpressionStatementNode, ReturnNode } from "./";
 
@@ -11,45 +11,45 @@ type Case = { name: string; node: Node; expected: Node };
 const cases: Case[] = [
   {
     name: "branch",
-    node: createBranchNode({ predicate: {} as ExpressionNode, consequence: {} as BlockNode }, fakePos, fakePos),
+    node: createBranchNode({ predicate: {} as ExpressionNode, consequence: {} as BlockNode }, fakePos1, fakePos2),
     expected: {
       type: "branch",
       predicate: {} as ExpressionNode,
       consequence: {} as BlockNode,
-      range: { begin: fakePos, end: fakePos },
+      range: fakeRange,
     },
   },
   {
     name: "branch with alternative",
     node: createBranchNode(
       { predicate: {} as ExpressionNode, consequence: {} as BlockNode, alternative: {} as BlockNode },
-      fakePos,
-      fakePos,
+      fakePos1,
+      fakePos2,
     ),
     expected: {
       type: "branch",
       predicate: {} as ExpressionNode,
       consequence: {} as BlockNode,
       alternative: {} as BlockNode,
-      range: { begin: fakePos, end: fakePos },
+      range: fakeRange,
     },
   },
   {
     name: "return",
-    node: createReturnNode({ expression: {} as ExpressionNode }, fakePos, fakePos),
+    node: createReturnNode({ expression: {} as ExpressionNode }, fakePos1, fakePos2),
     expected: {
       type: "return",
       expression: {} as ExpressionNode,
-      range: { begin: fakePos, end: fakePos },
+      range: fakeRange,
     },
   },
   {
     name: "expression statement",
-    node: createExpressionStatementNode({ expression: {} as ExpressionNode }, fakePos, fakePos),
+    node: createExpressionStatementNode({ expression: {} as ExpressionNode }, fakePos1, fakePos2),
     expected: {
       type: "expression statement",
       expression: {} as ExpressionNode,
-      range: { begin: fakePos, end: fakePos },
+      range: fakeRange,
     },
   },
 ];

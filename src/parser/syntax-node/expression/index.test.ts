@@ -1,6 +1,6 @@
 import { expect, it } from "bun:test";
+import { fakePos1, fakePos2, fakeRange } from "../../../util/position/index.test.fixture";
 import type { BlockNode } from "../group";
-import { fakePos } from "../testing/fixtures";
 import {
   createAssignmentNode,
   createCallNode,
@@ -41,98 +41,98 @@ type Case = { name: string; node: Node; expected: Node };
 const cases: Case[] = [
   {
     name: "identifier",
-    node: createIdentifierNode({ value: "foo" }, fakePos, fakePos),
+    node: createIdentifierNode({ value: "foo" }, fakePos1, fakePos2),
     expected: {
       type: "identifier",
       value: "foo",
-      range: { begin: fakePos, end: fakePos },
+      range: fakeRange,
     },
   },
   {
     name: "number",
-    node: createNumberNode({ value: 42 }, fakePos, fakePos),
+    node: createNumberNode({ value: 42 }, fakePos1, fakePos2),
     expected: {
       type: "number",
       value: 42,
-      range: { begin: fakePos, end: fakePos },
+      range: fakeRange,
     },
   },
   {
     name: "string",
-    node: createStringNode({ value: "foo" }, fakePos, fakePos),
+    node: createStringNode({ value: "foo" }, fakePos1, fakePos2),
     expected: {
       type: "string",
       value: "foo",
-      range: { begin: fakePos, end: fakePos },
+      range: fakeRange,
     },
   },
   {
     name: "prefix",
-    node: createPrefixNode({ prefix: "+", right: {} as ExpressionNode }, fakePos, fakePos),
+    node: createPrefixNode({ prefix: "+", right: {} as ExpressionNode }, fakePos1, fakePos2),
     expected: {
       type: "prefix",
       prefix: "+",
       right: {} as ExpressionNode,
-      range: { begin: fakePos, end: fakePos },
+      range: fakeRange,
     },
   },
   {
     name: "infix",
-    node: createInfixNode({ infix: "+", left: {} as ExpressionNode, right: {} as ExpressionNode }, fakePos, fakePos),
+    node: createInfixNode({ infix: "+", left: {} as ExpressionNode, right: {} as ExpressionNode }, fakePos1, fakePos2),
     expected: {
       type: "infix",
       infix: "+",
       left: {} as ExpressionNode,
       right: {} as ExpressionNode,
-      range: { begin: fakePos, end: fakePos },
+      range: fakeRange,
     },
   },
   {
     name: "function",
-    node: createFunctionNode({ parameters: [] as IdentifierNode[], body: {} as BlockNode }, fakePos, fakePos),
+    node: createFunctionNode({ parameters: [] as IdentifierNode[], body: {} as BlockNode }, fakePos1, fakePos2),
     expected: {
       type: "function",
       parameters: [],
       body: {} as FunctionNode["body"],
-      range: { begin: fakePos, end: fakePos },
+      range: fakeRange,
     },
   },
   {
     name: "call",
-    node: createCallNode({ func: {} as IdentifierNode, args: [] as ExpressionNode[] }, fakePos, fakePos),
+    node: createCallNode({ func: {} as IdentifierNode, args: [] as ExpressionNode[] }, fakePos1, fakePos2),
     expected: {
       type: "call",
       func: {} as CallNode["func"],
       args: [] as CallNode["args"],
-      range: { begin: fakePos, end: fakePos },
+      range: fakeRange,
     },
   },
   {
     name: "assignment",
-    node: createAssignmentNode({ left: {} as IdentifierNode, right: {} as ExpressionNode }, fakePos, fakePos),
+    node: createAssignmentNode({ left: {} as IdentifierNode, right: {} as ExpressionNode }, fakePos1, fakePos2),
     expected: {
       type: "assignment",
       left: {} as IdentifierNode,
       right: {} as ExpressionNode,
-      range: { begin: fakePos, end: fakePos },
+      range: fakeRange,
     },
   },
   {
     name: "list (empty)",
-    node: createListNode({ elements: [] }, fakePos, fakePos),
+    node: createListNode({ elements: [] }, fakePos1, fakePos2),
     expected: {
       type: "list",
       elements: [],
-      range: { begin: fakePos, end: fakePos },
+      range: fakeRange,
     },
   },
   {
     name: "list (non-empty)",
-    node: createListNode({ elements: [{} as ExpressionNode, {} as ExpressionNode] }, fakePos, fakePos),
+    node: createListNode({ elements: [{} as ExpressionNode, {} as ExpressionNode] }, fakePos1, fakePos2),
     expected: {
       type: "list",
       elements: [{} as ExpressionNode, {} as ExpressionNode],
-      range: { begin: fakePos, end: fakePos },
+      range: fakeRange,
     },
   },
 ];

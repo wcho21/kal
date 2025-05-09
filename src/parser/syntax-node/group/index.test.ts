@@ -1,5 +1,5 @@
 import { expect, it } from "bun:test";
-import { fakePos } from "../testing/fixtures";
+import { fakePos1, fakePos2, fakeRange } from "../../../util/position/index.test.fixture";
 import { createBlockNode, createProgramNode } from "./";
 import type { BlockNode, ProgramNode } from "./";
 
@@ -9,20 +9,20 @@ type Case = { name: string; node: Node; expected: Node };
 const cases: Case[] = [
   {
     name: "program",
-    node: createProgramNode({ statements: [] }, fakePos, fakePos),
+    node: createProgramNode({ statements: [] }, fakePos1, fakePos2),
     expected: {
       type: "program",
       statements: [],
-      range: { begin: fakePos, end: fakePos },
+      range: fakeRange,
     },
   },
   {
     name: "block",
-    node: createBlockNode({ statements: [] }, fakePos, fakePos),
+    node: createBlockNode({ statements: [] }, fakePos1, fakePos2),
     expected: {
       type: "block",
       statements: [],
-      range: { begin: fakePos, end: fakePos },
+      range: fakeRange,
     },
   },
 ];
