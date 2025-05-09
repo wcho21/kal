@@ -76,6 +76,15 @@ describe("create token with begin and end position", () => {
         range: fakeRange,
       },
     },
+    {
+      name: "separator ':'",
+      token: createSeparatorToken(":", fakePos1, fakePos2),
+      expected: {
+        type: "separator",
+        value: ":",
+        range: fakeRange,
+      },
+    },
   ];
 
   it.each(cases)("create $name token", ({ token, expected }) => {
@@ -140,11 +149,20 @@ describe("create token with range", () => {
       },
     },
     {
-      name: "separator",
+      name: "separator ','",
       token: createSeparatorToken(",", fakeRange),
       expected: {
         type: "separator",
         value: ",",
+        range: fakeRange,
+      },
+    },
+    {
+      name: "separator ':'",
+      token: createSeparatorToken(":", fakeRange),
+      expected: {
+        type: "separator",
+        value: ":",
         range: fakeRange,
       },
     },
