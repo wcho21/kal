@@ -444,7 +444,6 @@ export default class Parser {
 
     while (true) {
       const key = this.parseExpression(bindingPowers.lowest);
-      console.log(this.reader.read());
       this.advanceOrThrow("separator", ":", BadTableSeparatorError);
       const value = this.parseExpression(bindingPowers.lowest);
 
