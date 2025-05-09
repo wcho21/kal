@@ -78,7 +78,8 @@ export default class Lexer {
         return token;
       }
 
-      case ",": {
+      case ",":
+      case ":": {
         const { position } = this.charBuffer.popChar();
         const value = char.value;
 
