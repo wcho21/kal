@@ -2,7 +2,7 @@ import { type BindingPowerEntry, bindingPowers, getInfixBindingPower } from "./b
 import type * as Node from "./syntax-node";
 import * as node from "./syntax-node";
 
-import { type Range, copyRange } from "../util/position";
+import { type Range, type Position, copyRange } from "../util/position";
 
 export class ParserError extends Error {
   public received: string;
@@ -178,7 +178,7 @@ export default class Parser {
       return this.parseGroupedExpression();
     }
     if (type === "list delimiter" && value === "[") {
-      return this.parseListExpression();
+      return this.parseListOrTableExpression();
     }
 
     throw new BadExpressionError(type, "expression", range);
@@ -385,9 +385,19 @@ export default class Parser {
     return { ...expression, range };
   }
 
-  private parseListExpression(): Node.ListNode {
+  private parseListOrTableExpression(): Node.ListNode | Node.TableNode {
     const { begin } = this.reader.read().range;
     this.advanceOrThrow("list delimiter", "[", BadListDelimiterError);
+
+    const notOrOther = this.reader.read();
+    if (notOrOther.type === "operator" && notOrOther.value === "!") {
+      throw new Error("todo");
+    }
+
+    return this.parseListExpression(begin);
+  }
+
+  private parseListExpression(begin: Position): Node.ListNode {
 
     const elements: Node.ExpressionNode[] = [];
 
