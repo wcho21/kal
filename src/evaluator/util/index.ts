@@ -5,7 +5,7 @@ export function getListRepresentation(elements: ListableValue[]): string {
 }
 
 export function getTableRepresentation(elements: Map<KeyableValue, ListableValue>): string {
-  return `[${Array.from(elements)
+  return `[!${Array.from(elements)
     .map(([k, v]) => `${k.representation}: ${v.representation}`)
     .join(", ")}]`;
 }
