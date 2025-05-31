@@ -2,6 +2,9 @@
 
 <img src="./docs/images/kal-logo.png" alt="Kal logo" width="192px" height="192px" />
 
+> [!NOTE]
+> Note: This project is superseded by [Komi](https://github.com/wcho21/komi).
+
 ***Kal***: _Korean Algorithmic Language_.
 
 - < 0.03 MB.
@@ -10,9 +13,7 @@
 - Minimal syntax with Korean keywords.
 - No dependencies (made from scratch).
 
-Try ***Kal*** at [Playground][playground].
-
-[playground]: https://kal-playground.rooi.dev/
+~~Try ***Kal*** at Playground.~~
 
 You can load a ***Kal*** interpreter in browsers, and build manually (see below).
 
